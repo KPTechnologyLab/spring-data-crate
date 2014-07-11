@@ -1,12 +1,16 @@
-*.class
+## ignore any target dir
+target
 
-# Mobile Tools for Java (J2ME)
-.mtj.tmp/
+##ignore only top level data dir - local node data files for unit tests
+/data
 
-# Package Files #
-*.jar
-*.war
-*.ear
+## Ignore project files created by Eclipse
+.settings
+.project
+.classpath
 
-# virtual machine crash logs, see http://www.java.com/en/download/help/error_hotspot.xml
-hs_err_pid*
+## Ignore project files created by IntelliJ IDEA
+*.iml
+*.ipr
+*.iws
+.idea

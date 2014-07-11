@@ -1,0 +1,198 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+	<modelVersion>4.0.0</modelVersion>
+
+	<groupId>org.springframework.data</groupId>
+	<artifactId>spring-data-crate</artifactId>
+	<version>1.0.0.BUILD-SNAPSHOT</version>
+
+	<!--parent>
+		<groupId>org.springframework.data.build</groupId>
+		<artifactId>spring-data-parent</artifactId>
+		<version>1.5.0.BUILD-SNAPSHOT</version>
+		<relativePath>../spring-data-build/parent/pom.xml</relativePath>
+	</parent-->
+
+	<name>Spring Data Crate</name>
+	<description>Spring Data Implementation for Crate</description>
+	<url>https://github.com/spring-projects/spring-data-elasticsearch</url>
+
+	<properties>
+
+		<dist.key>DATACRATE</dist.key>
+		
+		<!-- spring, jackson, jodatime, cdi & webbeans to be removed when we start using spring data build -->
+		<spring>4.0.6.RELEASE</spring>
+		<jackson>2.4.1</jackson>
+		<jodatime>2.3</jodatime>
+		<cdi>1.0</cdi>
+		<webbeans>1.2.4</webbeans>
+		<commonscollections>3.2.1</commonscollections>
+		<commonslang>2.6</commonslang>
+		<crate>0.39.3</crate>
+		<springdata.commons>1.9.0.BUILD-SNAPSHOT</springdata.commons>
+
+	</properties>
+
+	<dependencies>
+
+		<!-- Spring -->
+		<dependency>
+			<groupId>org.springframework</groupId>
+			<artifactId>spring-context</artifactId>
+			<version>${spring}</version>
+			<exclusions>
+				<exclusion>
+					<groupId>commons-logging</groupId>
+					<artifactId>commons-logging</artifactId>
+				</exclusion>
+			</exclusions>
+		</dependency>
+
+		<dependency>
+			<groupId>org.springframework</groupId>
+			<artifactId>spring-tx</artifactId>
+			<version>${spring}</version>
+		</dependency>
+
+		<!-- SPRING DATA -->
+		<dependency>
+			<groupId>org.springframework.data</groupId>
+			<artifactId>spring-data-commons</artifactId>
+			<version>${springdata.commons}</version>
+		</dependency>
+
+		<!-- APACHE -->
+		<dependency>
+			<groupId>commons-lang</groupId>
+			<artifactId>commons-lang</artifactId>
+			<version>${commonslang}</version>
+		</dependency>
+		<dependency>
+			<groupId>commons-collections</groupId>
+			<artifactId>commons-collections</artifactId>
+			<version>${commonscollections}</version>
+		</dependency>
+
+		<!-- JODA Time -->
+		<dependency>
+			<groupId>joda-time</groupId>
+			<artifactId>joda-time</artifactId>
+			<version>${jodatime}</version>
+		</dependency>
+
+		<!-- Crate Client -->
+		<dependency>
+			<groupId>io.crate</groupId>
+			<artifactId>crate-client</artifactId>
+			<version>${crate}</version>
+		</dependency>
+
+		<!-- Jackson JSON Mapper -->
+		<dependency>
+			<groupId>com.fasterxml.jackson.core</groupId>
+			<artifactId>jackson-core</artifactId>
+			<version>${jackson}</version>
+		</dependency>
+		<dependency>
+			<groupId>com.fasterxml.jackson.core</groupId>
+			<artifactId>jackson-databind</artifactId>
+			<version>${jackson}</version>
+		</dependency>
+
+		<!-- CDI -->
+		<dependency>
+			<groupId>javax.enterprise</groupId>
+			<artifactId>cdi-api</artifactId>
+			<version>${cdi}</version>
+			<scope>provided</scope>
+			<optional>true</optional>
+		</dependency>
+
+		<!-- Test -->
+		<dependency>
+			<groupId>org.springframework</groupId>
+			<artifactId>spring-test</artifactId>
+			<version>${spring}</version>
+			<scope>test</scope>
+		</dependency>
+		<dependency>
+			<groupId>org.apache.openwebbeans.test</groupId>
+			<artifactId>cditest-owb</artifactId>
+			<version>${webbeans}</version>
+			<scope>test</scope>
+		</dependency>
+		<dependency>
+			<groupId>javax.servlet</groupId>
+			<artifactId>servlet-api</artifactId>
+			<version>3.0-alpha-1</version>
+			<scope>test</scope>
+		</dependency>
+
+	</dependencies>
+
+	<build>
+		<plugins>
+			<plugin>
+				<groupId>org.apache.maven.plugins</groupId>
+				<artifactId>maven-assembly-plugin</artifactId>
+			</plugin>
+			<plugin>
+				<groupId>org.codehaus.mojo</groupId>
+				<artifactId>wagon-maven-plugin</artifactId>
+			</plugin>
+		</plugins>
+	</build>
+
+	<developers>
+		<developer>
+			<id>hasnain</id>
+			<name>Hasnain Javed (KP Technology Lab)</name>
+			<timezone>+4</timezone>
+		</developer>
+		<developer>
+			<id>rizwan</id>
+			<name>Rizwan Idrees (Springer)</name>
+			<timezone>+0</timezone>
+		</developer>
+	</developers>
+
+	<repositories>
+		<repository>
+			<id>spring-libs-snapshot</id>
+			<url>http://repo.spring.io/libs-snapshot</url>
+		</repository>
+		<repository>
+        <snapshots>
+            <enabled>false</enabled>
+        </snapshots>
+        <id>central</id>
+        <name>bintray</name>
+        <url>http://dl.bintray.com/crate/crate</url>
+    </repository>
+	</repositories>
+
+	<!--pluginRepositories>
+		<pluginRepository>
+			<id>spring-plugins-release</id>
+			<url>http://repo.spring.io/plugins-release</url>
+		</pluginRepository>
+	</pluginRepositories-->
+
+	<scm>
+		<url>https://github.com/KPTechnologyLab/spring-data-crate</url>
+		<connection>scm:git:git://github.com/KPTechnologyLab/spring-data-crate.git</connection>
+		<developerConnection>scm:git:ssh://git@github.com/KPTechnologyLab/spring-data-crate.git</developerConnection>
+	</scm>
+
+	<!--ciManagement>
+		<system>Bamboo</system>
+		<url>http://build.springsource.org/browse/SPRINGCRATE</url>
+	</ciManagement-->
+
+	<!--issueManagement>
+		<system>JIRA</system>
+		<url>https://jira.springsource.org/browse/DATACRATE</url>
+	</issueManagement-->
+
+</project>
