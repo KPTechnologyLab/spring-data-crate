@@ -1,2 +1,2 @@
-spring-data-crate
-=================
+Spring Data Crate
+==================
