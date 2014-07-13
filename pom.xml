@@ -30,7 +30,8 @@
 		<commonslang>2.6</commonslang>
 		<crate>0.39.3</crate>
 		<springdata.commons>1.9.0.BUILD-SNAPSHOT</springdata.commons>
-
+		<mockito>1.9.5</mockito>
+		<junit>4.11</junit>
 	</properties>
 
 	<dependencies>
@@ -79,7 +80,7 @@
 			<artifactId>commons-collections</artifactId>
 			<version>${commonscollections}</version>
 		</dependency>
-		
+
 		<!-- JODA Time -->
 		<dependency>
 			<groupId>joda-time</groupId>
@@ -122,6 +123,21 @@
 			<version>${spring}</version>
 			<scope>test</scope>
 		</dependency>
+
+		<dependency>
+			<groupId>org.mockito</groupId>
+			<artifactId>mockito-all</artifactId>
+			<version>${mockito}</version>
+			<scope>test</scope>
+		</dependency>
+
+		<dependency>
+			<groupId>junit</groupId>
+			<artifactId>junit</artifactId>
+			<version>${junit}</version>
+			<scope>test</scope>
+		</dependency>
+
 		<dependency>
 			<groupId>org.apache.openwebbeans.test</groupId>
 			<artifactId>cditest-owb</artifactId>
