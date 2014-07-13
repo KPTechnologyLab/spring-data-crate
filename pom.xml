@@ -28,7 +28,6 @@
 		<webbeans>1.2.4</webbeans>
 		<commonscollections>3.2.1</commonscollections>
 		<commonslang>2.6</commonslang>
-		<commonsdbcp>1.4</commonsdbcp>
 		<crate>0.39.3</crate>
 		<springdata.commons>1.9.0.BUILD-SNAPSHOT</springdata.commons>
 
@@ -80,13 +79,7 @@
 			<artifactId>commons-collections</artifactId>
 			<version>${commonscollections}</version>
 		</dependency>
-
-		<dependency>
-			<groupId>commons-dbcp</groupId>
-			<artifactId>commons-dbcp</artifactId>
-			<version>${commonsdbcp}</version>
-		</dependency>
-
+		
 		<!-- JODA Time -->
 		<dependency>
 			<groupId>joda-time</groupId>
