@@ -1,27 +1,26 @@
 <?xml version="1.0" encoding="UTF-8" standalone="no"?>
-<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
 	<modelVersion>4.0.0</modelVersion>
 
 	<groupId>org.springframework.data</groupId>
 	<artifactId>spring-data-crate</artifactId>
 	<version>1.0.0.BUILD-SNAPSHOT</version>
 
-	<!--parent>
-		<groupId>org.springframework.data.build</groupId>
-		<artifactId>spring-data-parent</artifactId>
-		<version>1.5.0.BUILD-SNAPSHOT</version>
-		<relativePath>../spring-data-build/parent/pom.xml</relativePath>
-	</parent-->
+	<!--parent> <groupId>org.springframework.data.build</groupId> <artifactId>spring-data-parent</artifactId> 
+		<version>1.5.0.BUILD-SNAPSHOT</version> <relativePath>../spring-data-build/parent/pom.xml</relativePath> 
+		</parent -->
 
 	<name>Spring Data Crate</name>
-	<description>Spring Data Implementation for Crate</description>
+	<description>Spring Data Implementation for Crate Data (Big Data SQL in real time)</description>
 	<url>https://github.com/spring-projects/spring-data-elasticsearch</url>
 
 	<properties>
 
 		<dist.key>DATACRATE</dist.key>
-		
-		<!-- spring, jackson, jodatime, cdi & webbeans to be removed when we start using spring data build -->
+
+		<!-- spring, jackson, jodatime, cdi & webbeans to be removed when we start 
+			using spring data build -->
 		<spring>4.0.6.RELEASE</spring>
 		<jackson>2.4.1</jackson>
 		<jodatime>2.3</jodatime>
@@ -29,6 +28,7 @@
 		<webbeans>1.2.4</webbeans>
 		<commonscollections>3.2.1</commonscollections>
 		<commonslang>2.6</commonslang>
+		<commonsdbcp>1.4</commonsdbcp>
 		<crate>0.39.3</crate>
 		<springdata.commons>1.9.0.BUILD-SNAPSHOT</springdata.commons>
 
@@ -47,6 +47,13 @@
 					<artifactId>commons-logging</artifactId>
 				</exclusion>
 			</exclusions>
+		</dependency>
+
+		<!-- Spring JDBC -->
+		<dependency>
+			<groupId>org.springframework</groupId>
+			<artifactId>spring-jdbc</artifactId>
+			<version>${spring}</version>
 		</dependency>
 
 		<dependency>
@@ -72,6 +79,12 @@
 			<groupId>commons-collections</groupId>
 			<artifactId>commons-collections</artifactId>
 			<version>${commonscollections}</version>
+		</dependency>
+
+		<dependency>
+			<groupId>commons-dbcp</groupId>
+			<artifactId>commons-dbcp</artifactId>
+			<version>${commonsdbcp}</version>
 		</dependency>
 
 		<!-- JODA Time -->
@@ -163,21 +176,17 @@
 			<url>http://repo.spring.io/libs-snapshot</url>
 		</repository>
 		<repository>
-        <snapshots>
-            <enabled>false</enabled>
-        </snapshots>
-        <id>central</id>
-        <name>bintray</name>
-        <url>http://dl.bintray.com/crate/crate</url>
-    </repository>
+			<snapshots>
+				<enabled>false</enabled>
+			</snapshots>
+			<id>central</id>
+			<name>bintray</name>
+			<url>http://dl.bintray.com/crate/crate</url>
+		</repository>
 	</repositories>
 
-	<!--pluginRepositories>
-		<pluginRepository>
-			<id>spring-plugins-release</id>
-			<url>http://repo.spring.io/plugins-release</url>
-		</pluginRepository>
-	</pluginRepositories-->
+	<!--pluginRepositories> <pluginRepository> <id>spring-plugins-release</id> 
+		<url>http://repo.spring.io/plugins-release</url> </pluginRepository> </pluginRepositories -->
 
 	<scm>
 		<url>https://github.com/KPTechnologyLab/spring-data-crate</url>
@@ -185,14 +194,10 @@
 		<developerConnection>scm:git:ssh://git@github.com/KPTechnologyLab/spring-data-crate.git</developerConnection>
 	</scm>
 
-	<!--ciManagement>
-		<system>Bamboo</system>
-		<url>http://build.springsource.org/browse/SPRINGCRATE</url>
-	</ciManagement-->
+	<!--ciManagement> <system>Bamboo</system> <url>http://build.springsource.org/browse/SPRINGCRATE</url> 
+		</ciManagement -->
 
-	<!--issueManagement>
-		<system>JIRA</system>
-		<url>https://jira.springsource.org/browse/DATACRATE</url>
-	</issueManagement-->
+	<!--issueManagement> <system>JIRA</system> <url>https://jira.springsource.org/browse/DATACRATE</url> 
+		</issueManagement -->
 
 </project>
