@@ -14,42 +14,42 @@
  * limitations under the License.
  */
 
-package org.springframework.data.crate.core;
+package org.springframework.data.crate.client;
 
-import static org.springframework.util.Assert.notNull;
-
-import javax.sql.DataSource;
-
+import io.crate.client.CrateClient;
 import org.springframework.beans.factory.FactoryBean;
 import org.springframework.beans.factory.InitializingBean;
+import org.springframework.util.Assert;
 
 /**
- * 
+ * CrateDataSourceFactoryBean
+ *
  * @author Hasnain Javed
- * @since 1.0.0
+ * @author Rizwan Idrees
  */
-public class CrateDataSourceFactorytBean implements FactoryBean<DataSource>, InitializingBean {
-	
-	private DataSource dataSource;
-	
-	public CrateDataSourceFactorytBean(DataSource dataSource) {
-		super();
-		this.dataSource = dataSource;
+public class CrateClientFactoryBean implements FactoryBean<CrateClient>, InitializingBean {
+
+    private CrateClient client;
+	private String servers ="localhost:4300";
+
+    @Override
+	public CrateClient getObject() throws Exception {
+		return client;
 	}
 
-	public DataSource getObject() throws Exception {
-		return dataSource;
+    @Override
+	public Class<CrateClient> getObjectType() {
+		return CrateClient.class;
 	}
 
-	public Class<?> getObjectType() {
-		return DataSource.class;
-	}
-
+    @Override
 	public boolean isSingleton() {
 		return true;
 	}
 
-	public void afterPropertiesSet() throws Exception {
-		notNull(dataSource, "A data source implementation is required");
+    @Override
+	public void afterPropertiesSet()  {
+        Assert.hasText(servers, "[Assertion failed] servers settings missing.");
+        client = new CrateClient(servers);
 	}
 }

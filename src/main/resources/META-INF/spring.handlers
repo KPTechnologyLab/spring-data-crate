@@ -1,0 +1,1 @@
+http\://www.springframework.org/schema/data/crate=org.springframework.data.crate.config.CrateNamespaceHandler

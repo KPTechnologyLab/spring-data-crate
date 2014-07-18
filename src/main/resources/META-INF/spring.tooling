@@ -1,0 +1,4 @@
+# Tooling related information for the Crate namespace
+http\://www.springframework.org/schema/data/crate@name=Crate Namespace
+http\://www.springframework.org/schema/data/crate@prefix=crate
+http\://www.springframework.org/schema/data/crate@icon=org/springframework/jdbc/config/spring-jdbc.gif

@@ -1,0 +1,2 @@
+http\://www.springframework.org/schema/data/crate/crate-1.0.xsd=org/springframework/data/crate/config/spring-crate-1.0.xsd
+http\://www.springframework.org/schema/data/crate/crate.xsd=org/springframework/data/crate/config/spring-crate-1.0.xsd

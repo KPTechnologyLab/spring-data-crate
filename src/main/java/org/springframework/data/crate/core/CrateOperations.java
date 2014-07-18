@@ -16,11 +16,17 @@
 
 package org.springframework.data.crate.core;
 
+import org.springframework.data.crate.core.convert.CrateConverter;
+
 /**
  * 
  * @author Hasnain Javed
+ * @author Rizwan Idrees
+ *
  * @since 1.0.0
  */
 public interface CrateOperations {
+
+    CrateConverter getConverter();
 
 }

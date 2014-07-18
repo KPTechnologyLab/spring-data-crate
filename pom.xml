@@ -7,13 +7,16 @@
 	<artifactId>spring-data-crate</artifactId>
 	<version>1.0.0.BUILD-SNAPSHOT</version>
 
-	<!--parent> <groupId>org.springframework.data.build</groupId> <artifactId>spring-data-parent</artifactId> 
-		<version>1.5.0.BUILD-SNAPSHOT</version> <relativePath>../spring-data-build/parent/pom.xml</relativePath> 
-		</parent -->
+	<parent>
+        <groupId>org.springframework.data.build</groupId>
+        <artifactId>spring-data-parent</artifactId>
+		<version>1.5.0.BUILD-SNAPSHOT</version>
+        <relativePath>../spring-data-build/parent/pom.xml</relativePath>
+	</parent>
 
 	<name>Spring Data Crate</name>
 	<description>Spring Data Implementation for Crate Data (Big Data SQL in real time)</description>
-	<url>https://github.com/spring-projects/spring-data-elasticsearch</url>
+	<url>https://github.com/KPTechnologyLab/spring-data-crate</url>
 
 	<properties>
 

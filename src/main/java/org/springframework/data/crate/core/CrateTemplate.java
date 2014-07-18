@@ -20,23 +20,30 @@ import static org.slf4j.LoggerFactory.getLogger;
 
 import javax.sql.DataSource;
 
+import io.crate.client.CrateClient;
 import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.data.crate.core.convert.CrateConverter;
 import org.springframework.jdbc.core.namedparam.NamedParameterJdbcOperations;
 import org.springframework.jdbc.core.namedparam.NamedParameterJdbcTemplate;
 
 /**
- * 
  * @author Hasnain Javed
+ * @author Rizwan Idrees
+ *
  * @since 1.0.0
  */
-public class CreateTemplate implements CrateOperations {
+public class CrateTemplate implements CrateOperations {
+
+    private static final Logger logger = LoggerFactory.getLogger(CrateTemplate.class);
+	private final CrateClient crateClient;
 	
-	private final Logger logger;
-	private final NamedParameterJdbcOperations jdbcTemplate;
-	
-	public CreateTemplate(DataSource dataSource) {
-		super();
-		logger = getLogger(getClass());
-		jdbcTemplate = new NamedParameterJdbcTemplate(dataSource);
+	public CrateTemplate(CrateClient crateClient) {
+        this.crateClient = crateClient;
 	}
+
+    @Override
+    public CrateConverter getConverter() {
+        return null;
+    }
 }
