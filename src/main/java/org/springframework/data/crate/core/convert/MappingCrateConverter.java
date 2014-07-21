@@ -21,8 +21,8 @@ import org.springframework.context.ApplicationContextAware;
 import org.springframework.core.convert.ConversionService;
 import org.springframework.core.convert.support.DefaultConversionService;
 import org.springframework.core.convert.support.GenericConversionService;
-import org.springframework.data.crate.repository.support.CratePersistentEntity;
-import org.springframework.data.crate.repository.support.CratePersistentProperty;
+import org.springframework.data.crate.core.mapping.CratePersistentEntity;
+import org.springframework.data.crate.core.mapping.CratePersistentProperty;
 import org.springframework.data.mapping.context.MappingContext;
 import org.springframework.util.Assert;
 
@@ -42,7 +42,7 @@ public class MappingCrateConverter implements CrateConverter, ApplicationContext
 
 	public MappingCrateConverter(
             MappingContext<? extends CratePersistentEntity<?>, CratePersistentProperty> mappingContext) {
-		Assert.notNull(mappingContext);
+		Assert.notNull(mappingContext, "Mapping context is required.");
 		this.mappingContext = mappingContext;
 		this.conversionService = new DefaultConversionService();
 	}

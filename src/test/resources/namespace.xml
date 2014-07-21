@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<beans xmlns="http://www.springframework.org/schema/beans"
-       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+<beans xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
        xmlns:crate="http://www.springframework.org/schema/data/crate"
+       xmlns="http://www.springframework.org/schema/beans"
        xsi:schemaLocation="
 	   http://www.springframework.org/schema/beans
 	   http://www.springframework.org/schema/beans/spring-beans.xsd
@@ -15,5 +15,7 @@
     </bean>
 
     <crate:client id="client" servers="127.0.0.1:4300"/>
+
+    <crate:repositories base-package="org.springframework.data.sample.repositories"/>
 
 </beans>

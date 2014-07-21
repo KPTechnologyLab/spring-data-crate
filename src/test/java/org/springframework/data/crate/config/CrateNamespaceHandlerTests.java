@@ -21,6 +21,7 @@ import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.ApplicationContext;
 import org.springframework.data.crate.client.CrateClientFactoryBean;
+import org.springframework.data.sample.repositories.SampleCrateRepository;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 
@@ -44,5 +45,12 @@ public class CrateNamespaceHandlerTests {
     public void shouldCreateClient() {
         assertThat(context.getBean(CrateClientFactoryBean.class), is(notNullValue()));
         assertThat(context.getBean(CrateClientFactoryBean.class), is(instanceOf(CrateClientFactoryBean.class)));
+    }
+
+    @Test
+    public void shouldCreateRepository() {
+        assertThat(context.getBean(CrateClientFactoryBean.class), is(notNullValue()));
+        assertThat(context.getBean(SampleCrateRepository.class),
+                is(instanceOf(SampleCrateRepository.class)));
     }
 }

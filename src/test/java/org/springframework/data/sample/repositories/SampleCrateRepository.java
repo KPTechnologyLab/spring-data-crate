@@ -13,27 +13,16 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.springframework.data.crate.repository.support;
 
-import org.springframework.core.convert.converter.Converter;
-import org.springframework.data.mapping.PersistentProperty;
+package org.springframework.data.sample.repositories;
+
+import org.springframework.data.crate.repository.CrateRepository;
+import org.springframework.data.sample.entities.SampleEntity;
 
 /**
- * CratePersistentProperty
+ *  SampleCrateRepository for testing
  *
- * @author Rizwan Idrees
+ *  @author Rizwan Idrees
  */
-
-public interface CratePersistentProperty extends PersistentProperty<CratePersistentProperty> {
-
-	String getFieldName();
-
-	public enum PropertyToFieldNameConverter implements Converter<CratePersistentProperty, String> {
-
-		INSTANCE;
-
-		public String convert(CratePersistentProperty source) {
-			return source.getFieldName();
-		}
-	}
+public interface SampleCrateRepository extends CrateRepository<SampleEntity,Integer> {
 }

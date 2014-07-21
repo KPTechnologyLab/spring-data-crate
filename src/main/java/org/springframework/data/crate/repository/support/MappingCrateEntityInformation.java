@@ -17,6 +17,8 @@ package org.springframework.data.crate.repository.support;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.data.crate.core.mapping.CratePersistentEntity;
+import org.springframework.data.crate.core.mapping.CratePersistentProperty;
 import org.springframework.data.mapping.model.BeanWrapper;
 import org.springframework.data.repository.core.support.AbstractEntityInformation;
 import org.springframework.util.Assert;

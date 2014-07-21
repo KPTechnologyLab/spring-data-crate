@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.springframework.data.crate.repository.support;
+package org.springframework.data.crate.core.mapping;
 
 import org.springframework.data.mapping.PersistentEntity;
 

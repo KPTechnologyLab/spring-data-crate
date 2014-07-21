@@ -16,8 +16,8 @@
 package org.springframework.data.crate.core.convert;
 
 import org.springframework.core.convert.ConversionService;
-import org.springframework.data.crate.repository.support.CratePersistentEntity;
-import org.springframework.data.crate.repository.support.CratePersistentProperty;
+import org.springframework.data.crate.core.mapping.CratePersistentEntity;
+import org.springframework.data.crate.core.mapping.CratePersistentProperty;
 import org.springframework.data.mapping.context.MappingContext;
 
 /**

@@ -46,6 +46,10 @@ public class CrateRepositoryFactory extends RepositoryFactorySupport {
 		this.entityInformationCreator = new CrateEntityInformationCreatorImpl(crateOperations.getConverter().getMappingContext());
 	}
 
+	private static boolean isQueryDslRepository(Class<?> repositoryInterface) {
+		return QUERY_DSL_PRESENT && QueryDslPredicateExecutor.class.isAssignableFrom(repositoryInterface);
+	}
+
 	@Override
 	public <T, ID extends Serializable> CrateEntityInformation<T, ID> getEntityInformation(Class<T> domainClass) {
 		return entityInformationCreator.getEntityInformation(domainClass);
@@ -54,9 +58,7 @@ public class CrateRepositoryFactory extends RepositoryFactorySupport {
 	@Override
 	@SuppressWarnings({"rawtypes", "unchecked"})
 	protected Object getTargetRepository(RepositoryMetadata metadata) {
-
-
-        return null;
+        return new SimpleCrateRepository(crateOperations,getEntityInformation(metadata.getDomainType()), metadata.getDomainType());
 	}
 
 	@Override
@@ -67,19 +69,15 @@ public class CrateRepositoryFactory extends RepositoryFactorySupport {
 		return SimpleCrateRepository.class;
 	}
 
-	private static boolean isQueryDslRepository(Class<?> repositoryInterface) {
-		return QUERY_DSL_PRESENT && QueryDslPredicateExecutor.class.isAssignableFrom(repositoryInterface);
-	}
-
     @Override
     protected QueryLookupStrategy getQueryLookupStrategy(QueryLookupStrategy.Key key, EvaluationContextProvider evaluationContextProvider) {
         return new CrateQueryLookupStrategy();
     }
 
     private class CrateQueryLookupStrategy implements QueryLookupStrategy {
-
 		@Override
 		public RepositoryQuery resolveQuery(Method method, RepositoryMetadata metadata, NamedQueries namedQueries) {
+            //TODO: implement this method
             return null;
 		}
 	}
