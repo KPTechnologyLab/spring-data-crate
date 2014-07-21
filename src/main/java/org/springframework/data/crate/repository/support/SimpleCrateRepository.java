@@ -29,17 +29,8 @@ public class SimpleCrateRepository<T>  {
 		super();
 	}
 
-//	public SimpleCrateRepository(CrateEntityInformation<T, String> metadata,
-//                                 CrateOperations crateOperations) {
-//		super(metadata, crateOperations);
-//	}
-
 	public SimpleCrateRepository(CrateOperations crateOperations) {
 		//todo:
 	}
 
-	//@Override
-	protected String stringIdRepresentation(String id) {
-		return id;
-	}
 }
