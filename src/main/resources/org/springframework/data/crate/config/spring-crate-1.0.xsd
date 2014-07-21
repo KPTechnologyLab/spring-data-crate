@@ -35,8 +35,6 @@
         <xsd:union memberTypes="xsd:string"/>
     </xsd:simpleType>
 
-
-
     <xsd:element name="client">
         <xsd:annotation>
             <xsd:documentation source="java: org.springframework.data.crate.client.CrateClientFactoryBean"/>

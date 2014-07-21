@@ -16,7 +16,6 @@
 
 package org.springframework.data.crate.config;
 
-import org.junit.Ignore;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -28,7 +27,7 @@ import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 import static org.hamcrest.CoreMatchers.instanceOf;
 import static org.hamcrest.CoreMatchers.notNullValue;
 import static org.hamcrest.core.Is.is;
-import static org.junit.Assert.*;
+import static org.junit.Assert.assertThat;
 
 /**
  * @author Rizwan Idrees
@@ -36,16 +35,14 @@ import static org.junit.Assert.*;
 
 @RunWith(SpringJUnit4ClassRunner.class)
 @ContextConfiguration("classpath:namespace.xml")
-public class CrateNamespaceHandlerTest {
+public class CrateNamespaceHandlerTests {
 
     @Autowired
     private ApplicationContext context;
 
     @Test
-    @Ignore
     public void shouldCreateClient() {
         assertThat(context.getBean(CrateClientFactoryBean.class), is(notNullValue()));
         assertThat(context.getBean(CrateClientFactoryBean.class), is(instanceOf(CrateClientFactoryBean.class)));
     }
-
 }

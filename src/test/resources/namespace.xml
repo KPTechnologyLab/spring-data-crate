@@ -6,7 +6,7 @@
 	   http://www.springframework.org/schema/beans
 	   http://www.springframework.org/schema/beans/spring-beans.xsd
 	   http://www.springframework.org/schema/data/crate
-       http://www.springframework.org/schema/data/crate/spring-crate-1.0.xsd">
+       http://www.springframework.org/schema/data/crate/spring-crate.xsd">
 
 
     <bean name="crateTemplate"
@@ -14,8 +14,6 @@
         <constructor-arg ref="client"/>
     </bean>
 
-    <!--<crate:repositories base-package="org.springframework.data.elasticsearch.repositories.sample"/>-->
     <crate:client id="client" servers="127.0.0.1:4300"/>
-
 
 </beans>

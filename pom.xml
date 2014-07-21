@@ -22,13 +22,6 @@
 
 		<dist.key>DATACRATE</dist.key>
 
-		<!-- spring, jackson, jodatime, cdi & webbeans to be removed when we start 
-			using spring data build -->
-		<spring>4.0.6.RELEASE</spring>
-		<jackson>2.4.1</jackson>
-		<jodatime>2.3</jodatime>
-		<cdi>1.0</cdi>
-		<webbeans>1.2.4</webbeans>
 		<commonscollections>3.2.1</commonscollections>
 		<commonslang>2.6</commonslang>
 		<crate>0.39.3</crate>

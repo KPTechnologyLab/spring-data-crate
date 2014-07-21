@@ -52,4 +52,8 @@ public class CrateClientFactoryBean implements FactoryBean<CrateClient>, Initial
         Assert.hasText(servers, "[Assertion failed] servers settings missing.");
         client = new CrateClient(servers);
 	}
+
+    public void setServers(String servers) {
+        this.servers = servers;
+    }
 }
