@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       xmlns:crate="http://www.springframework.org/schema/data/crate"
+       xmlns="http://www.springframework.org/schema/beans"
+       xsi:schemaLocation="
+	   http://www.springframework.org/schema/beans
+	   http://www.springframework.org/schema/beans/spring-beans.xsd
+	   http://www.springframework.org/schema/data/crate
+       http://www.springframework.org/schema/data/crate/spring-crate.xsd">
+
+
+    <bean name="crateTemplate"
+          class="org.springframework.data.crate.core.CrateTemplate">
+        <constructor-arg ref="client"/>
+    </bean>
+
+    <crate:client id="client" servers="127.0.0.1:4300"/>
+
+
+</beans>

@@ -21,7 +21,9 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.data.crate.core.convert.CrateConverter;
 import org.springframework.data.crate.core.convert.MappingCrateConverter;
+import org.springframework.data.crate.core.mapping.CratePersistentEntity;
 import org.springframework.data.crate.core.mapping.SimpleCoreMappingContext;
+import org.springframework.util.Assert;
 
 /**
  * @author Hasnain Javed
@@ -48,5 +50,26 @@ public class CrateTemplate implements CrateOperations {
     @Override
     public CrateConverter getConverter() {
         return this.crateConverter;
+    }
+
+    @Override
+    public <T> boolean createTable(Class<T> clazz) {
+        CratePersistentEntity persistentEntity = getPersistentEntityFor(clazz);
+
+        return false;
+    }
+
+    @Override
+    public <T> boolean dropTable(Class<T> clazz) {
+        return false;
+    }
+
+    @Override
+    public <T> boolean dropTable(String name) {
+        return false;
+    }
+
+    private CratePersistentEntity getPersistentEntityFor(Class clazz) {
+        return crateConverter.getMappingContext().getPersistentEntity(clazz);
     }
 }
