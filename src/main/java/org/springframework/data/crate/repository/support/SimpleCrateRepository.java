@@ -40,8 +40,7 @@ public class SimpleCrateRepository<T, ID extends Serializable> implements CrateR
 
     public SimpleCrateRepository(CrateOperations crateOperations,
                                  CrateEntityInformation<T, ID> entityInformation,
-                                 Class<T> entityClass
-    ) {
+                                 Class<T> entityClass){
         Assert.notNull(crateOperations, "CrateOperations must be configured!");
         Assert.notNull(entityInformation, "entityInformation is missing");
         Assert.notNull(entityClass, "entityClass is missing");
