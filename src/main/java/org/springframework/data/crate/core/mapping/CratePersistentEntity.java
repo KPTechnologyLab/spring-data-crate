@@ -21,9 +21,10 @@ import org.springframework.data.mapping.PersistentEntity;
  * CratePersistentEntity
  *
  * @author Rizwan Idrees
+ * @author Hasnain Javed
  */
 
 public interface CratePersistentEntity<T> extends PersistentEntity<T, CratePersistentProperty> {
-
-
+	
+	String getTableName();
 }
