@@ -16,18 +16,16 @@
 
 package org.springframework.data.crate.core.mapping;
 
+import static java.util.Collections.singleton;
 import static org.hamcrest.Matchers.equalTo;
 import static org.hamcrest.Matchers.is;
 import static org.hamcrest.Matchers.notNullValue;
 import static org.junit.Assert.assertThat;
-import static org.mockito.Mockito.when;
 
 import org.junit.Test;
-import org.mockito.Mockito;
 import org.springframework.data.crate.core.mapping.annotations.Table;
 import org.springframework.data.sample.entities.Book;
 import org.springframework.data.sample.entities.SampleEntity;
-import org.springframework.data.util.TypeInformation;
 
 /**
  * 
@@ -37,34 +35,33 @@ import org.springframework.data.util.TypeInformation;
 public class SimpleCratePersistentEntityTests {
 	
 	@Test
-	@SuppressWarnings("unchecked")
 	public void shouldGetTableNameFromClass() {
 		
-		TypeInformation<SampleEntity> mock = Mockito.mock(TypeInformation.class);
+		CrateMappingContext mappingContext = prepareMappingContext(SampleEntity.class);
 		
-		when(mock.getType()).thenReturn(SampleEntity.class);
-		
-		CratePersistentEntity<SampleEntity> entity = new SimpleCratePersistentEntity<SampleEntity>(mock);
-		
-		String tableName = entity.getTableName();
+		String tableName = mappingContext.getPersistentEntity(SampleEntity.class).getTableName();
 		
 		assertThat(tableName, is(notNullValue()));
 		assertThat(tableName, is(equalTo(SampleEntity.class.getSimpleName().toUpperCase())));
 	}
 	
 	@Test
-	@SuppressWarnings("unchecked")
 	public void shouldGetTableNameFromAnnotation() {
 		
-		TypeInformation<Book> mock = Mockito.mock(TypeInformation.class);
+		CrateMappingContext mappingContext = prepareMappingContext(Book.class);
 		
-		when(mock.getType()).thenReturn(Book.class);
-		
-		CratePersistentEntity<Book> entity = new SimpleCratePersistentEntity<Book>(mock);
-		
-		String tableName = entity.getTableName();
+		String tableName = mappingContext.getPersistentEntity(Book.class).getTableName();
 		
 		assertThat(tableName, is(notNullValue()));
 		assertThat(tableName, is(equalTo(Book.class.getAnnotation(Table.class).name())));
+	}
+	
+	private static CrateMappingContext prepareMappingContext(Class<?> type) {
+		
+		CrateMappingContext mappingContext = new CrateMappingContext();
+		mappingContext.setInitialEntitySet(singleton(type));
+		mappingContext.initialize();
+		
+		return mappingContext;
 	}
 }
