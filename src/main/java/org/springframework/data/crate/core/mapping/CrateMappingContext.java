@@ -28,7 +28,7 @@ import java.lang.reflect.Field;
  * @author Rizwan Idrees
  */
 
-public class SimpleCoreMappingContext extends
+public class CrateMappingContext extends
         AbstractMappingContext<SimpleCratePersistentEntity<?>, CratePersistentProperty> {
 
 	@Override
