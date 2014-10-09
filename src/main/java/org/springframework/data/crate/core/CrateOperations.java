@@ -32,32 +32,4 @@ public interface CrateOperations {
      * @return CrateConverter
      */
     CrateConverter getConverter();
-
-    /**
-     * Creates a table based on clazz
-     * @param clazz
-     * @param <T>
-     * @return
-     */
-    <T> boolean createTable(Class<T> clazz);
-
-    /**
-     * Drops the table associated with clazz
-     * @param clazz
-     * @param <T>
-     * @return
-     */
-
-    <T> boolean dropTable(Class<T> clazz);
-
-    /**
-     * Drops the table
-     * @param name
-     * @param <T>
-     * @return
-     */
-
-    <T> boolean dropTable(String name);
-
-
 }
