@@ -23,6 +23,7 @@ import static org.junit.Assert.*;
 
 @RunWith(SpringJUnit4ClassRunner.class)
 @ContextConfiguration("classpath:crate-template-test.xml")
+@Ignore
 public class CrateTemplateTests {
 
     @Autowired
@@ -36,7 +37,7 @@ public class CrateTemplateTests {
         // client.sql("DROP TABLE Book").actionGet();
     }
 
-    @Test
+    /*@Test
     @Ignore
     public void shouldCreateTableForGivenClass(){
         //When
@@ -45,7 +46,7 @@ public class CrateTemplateTests {
         SQLResponse response = client.sql("SELECT table_name FROM information_schema.tables where table_name = 'Book'").actionGet();
         assertThat(response.rowCount(), is(greaterThan(0L)));
         assertThat((String) response.rows()[0][0] , is("Book"));
-    }
+    }*/
 
 
 }
