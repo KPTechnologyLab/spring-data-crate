@@ -49,7 +49,7 @@ public class CratePersistentEntityTableDefinitionMapper implements TableDefiniti
 	private final CrateMappingContext mappingContext;
 	private final EntityColumnMapper entityTypeMapper;
 	private final PrimitiveColumnMapper primitiveTypeMapper;
-	private final CollectionTypeColumnMapper collectionTypeMapper;
+	private final PrimitiveCollectionTypeColumnMapper primitiveCollectionTypeMapper;
 	private final MapTypeColumnMapper mapTypeMapper;
 	
 	public CratePersistentEntityTableDefinitionMapper(CrateMappingContext mappingContext) {
@@ -57,7 +57,7 @@ public class CratePersistentEntityTableDefinitionMapper implements TableDefiniti
 		this.mappingContext = mappingContext;
 		entityTypeMapper = new EntityColumnMapper();
 		primitiveTypeMapper = new PrimitiveColumnMapper();
-		collectionTypeMapper = new CollectionTypeColumnMapper();
+		primitiveCollectionTypeMapper = new PrimitiveCollectionTypeColumnMapper();
 		mapTypeMapper = new MapTypeColumnMapper();
 	}
 	
@@ -100,7 +100,7 @@ public class CratePersistentEntityTableDefinitionMapper implements TableDefiniti
 		return mappingContext.isSimpleType(collectionTypeProperty.getComponentType());
 	}
 
-	public static class TableDefinition {
+	/*public static class TableDefinition {
 		
 		private String name;
 		
@@ -123,9 +123,9 @@ public class CratePersistentEntityTableDefinitionMapper implements TableDefiniti
 			notNull(columns);
 			this.columns = columns;
 		}
-	}
+	}*/
 	
-	public static class Column {
+	/*public static class Column {
 		
 		private String name;
 		private String type;
@@ -186,7 +186,7 @@ public class CratePersistentEntityTableDefinitionMapper implements TableDefiniti
 		public boolean isArrayColumn() {
 			return ARRAY.equalsIgnoreCase(type);
 		}
-	}
+	}*/
 	
 	/**
 	 * 
@@ -205,7 +205,7 @@ public class CratePersistentEntityTableDefinitionMapper implements TableDefiniti
 			
 			notNull(properties);
 			
-			List<Column> columns = new ArrayList<CratePersistentEntityTableDefinitionMapper.Column>(properties.size());
+			List<Column> columns = new ArrayList<Column>(properties.size());
 			
 			for(CratePersistentProperty property : properties) {
 				Column column = createColumn(property);
@@ -220,29 +220,22 @@ public class CratePersistentEntityTableDefinitionMapper implements TableDefiniti
 	 * 
 	 * @author Hasnain Javed
 	 * @since 1.0.0
-	 * Creates array columns of primitive types and entities.
+	 * Creates array columns of array/collection of primitive types.
 	 */
-	private class CollectionTypeColumnMapper {
+	private class PrimitiveCollectionTypeColumnMapper {
 		
 		/**
-		 * @param properties properties of primitive/entity types, must not be {@literal null}.
+		 * @param properties properties of array/collection types, must not be {@literal null}.
 		 * @return list of columns of crate type array
 		 */
 		public List<Column> mapColumns(Set<CratePersistentProperty> properties) {
 			
-			List<Column> columns = new LinkedList<CratePersistentEntityTableDefinitionMapper.Column>();
+			List<Column> columns = new LinkedList<Column>();
 			
 			for(CratePersistentProperty property : properties) {
-				
 				// safety check
-				if(property.isCollectionLike()) {
-					
-					if(isPrimitiveElementType(property)) {
-						columns.add(createColumn(property));
-					}else {
-						CratePersistentEntity<?> entity = mappingContext.getPersistentEntity(property.getComponentType());
-						columns.addAll(entityTypeMapper.mapColumns(entity));
-					}
+				if(property.isCollectionLike() && isPrimitiveElementType(property)) {
+					columns.add(createColumn(property));
 				}
 			}
 			
@@ -270,10 +263,9 @@ public class CratePersistentEntityTableDefinitionMapper implements TableDefiniti
 			
 			notNull(properties);
 			
-			List<Column> columns = new LinkedList<CratePersistentEntityTableDefinitionMapper.Column>();
+			List<Column> columns = new LinkedList<Column>();
 			
 			for(CratePersistentProperty property : properties) {
-				
 				// safety check
 				if(property.isMap()) {
 					columns.add(createColumn(property));
@@ -300,7 +292,7 @@ public class CratePersistentEntityTableDefinitionMapper implements TableDefiniti
 		 */
 		public List<Column> mapColumns(CratePersistentEntity<?> entity) {
 			
-			List<Column> columns = new LinkedList<CratePersistentEntityTableDefinitionMapper.Column>();
+			List<Column> columns = new LinkedList<Column>();
 			
 			mapColumns(entity, columns);
 			
@@ -322,8 +314,8 @@ public class CratePersistentEntityTableDefinitionMapper implements TableDefiniti
 			
 			columns.addAll(primitiveTypeMapper.mapColumns(root.getPrimitiveProperties()));
 			columns.addAll(mapTypeMapper.mapColumns(root.getMapProperties()));
-			columns.addAll(collectionTypeMapper.mapColumns(filterPrimitiveCollectionType(root.getArrayProperties())));
-			columns.addAll(collectionTypeMapper.mapColumns(filterPrimitiveCollectionType(root.getCollectionProperties())));
+			columns.addAll(primitiveCollectionTypeMapper.mapColumns(filterPrimitiveCollectionType(root.getArrayProperties())));
+			columns.addAll(primitiveCollectionTypeMapper.mapColumns(filterPrimitiveCollectionType(root.getCollectionProperties())));
 			
 			Set<CratePersistentProperty> properties = root.getEntityProperties();
 			properties.addAll(filterEntityCollectionType(root.getArrayProperties()));
@@ -331,7 +323,7 @@ public class CratePersistentEntityTableDefinitionMapper implements TableDefiniti
 			
 			for(CratePersistentProperty property : properties) {
 				
-				List<Column> subColumns = new LinkedList<CratePersistentEntityTableDefinitionMapper.Column>();
+				List<Column> subColumns = new LinkedList<Column>();
 				
 				CratePersistentEntity<?> entity = mappingContext.getPersistentEntity(property);
 				

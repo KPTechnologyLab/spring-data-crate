@@ -43,8 +43,6 @@ import org.junit.runner.RunWith;
 import org.junit.runners.Suite;
 import org.junit.runners.Suite.SuiteClasses;
 import org.springframework.data.crate.InvalidCrateApiUsageException;
-import org.springframework.data.crate.core.mapping.CratePersistentEntityTableDefinitionMapper.Column;
-import org.springframework.data.crate.core.mapping.CratePersistentEntityTableDefinitionMapper.TableDefinition;
 import org.springframework.data.crate.core.mapping.CratePersistentEntityTableDefinitionMapperTest.CollectionTypeTableMappingTest;
 import org.springframework.data.crate.core.mapping.CratePersistentEntityTableDefinitionMapperTest.EntityTypeTableMappingTest;
 import org.springframework.data.crate.core.mapping.CratePersistentEntityTableDefinitionMapperTest.MapTypeTableMappingTest;
