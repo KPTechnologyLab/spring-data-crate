@@ -15,12 +15,14 @@
  */
 package org.springframework.data.crate.core.mapping;
 
-import org.springframework.data.mapping.context.AbstractMappingContext;
-import org.springframework.data.mapping.model.SimpleTypeHolder;
-import org.springframework.data.util.TypeInformation;
+import static org.springframework.data.crate.core.mapping.CrateSimpleTypes.HOLDER;
 
 import java.beans.PropertyDescriptor;
 import java.lang.reflect.Field;
+
+import org.springframework.data.mapping.context.AbstractMappingContext;
+import org.springframework.data.mapping.model.SimpleTypeHolder;
+import org.springframework.data.util.TypeInformation;
 
 /**
  * SimpleCrateMappingContext
@@ -28,9 +30,8 @@ import java.lang.reflect.Field;
  * @author Rizwan Idrees
  */
 
-public class CrateMappingContext extends
-        AbstractMappingContext<SimpleCratePersistentEntity<?>, CratePersistentProperty> {
-
+public class CrateMappingContext extends AbstractMappingContext<SimpleCratePersistentEntity<?>, CratePersistentProperty> {
+	
 	@Override
 	protected <T> SimpleCratePersistentEntity<?> createPersistentEntity(TypeInformation<T> typeInformation) {
 		return new SimpleCratePersistentEntity<T>(typeInformation);
@@ -40,5 +41,9 @@ public class CrateMappingContext extends
 	protected CratePersistentProperty createPersistentProperty(Field field, PropertyDescriptor descriptor,
 																	   SimpleCratePersistentEntity<?> owner, SimpleTypeHolder simpleTypeHolder) {
 		return new SimpleCratePersistentProperty(field, descriptor, owner, simpleTypeHolder);
+	}
+	
+	public boolean isSimpleType(Class<?> clazz) {
+		return HOLDER.isSimpleType(clazz); 
 	}
 }
