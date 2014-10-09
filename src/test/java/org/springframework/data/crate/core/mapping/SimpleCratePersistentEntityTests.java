@@ -17,14 +17,16 @@
 package org.springframework.data.crate.core.mapping;
 
 import static java.util.Collections.singleton;
-import static org.hamcrest.Matchers.equalTo;
 import static org.hamcrest.Matchers.is;
 import static org.hamcrest.Matchers.notNullValue;
 import static org.junit.Assert.assertThat;
 
+import java.util.Set;
+
 import org.junit.Test;
 import org.springframework.data.crate.core.mapping.annotations.Table;
 import org.springframework.data.sample.entities.Book;
+import org.springframework.data.sample.entities.PropertiesContainer;
 import org.springframework.data.sample.entities.SampleEntity;
 
 /**
@@ -42,7 +44,7 @@ public class SimpleCratePersistentEntityTests {
 		String tableName = mappingContext.getPersistentEntity(SampleEntity.class).getTableName();
 		
 		assertThat(tableName, is(notNullValue()));
-		assertThat(tableName, is(equalTo(SampleEntity.class.getSimpleName().toUpperCase())));
+		assertThat(tableName, is(SampleEntity.class.getSimpleName().toUpperCase()));
 	}
 	
 	@Test
@@ -53,7 +55,91 @@ public class SimpleCratePersistentEntityTests {
 		String tableName = mappingContext.getPersistentEntity(Book.class).getTableName();
 		
 		assertThat(tableName, is(notNullValue()));
-		assertThat(tableName, is(equalTo(Book.class.getAnnotation(Table.class).name())));
+		assertThat(tableName, is(Book.class.getAnnotation(Table.class).name()));
+	}
+	
+	@Test
+	public void shouldFilterPrimitiveFields() {
+		
+		Set<CratePersistentProperty> simpleProperties = prepareMappingContext(PropertiesContainer.class).
+														getPersistentEntity(PropertiesContainer.class).
+													    getPrimitiveProperties();
+		assertThat(simpleProperties, is(notNullValue()));
+		assertThat(simpleProperties.isEmpty(), is(false));
+		assertThat(simpleProperties.size(), is(1));
+		
+		CratePersistentProperty simpleProperty = simpleProperties.iterator().next();
+		assertThat(simpleProperty.isEntity(), is(false));
+		assertThat(simpleProperty.isArray(), is(false));
+		assertThat(simpleProperty.isCollectionLike(), is(false));
+		assertThat(simpleProperty.isMap(), is(false));
+		assertThat(simpleProperty.getActualType().getName(), is(String.class.getName()));
+	}
+	
+	@Test
+	public void shouldFilterEntityFields() {
+		
+		Set<CratePersistentProperty> compoisteProperties = prepareMappingContext(PropertiesContainer.class).
+														   getPersistentEntity(PropertiesContainer.class).
+														   getEntityProperties();
+		assertThat(compoisteProperties, is(notNullValue()));
+		assertThat(compoisteProperties.isEmpty(), is(false));
+		assertThat(compoisteProperties.size(), is(1));
+		
+		CratePersistentProperty compositeProperty = compoisteProperties.iterator().next();
+		assertThat(compositeProperty.isEntity(), is(true));
+		assertThat(compositeProperty.isArray(), is(false));
+		assertThat(compositeProperty.isCollectionLike(), is(false));
+		assertThat(compositeProperty.isMap(), is(false));
+		assertThat(compositeProperty.getActualType().getName(), is(Book.class.getName()));
+	}
+	
+	@Test
+	public void shouldFilterArrayFields() {
+		
+		Set<CratePersistentProperty> arrayProperties = prepareMappingContext(PropertiesContainer.class).
+													   getPersistentEntity(PropertiesContainer.class).
+													   getArrayProperties();
+		assertThat(arrayProperties, is(notNullValue()));
+		assertThat(arrayProperties.isEmpty(), is(false));
+		assertThat(arrayProperties.size(), is(1));
+		
+		CratePersistentProperty arrayProperty = arrayProperties.iterator().next();
+		assertThat(arrayProperty.isArray(), is(true));
+		assertThat(arrayProperty.getRawType().isArray(), is(true));
+	}
+	
+	@Test
+	public void shouldFilterCollectionFields() {
+		
+		Set<CratePersistentProperty> collectionProperties = prepareMappingContext(PropertiesContainer.class).
+														    getPersistentEntity(PropertiesContainer.class).
+														    getCollectionProperties();
+		assertThat(collectionProperties, is(notNullValue()));
+		assertThat(collectionProperties.isEmpty(), is(false));
+		assertThat(collectionProperties.size(), is(2));
+		
+		for(CratePersistentProperty collectionProperty : collectionProperties) {
+			assertThat(collectionProperty.isArray(), is(false));
+			assertThat(collectionProperty.isMap(), is(false));
+			assertThat(collectionProperty.isCollectionLike(), is(true));
+		}
+	}
+	
+	@Test
+	public void shouldFilterMapFields() {
+		
+		Set<CratePersistentProperty> mapProperties = prepareMappingContext(PropertiesContainer.class).
+												     getPersistentEntity(PropertiesContainer.class).
+												     getMapProperties();
+		assertThat(mapProperties, is(notNullValue()));
+		assertThat(mapProperties.isEmpty(), is(false));
+		assertThat(mapProperties.size(), is(1));
+		
+		CratePersistentProperty mapProperty = mapProperties.iterator().next();
+		assertThat(mapProperty.isArray(), is(false));
+		assertThat(mapProperty.isCollectionLike(), is(false));
+		assertThat(mapProperty.isMap(), is(true));
 	}
 	
 	private static CrateMappingContext prepareMappingContext(Class<?> type) {
