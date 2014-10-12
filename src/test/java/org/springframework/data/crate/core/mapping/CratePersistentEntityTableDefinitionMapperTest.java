@@ -43,6 +43,7 @@ import org.junit.runner.RunWith;
 import org.junit.runners.Suite;
 import org.junit.runners.Suite.SuiteClasses;
 import org.springframework.data.crate.InvalidCrateApiUsageException;
+import org.springframework.data.crate.core.CyclicReferenceException;
 import org.springframework.data.crate.core.mapping.CratePersistentEntityTableDefinitionMapperTest.CollectionTypeTableMappingTest;
 import org.springframework.data.crate.core.mapping.CratePersistentEntityTableDefinitionMapperTest.EntityTypeTableMappingTest;
 import org.springframework.data.crate.core.mapping.CratePersistentEntityTableDefinitionMapperTest.MapTypeTableMappingTest;
@@ -435,6 +436,21 @@ public class CratePersistentEntityTableDefinitionMapperTest {
 			assertThat(tableDefinition.getColumns().get(1).getSubColumns().get(1).getSubColumns().get(1).getType(), is(OBJECT));
 		}
 		
+		@Test(expected=CyclicReferenceException.class)
+		public void shouldDetectCycleForSelfReferencing() {
+				initMappingContextAndGetTableDefinition(SelfReferencingEntity.class);
+		}
+		
+		@Test(expected=CyclicReferenceException.class)
+		public void shouldDetectCycleForNestedClassViaCollectionReferencing() {
+				initMappingContextAndGetTableDefinition(LevelOneCycle.class);
+		}
+		
+		@Test(expected=CyclicReferenceException.class)
+		public void shouldDetectInBewteenCycleForNestedClassReferencing() {
+				initMappingContextAndGetTableDefinition(LevelThreeCycle.class);
+		}
+		
 		static class LevelOneEntity {
 			String levelOneString;
 			LevelTwoEntity levelTwo;
@@ -448,6 +464,22 @@ public class CratePersistentEntityTableDefinitionMapperTest {
 		static class LevelThreeEntity {
 			String levelThreeString;
 			Map<String, String> levelThreeMap;
+		}
+		
+		static class SelfReferencingEntity {
+			SelfReferencingEntity cyclic;
+		}
+		
+		static class LevelOneCycle {
+			LevelTwoCycle levelTwo;
+		}
+		
+		static class LevelTwoCycle {
+			Set<LevelOneCycle> levelOneCycles;
+		}
+		
+		static class LevelThreeCycle {
+			LevelTwoCycle levelTwo;
 		}
 	}
 	

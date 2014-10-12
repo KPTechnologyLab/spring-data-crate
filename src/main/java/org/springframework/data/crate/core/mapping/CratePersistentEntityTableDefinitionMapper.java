@@ -17,6 +17,7 @@ package org.springframework.data.crate.core.mapping;
 
 import static java.lang.Boolean.TRUE;
 import static org.slf4j.LoggerFactory.getLogger;
+import static org.springframework.data.crate.core.CyclicReferenceBarrier.cyclicReferenceBarrier;
 import static org.springframework.data.crate.core.mapping.CrateDataType.getCrateTypeFor;
 import static org.springframework.data.util.ClassTypeInformation.from;
 import static org.springframework.util.Assert.notNull;
@@ -29,6 +30,7 @@ import java.util.Set;
 
 import org.slf4j.Logger;
 import org.springframework.data.crate.InvalidCrateApiUsageException;
+import org.springframework.data.crate.core.CyclicReferenceBarrier;
 import org.springframework.data.util.TypeInformation;
 
 /**
@@ -203,40 +205,43 @@ public class CratePersistentEntityTableDefinitionMapper implements TableDefiniti
 			
 			List<Column> columns = new LinkedList<Column>();
 			
-			mapColumns(entity, columns);
+			mapColumns(entity, columns, cyclicReferenceBarrier());
 			
 			return columns;
 		}
 		
 		/**
-		 * Recursively iterates over a nested object's fields
+		 * Recursively crawls over a nested object's fields
 		 * @param root entity object, must not be {@literal null}.
 		 * @param columns list of columns fot root entity object, must not be {@literal null}.
+		 * @param barrier to detect potential cycles within entities.
 		 * @return list of columns (with optional list of subcloumns) of crate type object
 		 */
-		private void mapColumns(CratePersistentEntity<?> root, List<Column> columns) {
+		private void mapColumns(CratePersistentEntity<?> root, List<Column> columns, CyclicReferenceBarrier barrier) {
 			
 			notNull(root);
 			notNull(columns);
 			
 			logger.debug("creating object column for type {}", root.getType());
 			
-			columns.addAll(primitiveTypeMapper.mapColumns(root.getPrimitiveProperties()));
-			columns.addAll(mapTypeMapper.mapColumns(root.getMapProperties()));
+			columns.addAll(primitiveTypeMapper.mapColumns(root.getPrimitiveProperties()));			
 			columns.addAll(primitiveCollectionTypeMapper.mapColumns(filterPrimitiveCollectionType(root.getArrayProperties())));
 			columns.addAll(primitiveCollectionTypeMapper.mapColumns(filterPrimitiveCollectionType(root.getCollectionProperties())));
+			columns.addAll(mapTypeMapper.mapColumns(root.getMapProperties()));
 			
 			Set<CratePersistentProperty> properties = root.getEntityProperties();
 			properties.addAll(filterEntityCollectionType(root.getArrayProperties()));
 			properties.addAll(filterEntityCollectionType(root.getCollectionProperties()));
-			
+				
 			for(CratePersistentProperty property : properties) {
 				
 				List<Column> subColumns = new LinkedList<Column>();
 				
 				CratePersistentEntity<?> entity = mappingContext.getPersistentEntity(property);
 				
-				mapColumns(entity, subColumns);
+				barrier.guard(property);
+				
+				mapColumns(entity, subColumns, barrier);
 				
 				Column column = createColumn(property);
 				column.setSubColumns(subColumns);
@@ -282,7 +287,7 @@ public class CratePersistentEntityTableDefinitionMapper implements TableDefiniti
 			TypeInformation<?> componentType = from(property.getComponentType());
 			
 			if(componentType.isCollectionLike()) {
-				throw new InvalidCrateApiUsageException("currently crate does not support nested arrays/collections");
+				throw new InvalidCrateApiUsageException("currently crate does not support nested arrays/collections of arrays/collections");
 			}
 		}
 	}
