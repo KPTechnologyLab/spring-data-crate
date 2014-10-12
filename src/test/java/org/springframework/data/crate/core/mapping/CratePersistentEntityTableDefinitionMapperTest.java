@@ -48,7 +48,7 @@ import org.springframework.data.crate.core.mapping.CratePersistentEntityTableDef
 import org.springframework.data.crate.core.mapping.CratePersistentEntityTableDefinitionMapperTest.EntityTypeTableMappingTest;
 import org.springframework.data.crate.core.mapping.CratePersistentEntityTableDefinitionMapperTest.MapTypeTableMappingTest;
 import org.springframework.data.crate.core.mapping.CratePersistentEntityTableDefinitionMapperTest.PrimitivesTableMappingTest;
-import org.springframework.data.crate.core.mapping.CratePersistentEntityTableDefinitionMapperTest.TableNameMappingTest;
+import org.springframework.data.crate.core.mapping.CratePersistentEntityTableDefinitionMapperTest.TableMappingTest;
 import org.springframework.data.crate.core.mapping.annotations.Table;
 
 /**
@@ -56,7 +56,7 @@ import org.springframework.data.crate.core.mapping.annotations.Table;
  */
 
 @RunWith(Suite.class)
-@SuiteClasses({ TableNameMappingTest.class, PrimitivesTableMappingTest.class,
+@SuiteClasses({ TableMappingTest.class, PrimitivesTableMappingTest.class,
 				CollectionTypeTableMappingTest.class, MapTypeTableMappingTest.class,
 				EntityTypeTableMappingTest.class })
 public class CratePersistentEntityTableDefinitionMapperTest {
@@ -65,7 +65,7 @@ public class CratePersistentEntityTableDefinitionMapperTest {
 	 * 
 	 * @author Hasnain Javed 
 	 */
-	public static class TableNameMappingTest {
+	public static class TableMappingTest {
 		
 		static class TestEntity {
 		}
@@ -80,7 +80,7 @@ public class CratePersistentEntityTableDefinitionMapperTest {
 			TableDefinition tableDefinition = initMappingContextAndGetTableDefinition(TestEntity.class);
 			
 			assertThat(tableDefinition, is(notNullValue()));
-			assertThat(tableDefinition.getName(), is("TESTENTITY"));
+			assertThat(tableDefinition.getName(), is(TestEntity.class.getName()));
 		}
 		
 		@Test

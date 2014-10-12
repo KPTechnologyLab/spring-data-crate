@@ -44,7 +44,7 @@ public class SimpleCratePersistentEntityTests {
 		String tableName = mappingContext.getPersistentEntity(SampleEntity.class).getTableName();
 		
 		assertThat(tableName, is(notNullValue()));
-		assertThat(tableName, is(SampleEntity.class.getSimpleName().toUpperCase()));
+		assertThat(tableName, is(SampleEntity.class.getName()));
 	}
 	
 	@Test

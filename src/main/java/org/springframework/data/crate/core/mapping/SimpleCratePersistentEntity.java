@@ -198,7 +198,7 @@ public class SimpleCratePersistentEntity<T> extends BasicPersistentEntity<T, Cra
 			hasText(name, "Invalid name. Make sure the name is defined. e.g @Table(name=\"foo\")");
 			tableName = name;
 		}else {
-			tableName = clazz.getSimpleName().toUpperCase();
+			tableName = clazz.getName();
 		}
 		
 		return tableName;
