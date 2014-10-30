@@ -56,11 +56,12 @@ class Column {
 		return elementType;
 	}
 
-	public void setElementType(String elementType) {
-		hasText(elementType);
-		this.elementType = elementType;
+	public void setElementType(Class<?> elementType) {
+		notNull(elementType);
+		this.elementType = getCrateTypeFor(elementType);
+		hasText(this.elementType);
 	}
-
+	
 	public Class<?> getRawType() {
 		return rawType;
 	}

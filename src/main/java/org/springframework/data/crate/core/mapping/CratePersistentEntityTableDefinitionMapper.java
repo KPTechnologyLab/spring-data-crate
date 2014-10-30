@@ -18,7 +18,6 @@ package org.springframework.data.crate.core.mapping;
 import static java.lang.Boolean.TRUE;
 import static org.slf4j.LoggerFactory.getLogger;
 import static org.springframework.data.crate.core.CyclicReferenceBarrier.cyclicReferenceBarrier;
-import static org.springframework.data.crate.core.mapping.CrateDataType.getCrateTypeFor;
 import static org.springframework.data.util.ClassTypeInformation.from;
 import static org.springframework.util.Assert.notNull;
 
@@ -85,7 +84,7 @@ public class CratePersistentEntityTableDefinitionMapper implements TableDefiniti
 		}
 		
 		if(property.isCollectionLike()) {
-			column.setElementType(getCrateTypeFor(property.getComponentType()));
+			column.setElementType(property.getComponentType());
 		}
 		
 		logger.debug("mapped property type {} to crate type {}", property.getRawType(), column.getType());

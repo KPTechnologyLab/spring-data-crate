@@ -49,7 +49,7 @@ public class ColumnTest {
 	public void shouldCreateStatementForPrimitiveArray() {
 		
 		Column column = new Column("string_array", String[].class);
-		column.setElementType("string");
+		column.setElementType(String.class);
 		
 		assertThat(column.toSqlStatement(), is(STRING_ARRAY_COL_STMNT));
 	}
@@ -58,7 +58,7 @@ public class ColumnTest {
 	public void shouldCreateStatementForPrimitiveCollection() {
 		
 		Column column = new Column("string_collection", Set.class);
-		column.setElementType("string");
+		column.setElementType(String.class);
 		
 		assertThat(column.toSqlStatement(), is(STRING_COLLECTION_COL_STMNT));
 	}
@@ -120,7 +120,7 @@ public class ColumnTest {
 										 new Column("isbn", String.class));
 		
 		Column column = new Column("books_array", Book[].class);
-		column.setElementType("object");
+		column.setElementType(Book.class);
 		column.setSubColumns(subColumns);
 		
 		assertThat(column.toSqlStatement(), is(OBJECT_ARRAY_COL_STMNT));
@@ -134,7 +134,7 @@ public class ColumnTest {
 										 new Column("isbn", String.class));
 		
 		Column column = new Column("books_collection", List.class);
-		column.setElementType("object");
+		column.setElementType(Book.class);
 		column.setSubColumns(subColumns);
 		
 		assertThat(column.toSqlStatement(), is(OBJECT_COLLECTION_COL_STMNT));
@@ -155,7 +155,7 @@ public class ColumnTest {
 											   bookSubColumn);
 		
 		Column authorColumn = new Column("authors_array", Author[].class);
-		authorColumn.setElementType("object");
+		authorColumn.setElementType(Author.class);
 		authorColumn.setSubColumns(authorSubColumns);
 		
 		assertThat(authorColumn.toSqlStatement(), is(NESTED_OBJECT_ARRAY_COL_STMNT));
@@ -176,7 +176,7 @@ public class ColumnTest {
 											   bookSubColumn);
 		
 		Column authorColumn = new Column("authors_collection", Collection.class);
-		authorColumn.setElementType("object");
+		authorColumn.setElementType(Author.class);
 		authorColumn.setSubColumns(authorSubColumns);
 		
 		assertThat(authorColumn.toSqlStatement(), is(NESTED_OBJECT_COLLECTION_COL_STMNT));
