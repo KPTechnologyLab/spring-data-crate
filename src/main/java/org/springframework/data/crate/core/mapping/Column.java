@@ -2,8 +2,18 @@ package org.springframework.data.crate.core.mapping;
 
 import static java.util.Collections.emptyList;
 import static org.springframework.data.crate.core.mapping.CrateDataType.ARRAY;
+import static org.springframework.data.crate.core.mapping.CrateDataType.OBJECT;
+import static org.springframework.data.crate.core.mapping.CrateDataType.getCrateTypeFor;
+import static org.springframework.data.crate.core.mapping.TableDefinition.AS;
+import static org.springframework.data.crate.core.mapping.TableDefinition.CLOSE_BRACE;
+import static org.springframework.data.crate.core.mapping.TableDefinition.COMMA;
+import static org.springframework.data.crate.core.mapping.TableDefinition.OPEN_BRACE;
+import static org.springframework.data.crate.core.mapping.TableDefinition.PRIMARY_KEY;
+import static org.springframework.data.crate.core.mapping.TableDefinition.SPACE;
 import static org.springframework.util.Assert.hasText;
+import static org.springframework.util.Assert.notNull;
 
+import java.util.Iterator;
 import java.util.List;
 
 class Column {
@@ -12,10 +22,18 @@ class Column {
 	private String type;
 	private String elementType;
 	
+	private Class<?> rawType;
+	
 	private boolean primaryKey;
 	
 	private List<Column> subColumns;
-
+	
+	public Column(String name, Class<?> rawType) {
+		setName(name);
+		setRawType(rawType);
+		setType(getCrateTypeFor(rawType));
+	}
+	
 	public String getName() {
 		return name;
 	}
@@ -43,6 +61,15 @@ class Column {
 		this.elementType = elementType;
 	}
 
+	public Class<?> getRawType() {
+		return rawType;
+	}
+
+	public void setRawType(Class<?> rawType) {
+		notNull(rawType);
+		this.rawType = rawType;
+	}
+
 	public boolean isPrimaryKey() {
 		return primaryKey;
 	}
@@ -66,5 +93,74 @@ class Column {
 
 	public boolean isArrayColumn() {
 		return ARRAY.equalsIgnoreCase(type);
+	}
+	
+	public boolean isObjectColumn() {
+		return OBJECT.equalsIgnoreCase(type);
+	}
+	
+	public String toSqlStatement() {
+		
+		StringBuilder builder = new StringBuilder();
+		
+		createStatement(this, builder);
+		
+		return builder.toString();
+	}
+	
+	private void createStatement(Column column, StringBuilder builder) {
+		
+		builder.append(column.getName());
+		builder.append(SPACE);
+		
+		if(column.isArrayColumn()) {
+			builder.append(column.getType());
+			builder.append(OPEN_BRACE);
+			if(isPrimitiveElementType(column.getElementType())) {
+				builder.append(column.getElementType());
+			}else {
+				createObjectColumn(column, builder);
+			}
+			
+			builder.append(CLOSE_BRACE);
+		}else if(column.isObjectColumn()) {
+			createObjectColumn(column, builder);
+		}else {
+			builder.append(column.getType());
+		}
+		
+		if(column.isPrimaryKey()) {
+			builder.append(SPACE)
+				   .append(PRIMARY_KEY);
+		}
+	}
+	
+	private boolean isPrimitiveElementType(String elementType) {
+		return !OBJECT.equalsIgnoreCase(elementType);
+	}
+	
+	private void createObjectColumn(Column column, StringBuilder builder) {
+		
+		builder.append(OBJECT);
+		
+		if(!column.getSubColumns().isEmpty()) {
+			
+			builder.append(SPACE)
+				   .append(AS)
+				   .append(SPACE)
+			   	   .append(OPEN_BRACE);
+			
+			Iterator<Column> subColumns = column.getSubColumns().iterator();
+			
+			while(subColumns.hasNext()) {
+				createStatement(subColumns.next(), builder);
+				if(subColumns.hasNext()) {
+					builder.append(COMMA)
+						   .append(SPACE);
+				}
+			}
+			
+			builder.append(CLOSE_BRACE);
+		}
 	}
 }

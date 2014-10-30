@@ -40,10 +40,6 @@ public class CrateDataType {
 		CRATE_TYPES.put(Double.TYPE, DOUBLE);
 		CRATE_TYPES.put(Double.class, DOUBLE);
 		CRATE_TYPES.put(Date.class, TIMESTAMP);
-		CRATE_TYPES.put(Collection.class, ARRAY);
-		CRATE_TYPES.put(List.class, ARRAY);
-		CRATE_TYPES.put(Set.class, ARRAY);
-		CRATE_TYPES.put(Map.class, OBJECT);
 	}
 	
 	private CrateDataType() {
@@ -51,8 +47,12 @@ public class CrateDataType {
 	
 	public static String getCrateTypeFor(Class<?> clazz) {
 		
-		if(clazz.isArray()) {
+		if(clazz.isArray() || Collection.class.isAssignableFrom(clazz)) {
 			return ARRAY;
+		}
+		
+		if(Map.class.isAssignableFrom(clazz)) {
+			return OBJECT;
 		}
 		
 		return CRATE_TYPES.get(clazz) == null ? OBJECT : CRATE_TYPES.get(clazz);

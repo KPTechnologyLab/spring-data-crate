@@ -78,9 +78,7 @@ public class CratePersistentEntityTableDefinitionMapper implements TableDefiniti
 		
 		notNull(property);
 		
-		Column column = new Column();
-		column.setName(property.getFieldName());
-		column.setType(getCrateTypeFor(property.getRawType()));
+		Column column = new Column(property.getFieldName(), property.getRawType());
 		
 		if(property.isIdProperty()) {
 			column.setPrimaryKey(TRUE);
