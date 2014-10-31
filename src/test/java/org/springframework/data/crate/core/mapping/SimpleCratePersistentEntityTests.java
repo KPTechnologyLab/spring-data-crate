@@ -32,7 +32,7 @@ import org.springframework.data.sample.entities.SampleEntity;
 /**
  * 
  * @author Hasnain Javed
- *
+ * @since 1.0.0
  */
 public class SimpleCratePersistentEntityTests {
 	

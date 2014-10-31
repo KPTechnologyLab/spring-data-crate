@@ -53,6 +53,7 @@ import org.springframework.data.crate.core.mapping.annotations.Table;
 
 /**
  * @author Hasnain Javed
+ * @since 1.0.0
  */
 
 @RunWith(Suite.class)
