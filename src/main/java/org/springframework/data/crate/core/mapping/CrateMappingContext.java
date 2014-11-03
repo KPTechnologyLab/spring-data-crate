@@ -28,6 +28,7 @@ import org.springframework.data.util.TypeInformation;
  * SimpleCrateMappingContext
  *
  * @author Rizwan Idrees
+ * @author Hasnain Javed
  */
 
 public class CrateMappingContext extends AbstractMappingContext<SimpleCratePersistentEntity<?>, CratePersistentProperty> {
