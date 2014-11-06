@@ -13,9 +13,9 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-
 package org.springframework.data.crate.core.mapping.schema;
 
+import static org.springframework.data.crate.core.mapping.schema.EntityTableMapper.*;
 import static java.util.Collections.singleton;
 import static org.hamcrest.Matchers.is;
 import static org.hamcrest.Matchers.notNullValue;
@@ -38,7 +38,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
-import org.junit.Ignore;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.junit.runners.Suite;
@@ -46,12 +45,10 @@ import org.junit.runners.Suite.SuiteClasses;
 import org.springframework.data.crate.InvalidCrateApiUsageException;
 import org.springframework.data.crate.core.CyclicReferenceException;
 import org.springframework.data.crate.core.mapping.CrateMappingContext;
-import org.springframework.data.crate.core.mapping.annotations.Table;
-import org.springframework.data.crate.core.mapping.schema.CratePersistentEntityTableDefinitionMapperTest.CollectionTypeTableMappingTest;
-import org.springframework.data.crate.core.mapping.schema.CratePersistentEntityTableDefinitionMapperTest.EntityTypeTableMappingTest;
-import org.springframework.data.crate.core.mapping.schema.CratePersistentEntityTableDefinitionMapperTest.MapTypeTableMappingTest;
-import org.springframework.data.crate.core.mapping.schema.CratePersistentEntityTableDefinitionMapperTest.PrimitivesTableMappingTest;
-import org.springframework.data.crate.core.mapping.schema.CratePersistentEntityTableDefinitionMapperTest.TableDefinitionMappingTest;
+import org.springframework.data.crate.core.mapping.schema.EntityTableMapperTest.CollectionTypeTableMappingTest;
+import org.springframework.data.crate.core.mapping.schema.EntityTableMapperTest.EntityTypeTableMappingTest;
+import org.springframework.data.crate.core.mapping.schema.EntityTableMapperTest.MapTypeTableMappingTest;
+import org.springframework.data.crate.core.mapping.schema.EntityTableMapperTest.PrimitivesTableMappingTest;
 
 /**
  * @author Hasnain Javed
@@ -59,47 +56,14 @@ import org.springframework.data.crate.core.mapping.schema.CratePersistentEntityT
  */
 
 @RunWith(Suite.class)
-@SuiteClasses({ TableDefinitionMappingTest.class, PrimitivesTableMappingTest.class,
-				CollectionTypeTableMappingTest.class, MapTypeTableMappingTest.class,
-				EntityTypeTableMappingTest.class })
-public class CratePersistentEntityTableDefinitionMapperTest {
-	
-	/**
-	 * 
-	 * @author Hasnain Javed 
-	 */
-	@Ignore
-	public static class TableDefinitionMappingTest {
-		
-		@Test
-		public void shouldHaveTableNameFromClass() {
-			
-			TableDefinition tableDefinition = initMappingContextAndGetTableDefinition(TestEntity.class);
-			
-			assertThat(tableDefinition, is(notNullValue()));
-			assertThat(tableDefinition.getName(), is(TestEntity.class.getName()));
-		}
-		
-		@Test
-		public void shouldHaveTableNameFromAnnotation() {
-			
-			TableDefinition tableDefinition = initMappingContextAndGetTableDefinition(AnnotatedTestEntity.class);
-			
-			assertThat(tableDefinition, is(notNullValue()));
-			assertThat(tableDefinition.getName(), is(AnnotatedTestEntity.class.getAnnotation(Table.class).name()));
-		}
-		
-		static class TestEntity {
-		}
-		
-		@Table(name="test_entity")
-		static class AnnotatedTestEntity {
-		}
-	}
-	
+@SuiteClasses({ PrimitivesTableMappingTest.class, CollectionTypeTableMappingTest.class, 
+				MapTypeTableMappingTest.class, EntityTypeTableMappingTest.class })
+public class EntityTableMapperTest {
+
 	/**
 	 * 
 	 * @author Hasnain Javed
+	 * @since 1.0.0
 	 */
 	public static class PrimitivesTableMappingTest {
 		
@@ -260,7 +224,8 @@ public class CratePersistentEntityTableDefinitionMapperTest {
 	
 	/**
 	 * 
-	 * @author Hasnain Javed 
+	 * @author Hasnain Javed
+	 * @since 1.0.0 
 	 */
 	public static class CollectionTypeTableMappingTest {
 		
@@ -388,7 +353,8 @@ public class CratePersistentEntityTableDefinitionMapperTest {
 	
 	/**
 	 * 
-	 * @author Hasnain Javed 
+	 * @author Hasnain Javed
+	 * @since 1.0.0 
 	 */
 	public static class MapTypeTableMappingTest {
 		
@@ -412,7 +378,8 @@ public class CratePersistentEntityTableDefinitionMapperTest {
 	
 	/**
 	 * 
-	 * @author Hasnain Javed 
+	 * @author Hasnain Javed
+	 * @since 1.0.0 
 	 */
 	public static class EntityTypeTableMappingTest {
 		
@@ -489,8 +456,7 @@ public class CratePersistentEntityTableDefinitionMapperTest {
 	
 	private static TableDefinition initMappingContextAndGetTableDefinition(Class<?> type) {
 		CrateMappingContext mappingContext = prepareMappingContext(type);
-		return new CratePersistentEntityTableDefinitionMapper(mappingContext).
-				   createDefinition(mappingContext.getPersistentEntity(type));
+		return entityTableMapper(mappingContext).createDefinition(mappingContext.getPersistentEntity(type)); 
 	}
 
 	private static CrateMappingContext prepareMappingContext(Class<?> type) {

@@ -42,35 +42,82 @@ import org.springframework.data.util.TypeInformation;
  * @since 1.0.0
  * 
  * Creates table definitions for persistent entities.
- * The table definitions may be used to generate crate specific DDL
+ * Creates columns from entity properties and maps them from java type to crate data type.
+ * Nested arrays/collections of arrays/collections are not currently supported by crate db
  */
-public class CratePersistentEntityTableDefinitionMapper /*implements TableDefinitionMapper*/ {
+class EntityTableMapper {
 	
 	private final Logger logger = getLogger(getClass());
 	
-	private final MappingContext<? extends CratePersistentEntity<?>, CratePersistentProperty> mappingContext;
-	private final EntityColumnMapper entityTypeMapper;
 	private final PrimitiveColumnMapper primitiveTypeMapper;
 	private final PrimitiveCollectionTypeColumnMapper primitiveCollectionTypeMapper;
 	private final MapTypeColumnMapper mapTypeMapper;
 	
-	public CratePersistentEntityTableDefinitionMapper(MappingContext<? extends CratePersistentEntity<?>, CratePersistentProperty> mappingContext) {
-		super();
+	private final MappingContext<? extends CratePersistentEntity<?>, CratePersistentProperty> mappingContext;
+	
+	private EntityTableMapper(MappingContext<? extends CratePersistentEntity<?>, CratePersistentProperty> mappingContext) {
 		this.mappingContext = mappingContext;
-		entityTypeMapper = new EntityColumnMapper();
-		primitiveTypeMapper = new PrimitiveColumnMapper();
-		primitiveCollectionTypeMapper = new PrimitiveCollectionTypeColumnMapper();
-		mapTypeMapper = new MapTypeColumnMapper();
+		this.primitiveTypeMapper = new PrimitiveColumnMapper();
+		this.primitiveCollectionTypeMapper = new PrimitiveCollectionTypeColumnMapper();
+		this.mapTypeMapper = new MapTypeColumnMapper();
 	}
 	
-//	@Override
+	public static EntityTableMapper entityTableMapper(MappingContext<? extends CratePersistentEntity<?>, CratePersistentProperty> mappingContext) {
+		return new EntityTableMapper(mappingContext);
+	}
+	
+	/**
+	 * @param entity entity object, must not be {@literal null}. 
+	 * @return table definition containing table name and columns
+	 */
 	public TableDefinition createDefinition(CratePersistentEntity<?> entity) {
 		
-		logger.debug("generating table definition for {}", entity.getType());
+		List<Column> columns = new LinkedList<Column>();
 		
-		List<Column> columns = entityTypeMapper.mapColumns(entity);
+		mapColumns(entity, columns, cyclicReferenceBarrier());
 		
 		return new TableDefinition(entity.getTableName(), columns);
+	}
+	
+	/**
+	 * Recursively crawls over a nested object's fields
+	 * @param root entity object, must not be {@literal null}.
+	 * @param columns list of columns fot root entity object, must not be {@literal null}.
+	 * @param barrier to detect potential cycles within entities.
+	 * @param mappingContext must not be {@literal null}.
+	 * @return list of columns (with optional list of subcloumns) of crate type object
+	 */
+	private void mapColumns(CratePersistentEntity<?> root, List<Column> columns,  CyclicReferenceBarrier barrier) {
+		
+		notNull(root);
+		notNull(columns);
+		
+		logger.debug("creating object column for type {}", root.getType());
+		
+		columns.addAll(primitiveTypeMapper.mapColumns(root.getPrimitiveProperties()));			
+		columns.addAll(primitiveCollectionTypeMapper.mapColumns(filterPrimitiveCollectionType(root.getArrayProperties())));
+		columns.addAll(primitiveCollectionTypeMapper.mapColumns(filterPrimitiveCollectionType(root.getCollectionProperties())));
+		columns.addAll(mapTypeMapper.mapColumns(root.getMapProperties()));
+		
+		Set<CratePersistentProperty> properties = root.getEntityProperties();
+		properties.addAll(filterEntityCollectionType(root.getArrayProperties()));
+		properties.addAll(filterEntityCollectionType(root.getCollectionProperties()));
+			
+		for(CratePersistentProperty property : properties) {
+			
+			List<Column> subColumns = new LinkedList<Column>();
+			
+			CratePersistentEntity<?> entity = mappingContext.getPersistentEntity(property);
+			
+			barrier.guard(property);
+			
+			mapColumns(entity, subColumns, barrier);
+			
+			Column column = createColumn(property);
+			column.setSubColumns(subColumns);
+			
+			columns.add(column);
+		}
 	}
 	
 	private Column createColumn(CratePersistentProperty property) {
@@ -95,7 +142,48 @@ public class CratePersistentEntityTableDefinitionMapper /*implements TableDefini
 	private boolean isPrimitiveElementType(CratePersistentProperty collectionTypeProperty) {
 		return HOLDER.isSimpleType(collectionTypeProperty.getComponentType());
 	}
-
+	
+	private Set<CratePersistentProperty> filterPrimitiveCollectionType(Set<CratePersistentProperty> properties) {
+		
+		Set<CratePersistentProperty> filtered = new LinkedHashSet<CratePersistentProperty>();
+		
+		for(CratePersistentProperty property : properties) {
+			
+			checkNestedCollection(property);
+			
+			if(isPrimitiveElementType(property)) {
+				filtered.add(property);
+			}
+		}
+		
+		return filtered;
+	}
+	
+	private Set<CratePersistentProperty> filterEntityCollectionType(Set<CratePersistentProperty> properties) {
+		
+		Set<CratePersistentProperty> filtered = new LinkedHashSet<CratePersistentProperty>();
+		
+		for(CratePersistentProperty property : properties) {
+			
+			checkNestedCollection(property);
+			
+			if(!isPrimitiveElementType(property)) {
+				filtered.add(property);
+			}
+		}
+		
+		return filtered;
+	}
+	
+	private void checkNestedCollection(CratePersistentProperty property) {
+		
+		TypeInformation<?> componentType = from(property.getComponentType());
+		
+		if(componentType.isCollectionLike()) {
+			throw new InvalidCrateApiUsageException("currently crate does not support nested arrays/collections of arrays/collections");
+		}
+	}
+	
 	/**
 	 * 
 	 * @author Hasnain Javed
@@ -181,111 +269,6 @@ public class CratePersistentEntityTableDefinitionMapper /*implements TableDefini
 			}
 			
 			return columns;
-		}
-	}
-	
-	/**
-	 * 
-	 * @author Hasnain Javed
-	 * @since 1.0.0
-	 * 
-	 * Creates columns for entity (nested object) type properties.
-	 * Nested arrays/collections of arrays/collections are not currently supported by crate db
-	 */
-	private class EntityColumnMapper {
-		
-		/**
-		 * @param entity entity object, must not be {@literal null}.
-		 * @return list of columns of crate type object
-		 */
-		public List<Column> mapColumns(CratePersistentEntity<?> entity) {
-			
-			List<Column> columns = new LinkedList<Column>();
-			
-			mapColumns(entity, columns, cyclicReferenceBarrier());
-			
-			return columns;
-		}
-		
-		/**
-		 * Recursively crawls over a nested object's fields
-		 * @param root entity object, must not be {@literal null}.
-		 * @param columns list of columns fot root entity object, must not be {@literal null}.
-		 * @param barrier to detect potential cycles within entities.
-		 * @return list of columns (with optional list of subcloumns) of crate type object
-		 */
-		private void mapColumns(CratePersistentEntity<?> root, List<Column> columns, CyclicReferenceBarrier barrier) {
-			
-			notNull(root);
-			notNull(columns);
-			
-			logger.debug("creating object column for type {}", root.getType());
-			
-			columns.addAll(primitiveTypeMapper.mapColumns(root.getPrimitiveProperties()));			
-			columns.addAll(primitiveCollectionTypeMapper.mapColumns(filterPrimitiveCollectionType(root.getArrayProperties())));
-			columns.addAll(primitiveCollectionTypeMapper.mapColumns(filterPrimitiveCollectionType(root.getCollectionProperties())));
-			columns.addAll(mapTypeMapper.mapColumns(root.getMapProperties()));
-			
-			Set<CratePersistentProperty> properties = root.getEntityProperties();
-			properties.addAll(filterEntityCollectionType(root.getArrayProperties()));
-			properties.addAll(filterEntityCollectionType(root.getCollectionProperties()));
-				
-			for(CratePersistentProperty property : properties) {
-				
-				List<Column> subColumns = new LinkedList<Column>();
-				
-				CratePersistentEntity<?> entity = mappingContext.getPersistentEntity(property);
-				
-				barrier.guard(property);
-				
-				mapColumns(entity, subColumns, barrier);
-				
-				Column column = createColumn(property);
-				column.setSubColumns(subColumns);
-				
-				columns.add(column);
-			}
-		}
-		
-		private Set<CratePersistentProperty> filterPrimitiveCollectionType(Set<CratePersistentProperty> properties) {
-			
-			Set<CratePersistentProperty> filtered = new LinkedHashSet<CratePersistentProperty>();
-			
-			for(CratePersistentProperty property : properties) {
-				
-				checkNestedCollection(property);
-				
-				if(isPrimitiveElementType(property)) {
-					filtered.add(property);
-				}
-			}
-			
-			return filtered;
-		}
-		
-		private Set<CratePersistentProperty> filterEntityCollectionType(Set<CratePersistentProperty> properties) {
-			
-			Set<CratePersistentProperty> filtered = new LinkedHashSet<CratePersistentProperty>();
-			
-			for(CratePersistentProperty property : properties) {
-				
-				checkNestedCollection(property);
-				
-				if(!isPrimitiveElementType(property)) {
-					filtered.add(property);
-				}
-			}
-			
-			return filtered;
-		}
-		
-		private void checkNestedCollection(CratePersistentProperty property) {
-			
-			TypeInformation<?> componentType = from(property.getComponentType());
-			
-			if(componentType.isCollectionLike()) {
-				throw new InvalidCrateApiUsageException("currently crate does not support nested arrays/collections of arrays/collections");
-			}
 		}
 	}
 }
