@@ -14,15 +14,38 @@
  * limitations under the License.
  */
 
-package org.springframework.data.crate.core.mapping;
+package org.springframework.data.crate.core.mapping.schema;
+
+import static org.springframework.util.Assert.hasText;
+import static org.springframework.util.Assert.notEmpty;
+
+import java.util.List;
 
 /**
- * {@link TableDefinitionMapper} creates crate specific table definition for a given class.
+ * {@link TableDefinition} holds definition for table and columns.
  * 
  * @author Hasnain Javed
  * @since 1.0.0
  */
-interface TableDefinitionMapper {
+class TableDefinition {
 	
-	TableDefinition createDefinition(CratePersistentEntity<?> entity);
+	private String name;
+	
+	private List<Column> columns;
+
+	public TableDefinition(String name, List<Column> columns) {
+		super();
+		hasText(name);
+		notEmpty(columns);
+		this.name = name;
+		this.columns = columns;
+	}
+
+	public String getName() {
+		return name;
+	}
+	
+	public List<Column> getColumns() {
+		return columns;
+	}
 }

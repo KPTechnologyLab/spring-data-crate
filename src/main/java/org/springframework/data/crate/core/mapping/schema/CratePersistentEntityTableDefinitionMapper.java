@@ -13,11 +13,12 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.springframework.data.crate.core.mapping;
+package org.springframework.data.crate.core.mapping.schema;
 
 import static java.lang.Boolean.TRUE;
 import static org.slf4j.LoggerFactory.getLogger;
 import static org.springframework.data.crate.core.CyclicReferenceBarrier.cyclicReferenceBarrier;
+import static org.springframework.data.crate.core.mapping.CrateSimpleTypes.HOLDER;
 import static org.springframework.data.util.ClassTypeInformation.from;
 import static org.springframework.util.Assert.notNull;
 
@@ -30,6 +31,9 @@ import java.util.Set;
 import org.slf4j.Logger;
 import org.springframework.data.crate.InvalidCrateApiUsageException;
 import org.springframework.data.crate.core.CyclicReferenceBarrier;
+import org.springframework.data.crate.core.mapping.CratePersistentEntity;
+import org.springframework.data.crate.core.mapping.CratePersistentProperty;
+import org.springframework.data.mapping.context.MappingContext;
 import org.springframework.data.util.TypeInformation;
 
 /**
@@ -40,17 +44,17 @@ import org.springframework.data.util.TypeInformation;
  * Creates table definitions for persistent entities.
  * The table definitions may be used to generate crate specific DDL
  */
-public class CratePersistentEntityTableDefinitionMapper implements TableDefinitionMapper {
+public class CratePersistentEntityTableDefinitionMapper /*implements TableDefinitionMapper*/ {
 	
 	private final Logger logger = getLogger(getClass());
 	
-	private final CrateMappingContext mappingContext;
+	private final MappingContext<? extends CratePersistentEntity<?>, CratePersistentProperty> mappingContext;
 	private final EntityColumnMapper entityTypeMapper;
 	private final PrimitiveColumnMapper primitiveTypeMapper;
 	private final PrimitiveCollectionTypeColumnMapper primitiveCollectionTypeMapper;
 	private final MapTypeColumnMapper mapTypeMapper;
 	
-	public CratePersistentEntityTableDefinitionMapper(CrateMappingContext mappingContext) {
+	public CratePersistentEntityTableDefinitionMapper(MappingContext<? extends CratePersistentEntity<?>, CratePersistentProperty> mappingContext) {
 		super();
 		this.mappingContext = mappingContext;
 		entityTypeMapper = new EntityColumnMapper();
@@ -59,18 +63,14 @@ public class CratePersistentEntityTableDefinitionMapper implements TableDefiniti
 		mapTypeMapper = new MapTypeColumnMapper();
 	}
 	
-	@Override
+//	@Override
 	public TableDefinition createDefinition(CratePersistentEntity<?> entity) {
 		
 		logger.debug("generating table definition for {}", entity.getType());
 		
 		List<Column> columns = entityTypeMapper.mapColumns(entity);
 		
-		TableDefinition table = new TableDefinition();
-		table.setName(entity.getTableName());
-		table.setColumns(columns);
-		
-		return table;
+		return new TableDefinition(entity.getTableName(), columns);
 	}
 	
 	private Column createColumn(CratePersistentProperty property) {
@@ -93,7 +93,7 @@ public class CratePersistentEntityTableDefinitionMapper implements TableDefiniti
 	}
 	
 	private boolean isPrimitiveElementType(CratePersistentProperty collectionTypeProperty) {
-		return mappingContext.isSimpleType(collectionTypeProperty.getComponentType());
+		return HOLDER.isSimpleType(collectionTypeProperty.getComponentType());
 	}
 
 	/**

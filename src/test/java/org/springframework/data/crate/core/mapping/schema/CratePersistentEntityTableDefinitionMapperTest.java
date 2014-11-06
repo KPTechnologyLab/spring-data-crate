@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package org.springframework.data.crate.core.mapping;
+package org.springframework.data.crate.core.mapping.schema;
 
 import static java.util.Collections.singleton;
 import static org.hamcrest.Matchers.is;
@@ -38,18 +38,20 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
+import org.junit.Ignore;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.junit.runners.Suite;
 import org.junit.runners.Suite.SuiteClasses;
 import org.springframework.data.crate.InvalidCrateApiUsageException;
 import org.springframework.data.crate.core.CyclicReferenceException;
-import org.springframework.data.crate.core.mapping.CratePersistentEntityTableDefinitionMapperTest.CollectionTypeTableMappingTest;
-import org.springframework.data.crate.core.mapping.CratePersistentEntityTableDefinitionMapperTest.EntityTypeTableMappingTest;
-import org.springframework.data.crate.core.mapping.CratePersistentEntityTableDefinitionMapperTest.MapTypeTableMappingTest;
-import org.springframework.data.crate.core.mapping.CratePersistentEntityTableDefinitionMapperTest.PrimitivesTableMappingTest;
-import org.springframework.data.crate.core.mapping.CratePersistentEntityTableDefinitionMapperTest.TableDefinitionMappingTest;
+import org.springframework.data.crate.core.mapping.CrateMappingContext;
 import org.springframework.data.crate.core.mapping.annotations.Table;
+import org.springframework.data.crate.core.mapping.schema.CratePersistentEntityTableDefinitionMapperTest.CollectionTypeTableMappingTest;
+import org.springframework.data.crate.core.mapping.schema.CratePersistentEntityTableDefinitionMapperTest.EntityTypeTableMappingTest;
+import org.springframework.data.crate.core.mapping.schema.CratePersistentEntityTableDefinitionMapperTest.MapTypeTableMappingTest;
+import org.springframework.data.crate.core.mapping.schema.CratePersistentEntityTableDefinitionMapperTest.PrimitivesTableMappingTest;
+import org.springframework.data.crate.core.mapping.schema.CratePersistentEntityTableDefinitionMapperTest.TableDefinitionMappingTest;
 
 /**
  * @author Hasnain Javed
@@ -66,6 +68,7 @@ public class CratePersistentEntityTableDefinitionMapperTest {
 	 * 
 	 * @author Hasnain Javed 
 	 */
+	@Ignore
 	public static class TableDefinitionMappingTest {
 		
 		@Test
@@ -86,79 +89,11 @@ public class CratePersistentEntityTableDefinitionMapperTest {
 			assertThat(tableDefinition.getName(), is(AnnotatedTestEntity.class.getAnnotation(Table.class).name()));
 		}
 		
-		@Test
-		public void shouldCreateStatementWithPrimitiveColumn() {
-			
-			TableDefinition tableDefinition = initMappingContextAndGetTableDefinition(EntityWithPrimitives.class);
-			assertThat(tableDefinition, is(notNullValue()));
-			assertThat(tableDefinition.toSqlStatement(), is("create table entity (stringField string, integerField integer)"));
-		}
-		
-		@Test
-		public void shouldCreateStatementWithPrimitiveCollection() {
-			
-			TableDefinition tableDefinition = initMappingContextAndGetTableDefinition(EntityWithPrimitiveCollection.class);
-			assertThat(tableDefinition, is(notNullValue()));
-			assertThat(tableDefinition.toSqlStatement(), is("create table entity (integers array(integer))"));
-		}
-		
-		@Test
-		public void shouldCreateStatementWithNoFields() {
-			
-			TableDefinition tableDefinition = initMappingContextAndGetTableDefinition(EntityWithNestedEntity.class);
-			assertThat(tableDefinition, is(notNullValue()));
-			assertThat(tableDefinition.toSqlStatement(), is("create table entity (stringField string, nested object as (stringField string, integerField integer))"));
-		}
-		
-		@Test
-		public void shouldCreateStatementWithMap() {
-			
-			TableDefinition tableDefinition = initMappingContextAndGetTableDefinition(EntityWithMap.class);
-			assertThat(tableDefinition, is(notNullValue()));
-			assertThat(tableDefinition.toSqlStatement(), is("create table entity (map object)"));
-		}
-		
-		@Test
-		public void shouldCreateStatementWithNestedEntity() {
-			
-			TableDefinition tableDefinition = initMappingContextAndGetTableDefinition(EntityWithEntityCollection.class);
-			assertThat(tableDefinition, is(notNullValue()));
-			assertThat(tableDefinition.toSqlStatement(), is("create table entity (stringField string, nestedEntities array(object as (stringField string, integerField integer)))"));
-		}
-		
 		static class TestEntity {
 		}
 		
 		@Table(name="test_entity")
 		static class AnnotatedTestEntity {
-		}
-		
-		@Table(name="entity")
-		static class EntityWithPrimitives {
-			String stringField;
-			int integerField;
-		}
-		
-		@Table(name="entity")
-		static class EntityWithPrimitiveCollection {
-			List<Integer> integers;
-		}
-		
-		@Table(name="entity")
-		static class EntityWithMap {
-			Map<String, Integer> map;
-		}
-		
-		@Table(name="entity")
-		static class EntityWithNestedEntity {
-			String stringField;
-			EntityWithPrimitives nested;
-		}
-		
-		@Table(name="entity")
-		static class EntityWithEntityCollection {
-			String stringField;
-			Set<EntityWithPrimitives> nestedEntities;
 		}
 	}
 	
