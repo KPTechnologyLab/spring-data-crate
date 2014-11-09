@@ -20,6 +20,7 @@ import static java.util.Collections.singleton;
 import static org.hamcrest.Matchers.is;
 import static org.hamcrest.Matchers.notNullValue;
 import static org.junit.Assert.assertThat;
+import static org.springframework.util.StringUtils.replace;
 
 import java.util.Set;
 
@@ -34,7 +35,7 @@ import org.springframework.data.sample.entities.SampleEntity;
  * @author Hasnain Javed
  * @since 1.0.0
  */
-public class SimpleCratePersistentEntityTests {
+public class SimpleCratePersistentEntityTest {
 	
 	@Test
 	public void shouldGetTableNameFromClass() {
@@ -44,7 +45,7 @@ public class SimpleCratePersistentEntityTests {
 		String tableName = mappingContext.getPersistentEntity(SampleEntity.class).getTableName();
 		
 		assertThat(tableName, is(notNullValue()));
-		assertThat(tableName, is(SampleEntity.class.getName()));
+		assertThat(tableName, is(replace(SampleEntity.class.getName(), ".", "_")));
 	}
 	
 	@Test
