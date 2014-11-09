@@ -15,18 +15,19 @@
  */
 
 package org.springframework.data.crate.core;
-
+import static java.lang.String.format;
+import static org.slf4j.LoggerFactory.getLogger;
+import static org.springframework.util.Assert.notNull;
+import io.crate.action.sql.SQLActionException;
+import io.crate.action.sql.SQLResponse;
 import io.crate.client.CrateClient;
 
 import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import org.springframework.data.crate.CrateSQLActionException;
 import org.springframework.data.crate.core.convert.CrateConverter;
 import org.springframework.data.crate.core.convert.MappingCrateConverter;
-import org.springframework.data.crate.core.mapping.CratePersistentEntity;
-import org.springframework.data.crate.core.mapping.CratePersistentProperty;
 import org.springframework.data.crate.core.mapping.CrateMappingContext;
-import org.springframework.data.mapping.PropertyHandler;
-import org.springframework.util.Assert;
+import org.springframework.data.crate.core.mapping.CratePersistentEntity;
 
 /**
  * @author Hasnain Javed
@@ -36,7 +37,8 @@ import org.springframework.util.Assert;
  */
 public class CrateTemplate implements CrateOperations {
 
-    private static final Logger logger = LoggerFactory.getLogger(CrateTemplate.class);
+    private final Logger logger = getLogger(CrateTemplate.class);
+    
 	private final CrateClient client;
     private CrateConverter crateConverter;
 	
@@ -46,8 +48,8 @@ public class CrateTemplate implements CrateOperations {
 
     public CrateTemplate(CrateClient client, CrateConverter crateConverter) {
         this.client  = client;
-        this.crateConverter = crateConverter == null?
-                new MappingCrateConverter(new CrateMappingContext()) : crateConverter;
+        this.crateConverter = crateConverter == null ? new MappingCrateConverter(new CrateMappingContext()) 
+        											 : crateConverter;
     }
 
     @Override
@@ -55,6 +57,22 @@ public class CrateTemplate implements CrateOperations {
         return this.crateConverter;
     }
 
+    @Override
+	public SQLResponse execute(CrateSQLAction action) throws CrateSQLActionException {
+		notNull(action);
+    	try {
+			return client.sql(action.getSQLRequest()).actionGet();
+		}catch(SQLActionException e) {
+			throw new CrateSQLActionException(format("Failed to execute query [ %s ]", action.getSQLStatement()), e);
+		}
+	}
+    
+    @Override
+	public <T> void execute(CrateSQLAction action, CrateSQLResponseHandler<T> handler) {
+		notNull(handler);
+		handler.handle(execute(action));
+	}
+    
     private CratePersistentEntity<?> getPersistentEntityFor(Class<?> clazz) {
         return crateConverter.getMappingContext().getPersistentEntity(clazz);
     }

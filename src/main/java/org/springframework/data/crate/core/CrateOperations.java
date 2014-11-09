@@ -16,6 +16,9 @@
 
 package org.springframework.data.crate.core;
 
+import io.crate.action.sql.SQLResponse;
+
+import org.springframework.data.crate.CrateSQLActionException;
 import org.springframework.data.crate.core.convert.CrateConverter;
 
 /**
@@ -32,4 +35,18 @@ public interface CrateOperations {
      * @return CrateConverter
      */
     CrateConverter getConverter();
+    
+    /**
+     * execute the given action (insert | update | delete | alter | select)
+     * @param action must not be {@literal null}.
+     * @return response returned by crate as a result of executing the specified action
+     */
+    SQLResponse execute(CrateSQLAction action) throws CrateSQLActionException;
+    
+    /**
+     * execute the given action (insert | update | delete | alter | select)
+     * @param action must not be {@literal null}.
+     * @param handler must not be {@literal null}. 
+     */
+    <T> void execute(CrateSQLAction action, CrateSQLResponseHandler<T> handler) throws CrateSQLActionException;
 }
