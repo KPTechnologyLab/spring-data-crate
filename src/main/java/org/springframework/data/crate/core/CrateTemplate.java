@@ -23,6 +23,8 @@ import io.crate.action.sql.SQLResponse;
 import io.crate.client.CrateClient;
 
 import org.slf4j.Logger;
+import org.springframework.dao.DataAccessException;
+import org.springframework.dao.support.PersistenceExceptionTranslator;
 import org.springframework.data.crate.CrateSQLActionException;
 import org.springframework.data.crate.core.convert.CrateConverter;
 import org.springframework.data.crate.core.convert.MappingCrateConverter;
@@ -40,6 +42,7 @@ public class CrateTemplate implements CrateOperations {
     private final Logger logger = getLogger(CrateTemplate.class);
     
 	private final CrateClient client;
+	private final PersistenceExceptionTranslator exceptionTranslator = new CrateExceptionTranslator();
     private CrateConverter crateConverter;
 	
 	public CrateTemplate(CrateClient client) {
@@ -58,22 +61,39 @@ public class CrateTemplate implements CrateOperations {
     }
 
     @Override
-	public SQLResponse execute(CrateSQLAction action) throws CrateSQLActionException {
-		notNull(action);
-    	try {
-			return client.sql(action.getSQLRequest()).actionGet();
-		}catch(SQLActionException e) {
-			throw new CrateSQLActionException(format("Failed to execute query [ %s ]", action.getSQLStatement()), e);
-		}
-	}
+	public SQLResponse execute(CrateSQLAction action) throws DataAccessException {
+    	return this.execute(action, new CrateSQLResponseHandler<SQLResponse>() {
+			@Override
+			public SQLResponse handle(SQLResponse response) {
+				return response;
+			}
+    	});
+    }
     
     @Override
-	public <T> void execute(CrateSQLAction action, CrateSQLResponseHandler<T> handler) {
-		notNull(handler);
-		handler.handle(execute(action));
-	}
+	public <T> T execute(CrateSQLAction action, CrateSQLResponseHandler<T> handler) throws DataAccessException {
+    	notNull(action, "An implementation of CrateSQLAction is required");
+    	notNull(handler, "An implementation of CrateSQLResponseHandler<T> is required");
+    	try {
+    		return (T)handler.handle(client.sql(action.getSQLRequest()).actionGet());
+    	}catch(SQLActionException e) {
+    		throw tryConvertingRuntimeException(e);
+		}
+    }
     
     private CratePersistentEntity<?> getPersistentEntityFor(Class<?> clazz) {
         return crateConverter.getMappingContext().getPersistentEntity(clazz);
     }
+    
+    /**
+	 * Tries to convert the given {@link RuntimeException} into a {@link DataAccessException}. The original
+	 * exception is returned if the conversion fails.
+	 * 
+	 * @param ex
+	 * @return
+	 */
+	private RuntimeException tryConvertingRuntimeException(RuntimeException ex) {
+		RuntimeException resolved = exceptionTranslator.translateExceptionIfPossible(ex);
+		return resolved == null ? ex : resolved;
+	}
 }
