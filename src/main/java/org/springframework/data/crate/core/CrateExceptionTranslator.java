@@ -48,6 +48,7 @@ import org.springframework.dao.InvalidDataAccessResourceUsageException;
 import org.springframework.dao.OptimisticLockingFailureException;
 import org.springframework.dao.support.PersistenceExceptionTranslator;
 import org.springframework.data.crate.DuplicateTableException;
+import org.springframework.data.crate.NoSuchTableException;
 import org.springframework.data.crate.UncategorizedCrateException;
 
 /**
@@ -80,9 +81,10 @@ public class CrateExceptionTranslator implements PersistenceExceptionTranslator 
 				return new DataIntegrityViolationException(ex.getMessage(), ex);
 			case DUPLICATE_TABLE_NAME:
 				return new DuplicateTableException(ex.getMessage(), ex);
+			case UNKNOWN_TABLE:
+				return new NoSuchTableException(ex.getMessage(), ex);
 			case INVALID_SQL_STATEMENT_OR_SYNTAX:
 			case INVALID_TABLE_NAME:
-			case UNKNOWN_TABLE:
 			case UNKNOWN_ANALYZER:
 			case UNKNOWN_COLUMN:
 			case UNKNOWN_TYPE:
