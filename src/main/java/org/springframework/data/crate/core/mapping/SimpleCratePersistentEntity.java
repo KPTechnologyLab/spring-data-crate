@@ -16,7 +16,7 @@
 package org.springframework.data.crate.core.mapping;
 
 import static org.springframework.util.Assert.hasText;
-import static org.springframework.util.StringUtils.replace;
+import static org.springframework.util.StringUtils.*;
 
 import java.util.LinkedHashSet;
 import java.util.Set;
@@ -199,7 +199,7 @@ public class SimpleCratePersistentEntity<T> extends BasicPersistentEntity<T, Cra
 			hasText(name, "Invalid name. Make sure the name is defined. e.g @Table(name=\"foo\")");
 			tableName = name;
 		}else {
-			tableName = replace(clazz.getName(), ".", "_");
+			tableName = replace(clazz.getName(), ".", "_").toLowerCase();
 		}
 		
 		return tableName;
