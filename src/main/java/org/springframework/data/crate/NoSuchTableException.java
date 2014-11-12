@@ -26,6 +26,10 @@ public class NoSuchTableException extends InvalidDataAccessResourceUsageExceptio
 	
 	private static final long serialVersionUID = 756197703690095538L;
 	
+	public NoSuchTableException(String msg) {
+		super(msg);
+	}
+	
 	public NoSuchTableException(String msg, Throwable cause) {
 		super(msg, cause);
 	}
