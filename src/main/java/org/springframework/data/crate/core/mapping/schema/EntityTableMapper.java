@@ -72,11 +72,22 @@ class EntityTableMapper {
 	 */
 	public TableDefinition createDefinition(CratePersistentEntity<?> entity) {
 		
+		List<Column> columns = createColumns(entity);
+		
+		return new TableDefinition(entity.getTableName(), columns);
+	}
+	
+	/**
+	 * @param entity entity object, must not be {@literal null}. 
+	 * @return list of columns
+	 */
+	public List<Column> createColumns(CratePersistentEntity<?> entity) {
+		
 		List<Column> columns = new LinkedList<Column>();
 		
 		mapColumns(entity, columns, cyclicReferenceBarrier());
 		
-		return new TableDefinition(entity.getTableName(), columns);
+		return columns;
 	}
 	
 	/**
