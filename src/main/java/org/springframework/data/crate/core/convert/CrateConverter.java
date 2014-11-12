@@ -16,6 +16,7 @@
 package org.springframework.data.crate.core.convert;
 
 import org.springframework.core.convert.ConversionService;
+import org.springframework.dao.support.PersistenceExceptionTranslator;
 import org.springframework.data.crate.core.mapping.CratePersistentEntity;
 import org.springframework.data.crate.core.mapping.CratePersistentProperty;
 import org.springframework.data.mapping.context.MappingContext;
@@ -24,6 +25,7 @@ import org.springframework.data.mapping.context.MappingContext;
  * CrateConverter
  *
  * @author Rizwan Idrees
+ * @author Hasnain Javed
  */
 
 public interface CrateConverter {
@@ -41,4 +43,11 @@ public interface CrateConverter {
 	 * @return never {@literal null}.
 	 */
 	ConversionService getConversionService();
+	
+	/**
+	 * Exposes a shared {@link CrateExceptionTranslator}.
+	 * 
+	 * @return will never be {@literal null}.
+	 */
+	PersistenceExceptionTranslator getExceptionTranslator();
 }
