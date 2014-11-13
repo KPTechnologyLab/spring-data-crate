@@ -41,11 +41,10 @@ import org.springframework.data.util.TypeInformation;
  * @author Hasnain Javed
  * @since 1.0.0
  * 
- * Creates table definitions for persistent entities.
  * Creates columns from entity properties and maps them from java type to crate data type.
  * Nested arrays/collections of arrays/collections are not currently supported by crate db
  */
-class EntityTableMapper {
+class EntityColumnMapper {
 	
 	private final Logger logger = getLogger(getClass());
 	
@@ -55,26 +54,11 @@ class EntityTableMapper {
 	
 	private final MappingContext<? extends CratePersistentEntity<?>, CratePersistentProperty> mappingContext;
 	
-	private EntityTableMapper(MappingContext<? extends CratePersistentEntity<?>, CratePersistentProperty> mappingContext) {
+	public EntityColumnMapper(MappingContext<? extends CratePersistentEntity<?>, CratePersistentProperty> mappingContext) {
 		this.mappingContext = mappingContext;
 		this.primitiveTypeMapper = new PrimitiveColumnMapper();
 		this.primitiveCollectionTypeMapper = new PrimitiveCollectionTypeColumnMapper();
 		this.mapTypeMapper = new MapTypeColumnMapper();
-	}
-	
-	public static EntityTableMapper entityTableMapper(MappingContext<? extends CratePersistentEntity<?>, CratePersistentProperty> mappingContext) {
-		return new EntityTableMapper(mappingContext);
-	}
-	
-	/**
-	 * @param entity entity object, must not be {@literal null}. 
-	 * @return table definition containing table name and columns
-	 */
-	public TableDefinition createDefinition(CratePersistentEntity<?> entity) {
-		
-		List<Column> columns = createColumns(entity);
-		
-		return new TableDefinition(entity.getTableName(), columns);
 	}
 	
 	/**

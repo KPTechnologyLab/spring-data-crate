@@ -15,7 +15,6 @@
  */
 package org.springframework.data.crate.core.mapping.schema;
 
-import static org.springframework.data.crate.core.mapping.schema.EntityTableMapper.*;
 import static java.util.Collections.singleton;
 import static org.hamcrest.Matchers.is;
 import static org.hamcrest.Matchers.notNullValue;
@@ -45,10 +44,10 @@ import org.junit.runners.Suite.SuiteClasses;
 import org.springframework.data.crate.InvalidCrateApiUsageException;
 import org.springframework.data.crate.core.CyclicReferenceException;
 import org.springframework.data.crate.core.mapping.CrateMappingContext;
-import org.springframework.data.crate.core.mapping.schema.EntityTableMapperTest.CollectionTypeTableMappingTest;
-import org.springframework.data.crate.core.mapping.schema.EntityTableMapperTest.EntityTypeTableMappingTest;
-import org.springframework.data.crate.core.mapping.schema.EntityTableMapperTest.MapTypeTableMappingTest;
-import org.springframework.data.crate.core.mapping.schema.EntityTableMapperTest.PrimitivesTableMappingTest;
+import org.springframework.data.crate.core.mapping.schema.EntityColumnMapperTest.CollectionTypeColumnMappingTest;
+import org.springframework.data.crate.core.mapping.schema.EntityColumnMapperTest.EntityTypeColumnMappingTest;
+import org.springframework.data.crate.core.mapping.schema.EntityColumnMapperTest.MapTypeColumnMappingTest;
+import org.springframework.data.crate.core.mapping.schema.EntityColumnMapperTest.PrimitivesColumnMappingTest;
 
 /**
  * @author Hasnain Javed
@@ -56,36 +55,36 @@ import org.springframework.data.crate.core.mapping.schema.EntityTableMapperTest.
  */
 
 @RunWith(Suite.class)
-@SuiteClasses({ PrimitivesTableMappingTest.class, CollectionTypeTableMappingTest.class, 
-				MapTypeTableMappingTest.class, EntityTypeTableMappingTest.class })
-public class EntityTableMapperTest {
+@SuiteClasses({ PrimitivesColumnMappingTest.class, CollectionTypeColumnMappingTest.class, 
+				MapTypeColumnMappingTest.class, EntityTypeColumnMappingTest.class })
+public class EntityColumnMapperTest {
 
 	/**
 	 * 
 	 * @author Hasnain Javed
 	 * @since 1.0.0
 	 */
-	public static class PrimitivesTableMappingTest {
+	public static class PrimitivesColumnMappingTest {
 		
 		@Test
 		public void shouldCreateDefinitionWithStringColumn() {
 			
-			TableDefinition tableDefinition = initMappingContextAndGetTableDefinition(EntityWithString.class);
+			List<Column> columns = initMappingContextAndGetColumns(EntityWithString.class);
 			
-			assertThat(tableDefinition.getColumns(), is(notNullValue()));
-			assertThat(tableDefinition.getColumns().size(), is(1));
-			assertThat(tableDefinition.getColumns().iterator().next().getType(), is(STRING));
+			assertThat(columns, is(notNullValue()));
+			assertThat(columns.size(), is(1));
+			assertThat(columns.iterator().next().getType(), is(STRING));
 		}
 		
 		@Test
 		public void shouldCreateDefinitionWithShortColumn() {
 			
-			TableDefinition tableDefinition = initMappingContextAndGetTableDefinition(EntityWithShort.class);
+			List<Column> columns = initMappingContextAndGetColumns(EntityWithShort.class);
 			
-			assertThat(tableDefinition.getColumns(), is(notNullValue()));
-			assertThat(tableDefinition.getColumns().size(), is(2));
+			assertThat(columns, is(notNullValue()));
+			assertThat(columns.size(), is(2));
 			
-			for(Column column : tableDefinition.getColumns()) {
+			for(Column column : columns) {
 				assertThat(column.getType(), is(SHORT));
 			}
 		}
@@ -93,12 +92,12 @@ public class EntityTableMapperTest {
 		@Test
 		public void shouldCreateDefinitionWithByteColumn() {
 			
-			TableDefinition tableDefinition = initMappingContextAndGetTableDefinition(EntityWithByte.class);
+			List<Column> columns = initMappingContextAndGetColumns(EntityWithByte.class);
 			
-			assertThat(tableDefinition.getColumns(), is(notNullValue()));
-			assertThat(tableDefinition.getColumns().size(), is(2));
+			assertThat(columns, is(notNullValue()));
+			assertThat(columns.size(), is(2));
 			
-			for(Column column : tableDefinition.getColumns()) {
+			for(Column column : columns) {
 				assertThat(column.getType(), is(BYTE));
 			}
 		}
@@ -106,12 +105,12 @@ public class EntityTableMapperTest {
 		@Test
 		public void shouldCreateDefinitionWithIntegerColumn() {
 			
-			TableDefinition tableDefinition = initMappingContextAndGetTableDefinition(EntityWithInt.class);
+			List<Column> columns = initMappingContextAndGetColumns(EntityWithInt.class);
 			
-			assertThat(tableDefinition.getColumns(), is(notNullValue()));
-			assertThat(tableDefinition.getColumns().size(), is(2));
+			assertThat(columns, is(notNullValue()));
+			assertThat(columns.size(), is(2));
 			
-			for(Column column : tableDefinition.getColumns()) {
+			for(Column column : columns) {
 				assertThat(column.getType(), is(INTEGER));	
 			}
 		}
@@ -119,12 +118,12 @@ public class EntityTableMapperTest {
 		@Test
 		public void shouldCreateDefinitionWithLongColumn() {
 			
-			TableDefinition tableDefinition = initMappingContextAndGetTableDefinition(EntityWithLong.class);
+			List<Column> columns = initMappingContextAndGetColumns(EntityWithLong.class);
 			
-			assertThat(tableDefinition.getColumns(), is(notNullValue()));
-			assertThat(tableDefinition.getColumns().size(), is(2));
+			assertThat(columns, is(notNullValue()));
+			assertThat(columns.size(), is(2));
 			
-			for(Column column : tableDefinition.getColumns()) {
+			for(Column column : columns) {
 				assertThat(column.getType(), is(LONG));	
 			}
 		}
@@ -132,12 +131,12 @@ public class EntityTableMapperTest {
 		@Test
 		public void shouldCreateDefinitionWithFloatColumn() {
 			
-			TableDefinition tableDefinition = initMappingContextAndGetTableDefinition(EntityWithFloat.class);
+			List<Column> columns = initMappingContextAndGetColumns(EntityWithFloat.class);
 			
-			assertThat(tableDefinition.getColumns(), is(notNullValue()));
-			assertThat(tableDefinition.getColumns().size(), is(2));
+			assertThat(columns, is(notNullValue()));
+			assertThat(columns.size(), is(2));
 			
-			for(Column column : tableDefinition.getColumns()) {
+			for(Column column : columns) {
 				assertThat(column.getType(), is(FLOAT));	
 			}
 		}
@@ -145,12 +144,12 @@ public class EntityTableMapperTest {
 		@Test
 		public void shouldCreateDefinitionWithDoubleColumn() {
 			
-			TableDefinition tableDefinition = initMappingContextAndGetTableDefinition(EntityWithDouble.class);
+			List<Column> columns = initMappingContextAndGetColumns(EntityWithDouble.class);
 			
-			assertThat(tableDefinition.getColumns(), is(notNullValue()));
-			assertThat(tableDefinition.getColumns().size(), is(2));
+			assertThat(columns, is(notNullValue()));
+			assertThat(columns.size(), is(2));
 			
-			for(Column column : tableDefinition.getColumns()) {
+			for(Column column : columns) {
 				assertThat(column.getType(), is(DOUBLE));	
 			}
 		}
@@ -158,12 +157,12 @@ public class EntityTableMapperTest {
 		@Test
 		public void shouldCreateDefinitionWithBooleanColumn() {
 			
-			TableDefinition tableDefinition = initMappingContextAndGetTableDefinition(EntityWithBoolean.class);
+			List<Column> columns = initMappingContextAndGetColumns(EntityWithBoolean.class);
 			
-			assertThat(tableDefinition.getColumns(), is(notNullValue()));
-			assertThat(tableDefinition.getColumns().size(), is(2));
+			assertThat(columns, is(notNullValue()));
+			assertThat(columns.size(), is(2));
 			
-			for(Column column : tableDefinition.getColumns()) {
+			for(Column column : columns) {
 				assertThat(column.getType(), is(BOOLEAN));	
 			}
 		}
@@ -171,11 +170,11 @@ public class EntityTableMapperTest {
 		@Test
 		public void shouldCreateDefinitionWithDateColumn() {
 			
-			TableDefinition tableDefinition = initMappingContextAndGetTableDefinition(EntityWithDate.class);
+			List<Column> columns = initMappingContextAndGetColumns(EntityWithDate.class);
 			
-			assertThat(tableDefinition.getColumns(), is(notNullValue()));
-			assertThat(tableDefinition.getColumns().size(), is(1));
-			assertThat(tableDefinition.getColumns().iterator().next().getType(), is(TIMESTAMP));
+			assertThat(columns, is(notNullValue()));
+			assertThat(columns.size(), is(1));
+			assertThat(columns.iterator().next().getType(), is(TIMESTAMP));
 		}
 		
 		static class EntityWithString {
@@ -227,17 +226,17 @@ public class EntityTableMapperTest {
 	 * @author Hasnain Javed
 	 * @since 1.0.0 
 	 */
-	public static class CollectionTypeTableMappingTest {
+	public static class CollectionTypeColumnMappingTest {
 		
 		@Test
 		public void shouldCreateDefinitionWithStringArrayColumn() {
 			
-			TableDefinition tableDefinition = initMappingContextAndGetTableDefinition(EntityWithStringArray.class);
+			List<Column> columns = initMappingContextAndGetColumns(EntityWithStringArray.class);
 			
-			assertThat(tableDefinition.getColumns(), is(notNullValue()));
-			assertThat(tableDefinition.getColumns().size(), is(1));
+			assertThat(columns, is(notNullValue()));
+			assertThat(columns.size(), is(1));
 			
-			for(Column column : tableDefinition.getColumns()) {
+			for(Column column : columns) {
 				assertThat(column.getType(), is(ARRAY));
 				assertThat(column.getElementType(), is(STRING));
 			}
@@ -246,12 +245,12 @@ public class EntityTableMapperTest {
 		@Test
 		public void shouldCreateDefinitionWithShortArrayColumn() {
 			
-			TableDefinition tableDefinition = initMappingContextAndGetTableDefinition(EntityWithShortCollection.class);
+			List<Column> columns = initMappingContextAndGetColumns(EntityWithShortCollection.class);
 			
-			assertThat(tableDefinition.getColumns(), is(notNullValue()));
-			assertThat(tableDefinition.getColumns().size(), is(1));
+			assertThat(columns, is(notNullValue()));
+			assertThat(columns.size(), is(1));
 			
-			for(Column column : tableDefinition.getColumns()) {
+			for(Column column : columns) {
 				assertThat(column.getType(), is(ARRAY));
 				assertThat(column.getElementType(), is(SHORT));
 			}
@@ -260,12 +259,12 @@ public class EntityTableMapperTest {
 		@Test
 		public void shouldCreateDefinitionWithIntegerArrayColumn() {
 			
-			TableDefinition tableDefinition = initMappingContextAndGetTableDefinition(EntityWithIntegerArray.class);
+			List<Column> columns = initMappingContextAndGetColumns(EntityWithIntegerArray.class);
 			
-			assertThat(tableDefinition.getColumns(), is(notNullValue()));
-			assertThat(tableDefinition.getColumns().size(), is(2));
+			assertThat(columns, is(notNullValue()));
+			assertThat(columns.size(), is(2));
 			
-			for(Column column : tableDefinition.getColumns()) {
+			for(Column column : columns) {
 				assertThat(column.getType(), is(ARRAY));
 				assertThat(column.getElementType(), is(INTEGER));
 			}
@@ -274,12 +273,12 @@ public class EntityTableMapperTest {
 		@Test
 		public void shouldCreateDefinitionWithLongArrayColumn() {
 			
-			TableDefinition tableDefinition = initMappingContextAndGetTableDefinition(EntityWithLongCollection.class);
+			List<Column> columns = initMappingContextAndGetColumns(EntityWithLongCollection.class);
 			
-			assertThat(tableDefinition.getColumns(), is(notNullValue()));
-			assertThat(tableDefinition.getColumns().size(), is(1));
+			assertThat(columns, is(notNullValue()));
+			assertThat(columns.size(), is(1));
 			
-			for(Column column : tableDefinition.getColumns()) {
+			for(Column column : columns) {
 				assertThat(column.getType(), is(ARRAY));
 				assertThat(column.getElementType(), is(LONG));
 			}
@@ -288,12 +287,12 @@ public class EntityTableMapperTest {
 		@Test
 		public void shouldCreateDefinitionWithFloatArrayColumn() {
 			
-			TableDefinition tableDefinition = initMappingContextAndGetTableDefinition(EntityWithFloatCollection.class);
+			List<Column> columns = initMappingContextAndGetColumns(EntityWithFloatCollection.class);
 			
-			assertThat(tableDefinition.getColumns(), is(notNullValue()));
-			assertThat(tableDefinition.getColumns().size(), is(1));
+			assertThat(columns, is(notNullValue()));
+			assertThat(columns.size(), is(1));
 			
-			for(Column column : tableDefinition.getColumns()) {
+			for(Column column : columns) {
 				assertThat(column.getType(), is(ARRAY));
 				assertThat(column.getElementType(), is(FLOAT));
 			}
@@ -302,19 +301,19 @@ public class EntityTableMapperTest {
 		@Test(expected=InvalidCrateApiUsageException.class)
 		public void shouldNotCreateDefinitionForNestedCollectionTypes() {
 			
-			initMappingContextAndGetTableDefinition(EntityWithCollectionOfArray.class);
+			initMappingContextAndGetColumns(EntityWithCollectionOfArray.class);
 		}
 		
 		@Test(expected=InvalidCrateApiUsageException.class)
 		public void shouldNotCreateDefinitionForNestedArrayTypes() {
 			
-			initMappingContextAndGetTableDefinition(EntityWithArrayOfCollection.class);
+			initMappingContextAndGetColumns(EntityWithArrayOfCollection.class);
 		}
 		
 		@Test(expected=InvalidCrateApiUsageException.class)
 		public void shouldNotCreateDefinitionForNestedArrayTypesOfArray() {
 			
-			initMappingContextAndGetTableDefinition(EntityWithArrayOfArray.class);
+			initMappingContextAndGetColumns(EntityWithArrayOfArray.class);
 		}
 		
 		static class EntityWithStringArray {
@@ -356,17 +355,17 @@ public class EntityTableMapperTest {
 	 * @author Hasnain Javed
 	 * @since 1.0.0 
 	 */
-	public static class MapTypeTableMappingTest {
+	public static class MapTypeColumnMappingTest {
 		
 		@Test
 		public void shouldCreateDefinitionWithStringMapColumn() {
 			
-			TableDefinition tableDefinition = initMappingContextAndGetTableDefinition(EntityWithStringMap.class);
+			List<Column> columns = initMappingContextAndGetColumns(EntityWithStringMap.class);
 			
-			assertThat(tableDefinition.getColumns(), is(notNullValue()));
-			assertThat(tableDefinition.getColumns().size(), is(1));
+			assertThat(columns, is(notNullValue()));
+			assertThat(columns.size(), is(1));
 			
-			for(Column column : tableDefinition.getColumns()) {
+			for(Column column : columns) {
 				assertThat(column.getType(), is(OBJECT));
 			}
 		}
@@ -381,45 +380,45 @@ public class EntityTableMapperTest {
 	 * @author Hasnain Javed
 	 * @since 1.0.0 
 	 */
-	public static class EntityTypeTableMappingTest {
+	public static class EntityTypeColumnMappingTest {
 		
 		@Test
 		public void shouldCreateDefinitionWithNestedEntity() {
 			
-			TableDefinition tableDefinition = initMappingContextAndGetTableDefinition(LevelOneEntity.class);
+			List<Column> columns = initMappingContextAndGetColumns(LevelOneEntity.class);
 			
-			assertThat(tableDefinition.getColumns(), is(notNullValue()));
-			assertThat(tableDefinition.getColumns().size(), is(2));
+			assertThat(columns, is(notNullValue()));
+			assertThat(columns.size(), is(2));
 			
 			// level 1
-			assertThat(tableDefinition.getColumns().get(0).getType(), is(STRING));
-			assertThat(tableDefinition.getColumns().get(1).getType(), is(OBJECT));
+			assertThat(columns.get(0).getType(), is(STRING));
+			assertThat(columns.get(1).getType(), is(OBJECT));
 			
 			// level 2
-			assertThat(tableDefinition.getColumns().get(1).getSubColumns().size(), is(2));
-			assertThat(tableDefinition.getColumns().get(1).getSubColumns().get(0).getType(), is(STRING));
-			assertThat(tableDefinition.getColumns().get(1).getSubColumns().get(1).getType(), is(ARRAY));
-			assertThat(tableDefinition.getColumns().get(1).getSubColumns().get(1).getElementType(), is(OBJECT));
+			assertThat(columns.get(1).getSubColumns().size(), is(2));
+			assertThat(columns.get(1).getSubColumns().get(0).getType(), is(STRING));
+			assertThat(columns.get(1).getSubColumns().get(1).getType(), is(ARRAY));
+			assertThat(columns.get(1).getSubColumns().get(1).getElementType(), is(OBJECT));
 			
 			// level 3
-			assertThat(tableDefinition.getColumns().get(1).getSubColumns().get(1).getSubColumns().size(), is(2));
-			assertThat(tableDefinition.getColumns().get(1).getSubColumns().get(1).getSubColumns().get(0).getType(), is(STRING));
-			assertThat(tableDefinition.getColumns().get(1).getSubColumns().get(1).getSubColumns().get(1).getType(), is(OBJECT));
+			assertThat(columns.get(1).getSubColumns().get(1).getSubColumns().size(), is(2));
+			assertThat(columns.get(1).getSubColumns().get(1).getSubColumns().get(0).getType(), is(STRING));
+			assertThat(columns.get(1).getSubColumns().get(1).getSubColumns().get(1).getType(), is(OBJECT));
 		}
 		
 		@Test(expected=CyclicReferenceException.class)
 		public void shouldDetectCycleForSelfReferencing() {
-				initMappingContextAndGetTableDefinition(SelfReferencingEntity.class);
+				initMappingContextAndGetColumns(SelfReferencingEntity.class);
 		}
 		
 		@Test(expected=CyclicReferenceException.class)
 		public void shouldDetectCycleForNestedClassViaCollectionReferencing() {
-				initMappingContextAndGetTableDefinition(LevelOneCycle.class);
+				initMappingContextAndGetColumns(LevelOneCycle.class);
 		}
 		
 		@Test(expected=CyclicReferenceException.class)
 		public void shouldDetectInBewteenCycleForNestedClassReferencing() {
-				initMappingContextAndGetTableDefinition(LevelThreeCycle.class);
+				initMappingContextAndGetColumns(LevelThreeCycle.class);
 		}
 		
 		static class LevelOneEntity {
@@ -454,9 +453,9 @@ public class EntityTableMapperTest {
 		}
 	}
 	
-	private static TableDefinition initMappingContextAndGetTableDefinition(Class<?> type) {
+	private static List<Column> initMappingContextAndGetColumns(Class<?> type) {
 		CrateMappingContext mappingContext = prepareMappingContext(type);
-		return entityTableMapper(mappingContext).createDefinition(mappingContext.getPersistentEntity(type)); 
+		return new EntityColumnMapper(mappingContext).createColumns(mappingContext.getPersistentEntity(type)); 
 	}
 
 	private static CrateMappingContext prepareMappingContext(Class<?> type) {
