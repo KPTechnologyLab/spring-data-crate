@@ -367,6 +367,8 @@ public class EntityColumnMapperTest {
 			
 			for(Column column : columns) {
 				assertThat(column.getType(), is(OBJECT));
+				assertThat(column.isMapColumn(), is(true));
+				assertThat(column.isObjectColumn(), is(false));
 			}
 		}
 		
@@ -393,6 +395,8 @@ public class EntityColumnMapperTest {
 			// level 1
 			assertThat(columns.get(0).getType(), is(STRING));
 			assertThat(columns.get(1).getType(), is(OBJECT));
+			assertThat(columns.get(1).isObjectColumn(), is(true));
+			assertThat(columns.get(1).isMapColumn(), is(false));
 			
 			// level 2
 			assertThat(columns.get(1).getSubColumns().size(), is(2));
