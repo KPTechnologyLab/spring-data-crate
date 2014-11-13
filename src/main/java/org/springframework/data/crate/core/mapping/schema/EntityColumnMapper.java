@@ -65,7 +65,7 @@ class EntityColumnMapper {
 	 * @param entity entity object, must not be {@literal null}. 
 	 * @return list of columns
 	 */
-	public List<Column> createColumns(CratePersistentEntity<?> entity) {
+	List<Column> createColumns(CratePersistentEntity<?> entity) {
 		
 		List<Column> columns = new LinkedList<Column>();
 		
@@ -115,11 +115,15 @@ class EntityColumnMapper {
 		}
 	}
 	
-	private Column createColumn(CratePersistentProperty property) {
+	Column createColumn(CratePersistentProperty property) {
+		return createColumn(property.getFieldName(), property);
+	}
+	
+	Column createColumn(String name, CratePersistentProperty property) {
 		
 		notNull(property);
 		
-		Column column = new Column(property.getFieldName(), property.getRawType());
+		Column column = new Column(name, property.getRawType());
 		
 		if(property.isIdProperty()) {
 			column.setPrimaryKey(TRUE);
