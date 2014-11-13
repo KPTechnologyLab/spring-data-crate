@@ -24,6 +24,7 @@ import static org.springframework.util.Assert.hasText;
 import static org.springframework.util.Assert.notNull;
 
 import java.util.List;
+import java.util.Map;
 
 /**
  * {@link Column} holds definition for column. Generates crate specific ddl for column.
@@ -112,7 +113,11 @@ class Column {
 	}
 	
 	public boolean isObjectColumn() {
-		return OBJECT.equalsIgnoreCase(type);
+		return (OBJECT.equalsIgnoreCase(type) && !isMapColumn());
+	}
+	
+	public boolean isMapColumn() {
+		return Map.class.isAssignableFrom(rawType);
 	}
 	
 	public boolean isPrimitiveElementType(String elementType) {
