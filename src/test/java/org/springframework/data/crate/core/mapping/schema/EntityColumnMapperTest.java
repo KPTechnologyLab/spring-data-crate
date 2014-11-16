@@ -298,6 +298,48 @@ public class EntityColumnMapperTest {
 			}
 		}
 		
+		@Test
+		public void shouldCreateCollectionOfMapArrayColumn() {
+			
+			List<Column> columns = initMappingContextAndGetColumns(EntityWithSimpleKeyMapCollection.class);
+			
+			assertThat(columns, is(notNullValue()));
+			assertThat(columns.size(), is(1));
+			
+			for(Column column : columns) {
+				assertThat(column.getCrateType(), is(ARRAY));
+				assertThat(column.getElementCrateType(), is(OBJECT));
+				assertThat(column.getSubColumns().isEmpty(), is(true));
+			}
+		}
+		
+		@Test
+		public void shouldCreateArrayOfMapArrayColumn() {
+			
+			List<Column> columns = initMappingContextAndGetColumns(EntityWithSimpleKeyMapArray.class);
+			
+			assertThat(columns, is(notNullValue()));
+			assertThat(columns.size(), is(1));
+			
+			for(Column column : columns) {
+				assertThat(column.getCrateType(), is(ARRAY));
+				assertThat(column.getElementCrateType(), is(OBJECT));
+				assertThat(column.getSubColumns().isEmpty(), is(true));
+			}
+		}
+		
+		@Test(expected=InvalidCrateApiUsageException.class)
+		public void shouldNotCreateCollectionOfMapArrayColumn() {
+			
+			initMappingContextAndGetColumns(EntityWithComplexKeyMapCollection.class);
+		}
+		
+		@Test(expected=InvalidCrateApiUsageException.class)
+		public void shouldNotCreatearrayOfMapArrayColumn() {
+			
+			initMappingContextAndGetColumns(EntityWithComplexKeyMapArray.class);
+		}
+		
 		@Test(expected=InvalidCrateApiUsageException.class)
 		public void shouldNotCreateDefinitionForNestedCollectionTypes() {
 			
@@ -348,6 +390,22 @@ public class EntityColumnMapperTest {
 		static class EntityWithArrayOfArray{
 			Set<String>[][] array;
 		}
+		
+		static class EntityWithSimpleKeyMapCollection {
+			List<Map<String, String>> maps;
+		}
+		
+		static class EntityWithComplexKeyMapCollection {
+			List<Map<EntityWithSimpleKeyMapCollection, String>> maps;
+		}
+		
+		static class EntityWithSimpleKeyMapArray {
+			Map<String, String>[] maps;
+		}
+		
+		static class EntityWithComplexKeyMapArray {
+			Map<EntityWithStringArray, String>[] maps;
+		}
 	}
 	
 	/**
@@ -372,8 +430,17 @@ public class EntityColumnMapperTest {
 			}
 		}
 		
+		@Test(expected=InvalidCrateApiUsageException.class)
+		public void shouldNotCreateColumnWithComplexMapKey() {
+			initMappingContextAndGetColumns(EntityWithComplexKeyMap.class);
+		}
+		
 		static class EntityWithStringMap {
 			Map<String, String> map;
+		}
+		
+		static class EntityWithComplexKeyMap {
+			Map<EntityWithStringMap, String> map;
 		}
 	}
 	

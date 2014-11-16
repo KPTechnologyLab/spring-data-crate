@@ -51,7 +51,7 @@ class EntityColumnMapper {
 	private final PrimitiveColumnMapper primitiveTypeMapper;
 	private final PrimitiveCollectionTypeColumnMapper primitiveCollectionTypeMapper;
 	private final MapTypeColumnMapper mapTypeMapper;
-	
+	private final MapCollectionTypeColumnMapper mapCollectionTypeMapper;
 	private final MappingContext<? extends CratePersistentEntity<?>, CratePersistentProperty> mappingContext;
 	
 	public EntityColumnMapper(MappingContext<? extends CratePersistentEntity<?>, CratePersistentProperty> mappingContext) {
@@ -59,6 +59,7 @@ class EntityColumnMapper {
 		this.primitiveTypeMapper = new PrimitiveColumnMapper();
 		this.primitiveCollectionTypeMapper = new PrimitiveCollectionTypeColumnMapper();
 		this.mapTypeMapper = new MapTypeColumnMapper();
+		this.mapCollectionTypeMapper = new MapCollectionTypeColumnMapper();
 	}
 	
 	/**
@@ -94,6 +95,8 @@ class EntityColumnMapper {
 		columns.addAll(primitiveCollectionTypeMapper.mapColumns(filterPrimitiveCollectionType(root.getArrayProperties())));
 		columns.addAll(primitiveCollectionTypeMapper.mapColumns(filterPrimitiveCollectionType(root.getCollectionProperties())));
 		columns.addAll(mapTypeMapper.mapColumns(root.getMapProperties()));
+		columns.addAll(mapCollectionTypeMapper.mapColumns(filterMapCollectionType(root.getArrayProperties())));
+		columns.addAll(mapCollectionTypeMapper.mapColumns(filterMapCollectionType(root.getCollectionProperties())));
 		
 		Set<CratePersistentProperty> properties = root.getEntityProperties();
 		properties.addAll(filterEntityCollectionType(root.getArrayProperties()));
@@ -138,8 +141,12 @@ class EntityColumnMapper {
 		return column;
 	}
 	
-	private boolean isPrimitiveElementType(CratePersistentProperty collectionTypeProperty) {
-		return HOLDER.isSimpleType(collectionTypeProperty.getComponentType());
+	private boolean isSimpleType(Class<?> type) {
+		return HOLDER.isSimpleType(type);
+	}
+	
+	private boolean isMapType(Class<?> type) {
+		return from(type).isMap();
 	}
 	
 	private Set<CratePersistentProperty> filterPrimitiveCollectionType(Set<CratePersistentProperty> properties) {
@@ -150,7 +157,7 @@ class EntityColumnMapper {
 			
 			checkNestedCollection(property);
 			
-			if(isPrimitiveElementType(property)) {
+			if(isSimpleType(property.getComponentType())) {
 				filtered.add(property);
 			}
 		}
@@ -166,7 +173,25 @@ class EntityColumnMapper {
 			
 			checkNestedCollection(property);
 			
-			if(!isPrimitiveElementType(property)) {
+			Class<?> componentType = property.getComponentType(); 
+			
+			if(!isSimpleType(componentType) && !isMapType(componentType)) {
+				filtered.add(property);
+			}
+		}
+		
+		return filtered;
+	}
+	
+	private Set<CratePersistentProperty> filterMapCollectionType(Set<CratePersistentProperty> properties) {
+		
+		Set<CratePersistentProperty> filtered = new LinkedHashSet<CratePersistentProperty>();
+		
+		for(CratePersistentProperty property : properties) {
+			
+			checkNestedCollection(property);
+			
+			if(isMapType(property.getComponentType())) {
 				filtered.add(property);
 			}
 		}
@@ -180,6 +205,12 @@ class EntityColumnMapper {
 		
 		if(componentType.isCollectionLike()) {
 			throw new InvalidCrateApiUsageException("currently crate does not support nested arrays/collections of arrays/collections");
+		}
+	}
+	
+	private void checkMapKey(Class<?> componentType) {
+		if(!isSimpleType(componentType)) {
+			throw new InvalidCrateApiUsageException("Complex objects cannot be used as map's key");
 		}
 	}
 	
@@ -229,7 +260,45 @@ class EntityColumnMapper {
 			
 			for(CratePersistentProperty property : properties) {
 				// safety check
-				if(property.isCollectionLike() && isPrimitiveElementType(property)) {
+				if(property.isCollectionLike() && isSimpleType(property.getComponentType())) {
+					columns.add(createColumn(property));
+				}
+			}
+			
+			return columns;
+		}
+	}
+	
+	/**
+	 * 
+	 * @author Hasnain Javed
+	 * @since 1.0.0
+	 * Creates array columns of array/collection of map types.
+	 */
+	private class MapCollectionTypeColumnMapper {
+		
+		/**
+		 * @param properties properties of array/collection types, must not be {@literal null}.
+		 * @return list of columns of crate type array
+		 * @throws {@link InvalidCrateApiUsageException}
+		 */
+		public List<Column> mapColumns(Set<CratePersistentProperty> properties) {
+			
+			List<Column> columns = new LinkedList<Column>();
+			
+			for(CratePersistentProperty property : properties) {
+				
+				TypeInformation<?> typeInformation = from(property.getComponentType());
+				// safety check
+				if(property.isCollectionLike() && typeInformation.isMap()) {
+					
+					// could be a list or an array
+					TypeInformation<?> actualType = property.getTypeInformation().getActualType();					
+					// get the map's key type
+					Class<?> componentType = actualType.getTypeArguments().get(0).getType();					
+					
+					checkMapKey(componentType);
+					
 					columns.add(createColumn(property));
 				}
 			}
@@ -253,6 +322,7 @@ class EntityColumnMapper {
 		/**
 		 * @param properties map type properties, must not be {@literal null}.
 		 * @return list of columns of crate type object
+		 * @throws {@link InvalidCrateApiUsageException} for complex key types 
 		 */
 		public List<Column> mapColumns(Set<CratePersistentProperty> properties) {
 			
@@ -263,6 +333,7 @@ class EntityColumnMapper {
 			for(CratePersistentProperty property : properties) {
 				// safety check
 				if(property.isMap()) {
+					checkMapKey(property.getComponentType());
 					columns.add(createColumn(property));
 				}
 			}
