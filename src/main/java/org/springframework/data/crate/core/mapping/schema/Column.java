@@ -50,9 +50,14 @@ class Column {
 	}
 	
 	public Column(String name, Class<?> rawType, Class<?> elementRawType) {
-		setName(name);
-		setRawType(rawType);
+		
+		hasText(name);
+		notNull(rawType);
+		
+		this.name = name;
+		this.rawType = rawType;
 		setCrateType(getCrateTypeFor(rawType));
+		
 		if(elementRawType != null) {
 			this.elementRawType = elementRawType;
 			setElementCrateType(getCrateTypeFor(elementRawType));
@@ -61,11 +66,6 @@ class Column {
 	
 	public String getName() {
 		return name;
-	}
-
-	public void setName(String name) {
-		hasText(name);
-		this.name = name;
 	}
 
 	public String getCrateType() {
@@ -92,11 +92,6 @@ class Column {
 
 	public Class<?> getRawType() {
 		return rawType;
-	}
-
-	public void setRawType(Class<?> rawType) {
-		notNull(rawType);
-		this.rawType = rawType;
 	}
 
 	public boolean isPrimaryKey() {
