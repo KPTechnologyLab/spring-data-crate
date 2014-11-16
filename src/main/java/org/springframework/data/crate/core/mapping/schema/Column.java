@@ -35,19 +35,28 @@ import java.util.Map;
 class Column {
 	
 	private String name;
-	private String type;
-	private String elementType;
+	private String crateType;
+	private String crateElementType;
 	
 	private Class<?> rawType;
+	private Class<?> elementRawType;
 	
 	private boolean primaryKey;
 	
 	private List<Column> subColumns;
 	
 	public Column(String name, Class<?> rawType) {
+		this(name, rawType, null);
+	}
+	
+	public Column(String name, Class<?> rawType, Class<?> elementRawType) {
 		setName(name);
 		setRawType(rawType);
-		setType(getCrateTypeFor(rawType));
+		setCrateType(getCrateTypeFor(rawType));
+		if(elementRawType != null) {
+			this.elementRawType = elementRawType;
+			setElementCrateType(getCrateTypeFor(elementRawType));
+		}
 	}
 	
 	public String getName() {
@@ -59,25 +68,28 @@ class Column {
 		this.name = name;
 	}
 
-	public String getType() {
-		return type;
+	public String getCrateType() {
+		return crateType;
 	}
 
-	public void setType(String type) {
+	private void setCrateType(String type) {
 		hasText(type);
-		this.type = type;
+		this.crateType = type;
 	}
 	
-	public String getElementType() {
-		return elementType;
+	public String getElementCrateType() {
+		return crateElementType;
 	}
 
-	public void setElementType(Class<?> elementType) {
-		notNull(elementType);
-		this.elementType = getCrateTypeFor(elementType);
-		hasText(this.elementType);
+	private void setElementCrateType(String elementType) {
+		hasText(elementType);
+		this.crateElementType = elementType;
 	}
-	
+
+	public Class<?> getElementRawType() {
+		return elementRawType;
+	}
+
 	public Class<?> getRawType() {
 		return rawType;
 	}
@@ -109,11 +121,15 @@ class Column {
 	}
 
 	public boolean isArrayColumn() {
-		return ARRAY.equalsIgnoreCase(type);
+		return ARRAY.equalsIgnoreCase(crateType);
+	}
+	
+	public boolean isPrimitiveArrayColumn() {
+		return (isArrayColumn() && isPrimitiveElementType(crateElementType));
 	}
 	
 	public boolean isObjectColumn() {
-		return (OBJECT.equalsIgnoreCase(type) && !isMapColumn());
+		return (OBJECT.equalsIgnoreCase(crateType) && !isMapColumn());
 	}
 	
 	public boolean isMapColumn() {

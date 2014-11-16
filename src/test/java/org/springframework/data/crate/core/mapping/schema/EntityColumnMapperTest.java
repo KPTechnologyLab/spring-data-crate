@@ -67,17 +67,17 @@ public class EntityColumnMapperTest {
 	public static class PrimitivesColumnMappingTest {
 		
 		@Test
-		public void shouldCreateDefinitionWithStringColumn() {
+		public void shouldCreateStringColumn() {
 			
 			List<Column> columns = initMappingContextAndGetColumns(EntityWithString.class);
 			
 			assertThat(columns, is(notNullValue()));
 			assertThat(columns.size(), is(1));
-			assertThat(columns.iterator().next().getType(), is(STRING));
+			assertThat(columns.iterator().next().getCrateType(), is(STRING));
 		}
 		
 		@Test
-		public void shouldCreateDefinitionWithShortColumn() {
+		public void shouldCreateShortColumn() {
 			
 			List<Column> columns = initMappingContextAndGetColumns(EntityWithShort.class);
 			
@@ -85,12 +85,12 @@ public class EntityColumnMapperTest {
 			assertThat(columns.size(), is(2));
 			
 			for(Column column : columns) {
-				assertThat(column.getType(), is(SHORT));
+				assertThat(column.getCrateType(), is(SHORT));
 			}
 		}
 		
 		@Test
-		public void shouldCreateDefinitionWithByteColumn() {
+		public void shouldCreateByteColumn() {
 			
 			List<Column> columns = initMappingContextAndGetColumns(EntityWithByte.class);
 			
@@ -98,12 +98,12 @@ public class EntityColumnMapperTest {
 			assertThat(columns.size(), is(2));
 			
 			for(Column column : columns) {
-				assertThat(column.getType(), is(BYTE));
+				assertThat(column.getCrateType(), is(BYTE));
 			}
 		}
 		
 		@Test
-		public void shouldCreateDefinitionWithIntegerColumn() {
+		public void shouldCreateIntegerColumn() {
 			
 			List<Column> columns = initMappingContextAndGetColumns(EntityWithInt.class);
 			
@@ -111,12 +111,12 @@ public class EntityColumnMapperTest {
 			assertThat(columns.size(), is(2));
 			
 			for(Column column : columns) {
-				assertThat(column.getType(), is(INTEGER));	
+				assertThat(column.getCrateType(), is(INTEGER));	
 			}
 		}
 		
 		@Test
-		public void shouldCreateDefinitionWithLongColumn() {
+		public void shouldCreateLongColumn() {
 			
 			List<Column> columns = initMappingContextAndGetColumns(EntityWithLong.class);
 			
@@ -124,12 +124,12 @@ public class EntityColumnMapperTest {
 			assertThat(columns.size(), is(2));
 			
 			for(Column column : columns) {
-				assertThat(column.getType(), is(LONG));	
+				assertThat(column.getCrateType(), is(LONG));	
 			}
 		}
 		
 		@Test
-		public void shouldCreateDefinitionWithFloatColumn() {
+		public void shouldCreateFloatColumn() {
 			
 			List<Column> columns = initMappingContextAndGetColumns(EntityWithFloat.class);
 			
@@ -137,12 +137,12 @@ public class EntityColumnMapperTest {
 			assertThat(columns.size(), is(2));
 			
 			for(Column column : columns) {
-				assertThat(column.getType(), is(FLOAT));	
+				assertThat(column.getCrateType(), is(FLOAT));	
 			}
 		}
 		
 		@Test
-		public void shouldCreateDefinitionWithDoubleColumn() {
+		public void shouldCreateDoubleColumn() {
 			
 			List<Column> columns = initMappingContextAndGetColumns(EntityWithDouble.class);
 			
@@ -150,12 +150,12 @@ public class EntityColumnMapperTest {
 			assertThat(columns.size(), is(2));
 			
 			for(Column column : columns) {
-				assertThat(column.getType(), is(DOUBLE));	
+				assertThat(column.getCrateType(), is(DOUBLE));	
 			}
 		}
 		
 		@Test
-		public void shouldCreateDefinitionWithBooleanColumn() {
+		public void shouldCreateBooleanColumn() {
 			
 			List<Column> columns = initMappingContextAndGetColumns(EntityWithBoolean.class);
 			
@@ -163,18 +163,18 @@ public class EntityColumnMapperTest {
 			assertThat(columns.size(), is(2));
 			
 			for(Column column : columns) {
-				assertThat(column.getType(), is(BOOLEAN));	
+				assertThat(column.getCrateType(), is(BOOLEAN));	
 			}
 		}
 		
 		@Test
-		public void shouldCreateDefinitionWithDateColumn() {
+		public void shouldCreateDateColumn() {
 			
 			List<Column> columns = initMappingContextAndGetColumns(EntityWithDate.class);
 			
 			assertThat(columns, is(notNullValue()));
 			assertThat(columns.size(), is(1));
-			assertThat(columns.iterator().next().getType(), is(TIMESTAMP));
+			assertThat(columns.iterator().next().getCrateType(), is(TIMESTAMP));
 		}
 		
 		static class EntityWithString {
@@ -229,7 +229,7 @@ public class EntityColumnMapperTest {
 	public static class CollectionTypeColumnMappingTest {
 		
 		@Test
-		public void shouldCreateDefinitionWithStringArrayColumn() {
+		public void shouldCreateStringArrayColumn() {
 			
 			List<Column> columns = initMappingContextAndGetColumns(EntityWithStringArray.class);
 			
@@ -237,13 +237,13 @@ public class EntityColumnMapperTest {
 			assertThat(columns.size(), is(1));
 			
 			for(Column column : columns) {
-				assertThat(column.getType(), is(ARRAY));
-				assertThat(column.getElementType(), is(STRING));
+				assertThat(column.getCrateType(), is(ARRAY));
+				assertThat(column.getElementCrateType(), is(STRING));
 			}
 		}
 		
 		@Test
-		public void shouldCreateDefinitionWithShortArrayColumn() {
+		public void shouldCreateShortArrayColumn() {
 			
 			List<Column> columns = initMappingContextAndGetColumns(EntityWithShortCollection.class);
 			
@@ -251,13 +251,13 @@ public class EntityColumnMapperTest {
 			assertThat(columns.size(), is(1));
 			
 			for(Column column : columns) {
-				assertThat(column.getType(), is(ARRAY));
-				assertThat(column.getElementType(), is(SHORT));
+				assertThat(column.getCrateType(), is(ARRAY));
+				assertThat(column.getElementCrateType(), is(SHORT));
 			}
 		}
 		
 		@Test
-		public void shouldCreateDefinitionWithIntegerArrayColumn() {
+		public void shouldCreateIntegerArrayColumn() {
 			
 			List<Column> columns = initMappingContextAndGetColumns(EntityWithIntegerArray.class);
 			
@@ -265,13 +265,13 @@ public class EntityColumnMapperTest {
 			assertThat(columns.size(), is(2));
 			
 			for(Column column : columns) {
-				assertThat(column.getType(), is(ARRAY));
-				assertThat(column.getElementType(), is(INTEGER));
+				assertThat(column.getCrateType(), is(ARRAY));
+				assertThat(column.getElementCrateType(), is(INTEGER));
 			}
 		}
 		
 		@Test
-		public void shouldCreateDefinitionWithLongArrayColumn() {
+		public void shouldCreateLongArrayColumn() {
 			
 			List<Column> columns = initMappingContextAndGetColumns(EntityWithLongCollection.class);
 			
@@ -279,13 +279,13 @@ public class EntityColumnMapperTest {
 			assertThat(columns.size(), is(1));
 			
 			for(Column column : columns) {
-				assertThat(column.getType(), is(ARRAY));
-				assertThat(column.getElementType(), is(LONG));
+				assertThat(column.getCrateType(), is(ARRAY));
+				assertThat(column.getElementCrateType(), is(LONG));
 			}
 		}
 		
 		@Test
-		public void shouldCreateDefinitionWithFloatArrayColumn() {
+		public void shouldCreateFloatArrayColumn() {
 			
 			List<Column> columns = initMappingContextAndGetColumns(EntityWithFloatCollection.class);
 			
@@ -293,8 +293,8 @@ public class EntityColumnMapperTest {
 			assertThat(columns.size(), is(1));
 			
 			for(Column column : columns) {
-				assertThat(column.getType(), is(ARRAY));
-				assertThat(column.getElementType(), is(FLOAT));
+				assertThat(column.getCrateType(), is(ARRAY));
+				assertThat(column.getElementCrateType(), is(FLOAT));
 			}
 		}
 		
@@ -358,7 +358,7 @@ public class EntityColumnMapperTest {
 	public static class MapTypeColumnMappingTest {
 		
 		@Test
-		public void shouldCreateDefinitionWithStringMapColumn() {
+		public void shouldCreateStringMapColumn() {
 			
 			List<Column> columns = initMappingContextAndGetColumns(EntityWithStringMap.class);
 			
@@ -366,7 +366,7 @@ public class EntityColumnMapperTest {
 			assertThat(columns.size(), is(1));
 			
 			for(Column column : columns) {
-				assertThat(column.getType(), is(OBJECT));
+				assertThat(column.getCrateType(), is(OBJECT));
 				assertThat(column.isMapColumn(), is(true));
 				assertThat(column.isObjectColumn(), is(false));
 			}
@@ -385,7 +385,7 @@ public class EntityColumnMapperTest {
 	public static class EntityTypeColumnMappingTest {
 		
 		@Test
-		public void shouldCreateDefinitionWithNestedEntity() {
+		public void shouldCreateObjectColumn() {
 			
 			List<Column> columns = initMappingContextAndGetColumns(LevelOneEntity.class);
 			
@@ -393,21 +393,21 @@ public class EntityColumnMapperTest {
 			assertThat(columns.size(), is(2));
 			
 			// level 1
-			assertThat(columns.get(0).getType(), is(STRING));
-			assertThat(columns.get(1).getType(), is(OBJECT));
+			assertThat(columns.get(0).getCrateType(), is(STRING));
+			assertThat(columns.get(1).getCrateType(), is(OBJECT));
 			assertThat(columns.get(1).isObjectColumn(), is(true));
 			assertThat(columns.get(1).isMapColumn(), is(false));
 			
 			// level 2
 			assertThat(columns.get(1).getSubColumns().size(), is(2));
-			assertThat(columns.get(1).getSubColumns().get(0).getType(), is(STRING));
-			assertThat(columns.get(1).getSubColumns().get(1).getType(), is(ARRAY));
-			assertThat(columns.get(1).getSubColumns().get(1).getElementType(), is(OBJECT));
+			assertThat(columns.get(1).getSubColumns().get(0).getCrateType(), is(STRING));
+			assertThat(columns.get(1).getSubColumns().get(1).getCrateType(), is(ARRAY));
+			assertThat(columns.get(1).getSubColumns().get(1).getElementCrateType(), is(OBJECT));
 			
 			// level 3
 			assertThat(columns.get(1).getSubColumns().get(1).getSubColumns().size(), is(2));
-			assertThat(columns.get(1).getSubColumns().get(1).getSubColumns().get(0).getType(), is(STRING));
-			assertThat(columns.get(1).getSubColumns().get(1).getSubColumns().get(1).getType(), is(OBJECT));
+			assertThat(columns.get(1).getSubColumns().get(1).getSubColumns().get(0).getCrateType(), is(STRING));
+			assertThat(columns.get(1).getSubColumns().get(1).getSubColumns().get(1).getCrateType(), is(OBJECT));
 		}
 		
 		@Test(expected=CyclicReferenceException.class)
@@ -459,9 +459,9 @@ public class EntityColumnMapperTest {
 	
 	private static List<Column> initMappingContextAndGetColumns(Class<?> type) {
 		CrateMappingContext mappingContext = prepareMappingContext(type);
-		return new EntityColumnMapper(mappingContext).createColumns(mappingContext.getPersistentEntity(type)); 
+		return new EntityColumnMapper(mappingContext).toColumns(mappingContext.getPersistentEntity(type)); 
 	}
-
+	
 	private static CrateMappingContext prepareMappingContext(Class<?> type) {
 
 		CrateMappingContext mappingContext = new CrateMappingContext();

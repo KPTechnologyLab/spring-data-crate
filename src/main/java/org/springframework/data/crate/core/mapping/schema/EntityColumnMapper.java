@@ -62,10 +62,11 @@ class EntityColumnMapper {
 	}
 	
 	/**
+	 * Creates columns from {@link CratePersistentEntity}
 	 * @param entity entity object, must not be {@literal null}. 
 	 * @return list of columns
 	 */
-	List<Column> createColumns(CratePersistentEntity<?> entity) {
+	List<Column> toColumns(CratePersistentEntity<?> entity) {
 		
 		List<Column> columns = new LinkedList<Column>();
 		
@@ -77,16 +78,16 @@ class EntityColumnMapper {
 	/**
 	 * Recursively crawls over a nested object's fields
 	 * @param root entity object, must not be {@literal null}.
-	 * @param columns list of columns fot root entity object, must not be {@literal null}.
+	 * @param columns list of columns for root entity object, must not be {@literal null}.
 	 * @param barrier to detect potential cycles within entities.
 	 * @param mappingContext must not be {@literal null}.
-	 * @return list of columns (with optional list of subcloumns) of crate type object
+	 * @return list of columns (with optional list of subcloumns) of crate types
 	 */
 	private void mapColumns(CratePersistentEntity<?> root, List<Column> columns,  CyclicReferenceBarrier barrier) {
 		
 		notNull(root);
 		notNull(columns);
-		
+
 		logger.debug("creating object column for type {}", root.getType());
 		
 		columns.addAll(primitiveTypeMapper.mapColumns(root.getPrimitiveProperties()));			
@@ -115,26 +116,25 @@ class EntityColumnMapper {
 		}
 	}
 	
-	Column createColumn(CratePersistentProperty property) {
-		return createColumn(property.getFieldName(), property);
-	}
-	
-	Column createColumn(String name, CratePersistentProperty property) {
+	private Column createColumn(CratePersistentProperty property) {
 		
 		notNull(property);
 		
-		Column column = new Column(name, property.getRawType());
+		Column column = null;
+		
+		if(property.isCollectionLike()) {
+			column = new Column(property.getName(), property.getRawType(), property.getComponentType());
+		}else {
+			column = new Column(property.getName(), property.getRawType());
+		}
 		
 		if(property.isIdProperty()) {
 			column.setPrimaryKey(TRUE);
 		}
 		
-		if(property.isCollectionLike()) {
-			column.setElementType(property.getComponentType());
-		}
-		
-		logger.debug("mapped property type {} to crate type {}", property.getRawType(), column.getType());
-		
+		logger.debug("mapped field '{}' of type '{}' to crate type '{}'", new Object[]{property.getName(),
+																					   property.getRawType(),
+																					   column.getCrateType()});
 		return column;
 	}
 	
