@@ -92,15 +92,13 @@ class EntityColumnMapper {
 		logger.debug("creating object column for type {}", root.getType());
 		
 		columns.addAll(primitiveTypeMapper.mapColumns(root.getPrimitiveProperties()));			
-		columns.addAll(primitiveCollectionTypeMapper.mapColumns(filterPrimitiveCollectionType(root.getArrayProperties())));
-		columns.addAll(primitiveCollectionTypeMapper.mapColumns(filterPrimitiveCollectionType(root.getCollectionProperties())));
+		columns.addAll(primitiveCollectionTypeMapper.mapColumns(filterPrimitiveCollectionType(root)));
 		columns.addAll(mapTypeMapper.mapColumns(root.getMapProperties()));
-		columns.addAll(mapCollectionTypeMapper.mapColumns(filterMapCollectionType(root.getArrayProperties())));
-		columns.addAll(mapCollectionTypeMapper.mapColumns(filterMapCollectionType(root.getCollectionProperties())));
+		columns.addAll(mapCollectionTypeMapper.mapColumns(filterMapCollectionType(root)));
 		
 		Set<CratePersistentProperty> properties = root.getEntityProperties();
-		properties.addAll(filterEntityCollectionType(root.getArrayProperties()));
-		properties.addAll(filterEntityCollectionType(root.getCollectionProperties()));
+		properties.addAll(filterEntityCollectionType(root));
+		properties.addAll(filterEntityCollectionType(root));
 			
 		for(CratePersistentProperty property : properties) {
 			
@@ -149,9 +147,13 @@ class EntityColumnMapper {
 		return from(type).isMap();
 	}
 	
-	private Set<CratePersistentProperty> filterPrimitiveCollectionType(Set<CratePersistentProperty> properties) {
+	private Set<CratePersistentProperty> filterPrimitiveCollectionType(CratePersistentEntity<?> entity) {
 		
 		Set<CratePersistentProperty> filtered = new LinkedHashSet<CratePersistentProperty>();
+		
+		List<CratePersistentProperty> properties = new LinkedList<CratePersistentProperty>();
+		properties.addAll(entity.getArrayProperties());
+		properties.addAll(entity.getCollectionProperties());
 		
 		for(CratePersistentProperty property : properties) {
 			
@@ -165,9 +167,13 @@ class EntityColumnMapper {
 		return filtered;
 	}
 	
-	private Set<CratePersistentProperty> filterEntityCollectionType(Set<CratePersistentProperty> properties) {
+	private Set<CratePersistentProperty> filterEntityCollectionType(CratePersistentEntity<?> entity) {
 		
 		Set<CratePersistentProperty> filtered = new LinkedHashSet<CratePersistentProperty>();
+		
+		List<CratePersistentProperty> properties = new LinkedList<CratePersistentProperty>();
+		properties.addAll(entity.getArrayProperties());
+		properties.addAll(entity.getCollectionProperties());
 		
 		for(CratePersistentProperty property : properties) {
 			
@@ -183,9 +189,13 @@ class EntityColumnMapper {
 		return filtered;
 	}
 	
-	private Set<CratePersistentProperty> filterMapCollectionType(Set<CratePersistentProperty> properties) {
+	private Set<CratePersistentProperty> filterMapCollectionType(CratePersistentEntity<?> entity) {
 		
 		Set<CratePersistentProperty> filtered = new LinkedHashSet<CratePersistentProperty>();
+		
+		List<CratePersistentProperty> properties = new LinkedList<CratePersistentProperty>();
+		properties.addAll(entity.getArrayProperties());
+		properties.addAll(entity.getCollectionProperties());
 		
 		for(CratePersistentProperty property : properties) {
 			
