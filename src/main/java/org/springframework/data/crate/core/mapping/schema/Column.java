@@ -123,6 +123,10 @@ class Column {
 		return (isArrayColumn() && isPrimitiveElementType(crateElementType));
 	}
 	
+	public boolean isObjectArrayColumn() {
+		return (isArrayColumn() && !isPrimitiveElementType(crateElementType));
+	}
+	
 	public boolean isObjectColumn() {
 		return (OBJECT.equalsIgnoreCase(crateType) && !isMapColumn());
 	}
