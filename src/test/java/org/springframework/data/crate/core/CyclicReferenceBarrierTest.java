@@ -19,12 +19,15 @@ package org.springframework.data.crate.core;
 import static java.util.Collections.singleton;
 import static org.springframework.data.crate.core.CyclicReferenceBarrier.cyclicReferenceBarrier;
 
+import java.util.LinkedHashSet;
 import java.util.List;
+import java.util.Set;
 
 import org.junit.Test;
 import org.springframework.data.crate.core.mapping.CrateMappingContext;
 import org.springframework.data.crate.core.mapping.CratePersistentEntity;
 import org.springframework.data.crate.core.mapping.CratePersistentProperty;
+import org.springframework.data.crate.core.mapping.annotations.Table;
 
 /**
  * 
@@ -115,8 +118,17 @@ public class CyclicReferenceBarrierTest {
 		crawlEntity(mappingContext, entity, cyclicReferenceBarrier());
 	}
 	
-	private void crawlEntity(CrateMappingContext mappingContext, CratePersistentEntity<?> entity, CyclicReferenceBarrier barrier) {
+	@Test
+	public void shouldNotCycleWithSameClassUsedMoreThanOnce() {
 		
+		CrateMappingContext mappingContext = prepareMappingContext(Entity.class);
+		
+		CratePersistentEntity<?> entity = mappingContext.getPersistentEntity(Entity.class);
+		
+		crawlEntity(mappingContext, entity, cyclicReferenceBarrier());
+	}
+	
+	private void crawlEntity(CrateMappingContext mappingContext, CratePersistentEntity<?> entity, CyclicReferenceBarrier barrier) {
 		for(CratePersistentProperty property : entity.getEntityProperties()) {
 			barrier.guard(property);
 			crawlEntity(mappingContext, mappingContext.getPersistentEntity(property), barrier);
@@ -166,5 +178,18 @@ public class CyclicReferenceBarrierTest {
 	
 	public static class CyclicBook {
 		org.springframework.data.sample.entities.CyclicBook cyclicBook;
+	}
+	
+	public static class Entity {
+		LevelZero zero1;
+		LevelZero zero2;
+		
+		String string1;
+		String string2;
+	}
+	
+	public static class LevelZero {
+		String field1;
+		Long field2;
 	}
 }

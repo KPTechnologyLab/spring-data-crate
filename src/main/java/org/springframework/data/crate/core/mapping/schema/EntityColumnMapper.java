@@ -98,7 +98,6 @@ class EntityColumnMapper {
 		
 		Set<CratePersistentProperty> properties = root.getEntityProperties();
 		properties.addAll(filterEntityCollectionType(root));
-		properties.addAll(filterEntityCollectionType(root));
 			
 		for(CratePersistentProperty property : properties) {
 			

@@ -328,6 +328,23 @@ public class EntityColumnMapperTest {
 			}
 		}
 		
+		@Test 
+		public void shouldCreateArrayColumnsOfSameClassType() {
+			
+			List<Column> columns = initMappingContextAndGetColumns(EntityWithEntityCollection.class);
+			
+			assertThat(columns, is(notNullValue()));
+			assertThat(columns.size(), is(2));
+			
+			for(Column column : columns) {
+				assertThat(column.getCrateType(), is(ARRAY));
+				assertThat(column.getElementCrateType(), is(OBJECT));
+				assertThat(column.getSubColumns().size(), is(1));
+				assertThat(column.getSubColumns().get(0).getCrateType(), is(ARRAY));
+				assertThat(column.getSubColumns().get(0).getElementCrateType(), is(STRING));
+			}
+		}
+		
 		@Test(expected=InvalidCrateApiUsageException.class)
 		public void shouldNotCreateCollectionOfMapArrayColumn() {
 			
@@ -405,6 +422,11 @@ public class EntityColumnMapperTest {
 		
 		static class EntityWithComplexKeyMapArray {
 			Map<EntityWithStringArray, String>[] maps;
+		}
+		
+		static class EntityWithEntityCollection {
+			List<EntityWithStringArray> entityList;
+			EntityWithStringArray[] entityArray;
 		}
 	}
 	
