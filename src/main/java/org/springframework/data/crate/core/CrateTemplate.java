@@ -42,7 +42,7 @@ public class CrateTemplate implements CrateOperations {
     private final Logger logger = getLogger(CrateTemplate.class);
     
 	private final CrateClient client;
-	private final PersistenceExceptionTranslator exceptionTranslator = new CrateExceptionTranslator();
+	private final PersistenceExceptionTranslator exceptionTranslator;
     private CrateConverter crateConverter;
 	
 	public CrateTemplate(CrateClient client) {
@@ -53,6 +53,7 @@ public class CrateTemplate implements CrateOperations {
         this.client  = client;
         this.crateConverter = crateConverter == null ? new MappingCrateConverter(new CrateMappingContext()) 
         											 : crateConverter;
+        this.exceptionTranslator = new CrateExceptionTranslator();
     }
 
     @Override

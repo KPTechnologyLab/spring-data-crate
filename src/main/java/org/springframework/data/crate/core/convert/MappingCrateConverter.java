@@ -21,8 +21,6 @@ import org.springframework.context.ApplicationContextAware;
 import org.springframework.core.convert.ConversionService;
 import org.springframework.core.convert.support.DefaultConversionService;
 import org.springframework.core.convert.support.GenericConversionService;
-import org.springframework.dao.support.PersistenceExceptionTranslator;
-import org.springframework.data.crate.core.CrateExceptionTranslator;
 import org.springframework.data.crate.core.mapping.CratePersistentEntity;
 import org.springframework.data.crate.core.mapping.CratePersistentProperty;
 import org.springframework.data.mapping.context.MappingContext;
@@ -39,7 +37,7 @@ public class MappingCrateConverter implements CrateConverter, ApplicationContext
 
 	private final MappingContext<? extends CratePersistentEntity<?>, CratePersistentProperty> mappingContext;
 	private final GenericConversionService conversionService;
-	private final PersistenceExceptionTranslator exceptionTranslator;
+
 	@SuppressWarnings("unused")
 	private ApplicationContext applicationContext;
 
@@ -48,7 +46,6 @@ public class MappingCrateConverter implements CrateConverter, ApplicationContext
 		Assert.notNull(mappingContext, "Mapping context is required.");
 		this.mappingContext = mappingContext;
 		this.conversionService = new DefaultConversionService();
-		this.exceptionTranslator = new CrateExceptionTranslator();
 	}
 
 	@Override
@@ -64,10 +61,5 @@ public class MappingCrateConverter implements CrateConverter, ApplicationContext
 	@Override
 	public void setApplicationContext(ApplicationContext applicationContext) throws BeansException {
 		this.applicationContext = applicationContext;
-	}
-
-	@Override
-	public PersistenceExceptionTranslator getExceptionTranslator() {
-		return exceptionTranslator;
 	}
 }
