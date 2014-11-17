@@ -100,9 +100,10 @@ public class CratePersistentEntityTableManager {
 			Entry<String, Column> columnPath = iterator.next();			
 			if(!sqlPaths.containsKey(columnPath.getKey())) {
 				
+				logger.debug("adding new column under path '{}'", columnPath.getKey());
 				additionalColumns.add(columnPath.getValue());
 				
-				if(columnPath.getValue().isObjectColumn()) {
+				if(columnPath.getValue().isObjectColumn() || columnPath.getValue().isObjectArrayColumn()) {
 					removePropertyPaths(columnPath.getKey(), iterator);
 				}
 			}
@@ -116,7 +117,7 @@ public class CratePersistentEntityTableManager {
 		while(columns.hasNext()) {
 			Entry<String, Column> columnPath = columns.next();
 			if(columnPath.getKey().startsWith(dotPath)) {
-				logger.info("removing column path {} where sql path is {}", columnPath.getKey(), dotPath);
+				logger.info("removing column path '{}' where sql path is '{}'", columnPath.getKey(), dotPath);
 				columns.remove();
 			}
 		}
@@ -127,6 +128,7 @@ public class CratePersistentEntityTableManager {
 		LinkedHashMap<String, Column> map = new LinkedHashMap<String, Column>();
 		
 		for(Column column : columns) {
+			logger.debug("pushing column under key '{}'", column.getName());
 			map.put(column.getName(), column);
 			columnToDotPath(column, map, column.getName());
 		}
@@ -140,7 +142,8 @@ public class CratePersistentEntityTableManager {
 		
 		while(subColumns.hasNext()) {
 			Column subColumn = subColumns.next();
-			String dotPath = createdotPathKey(columnName, subColumn.getName()); 
+			String dotPath = createdotPathKey(columnName, subColumn.getName());
+			logger.debug("pushing column under key '{}'", dotPath);
 			map.put(dotPath, subColumn);
 			columnToDotPath(subColumn, map, dotPath);
 		}
@@ -159,7 +162,7 @@ public class CratePersistentEntityTableManager {
 			
 			String dotPath = toDotPath(metadata.getSqlPath());
 			String type = metadata.getCrateType();
-			
+			logger.debug("pushing sqlPath under key '{}'", dotPath);
 			sqlPaths.put(dotPath, type);
 		}
 		
