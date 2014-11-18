@@ -101,7 +101,12 @@ public class CratePersistentEntityTableManager {
 			if(!sqlPaths.containsKey(columnPath.getKey())) {
 				
 				logger.debug("adding new column under path '{}'", columnPath.getKey());
-				additionalColumns.add(columnPath.getValue());
+				Column addedColumn = new Column(columnPath.getKey(), 
+												columnPath.getValue().getRawType(), 
+												columnPath.getValue().getElementRawType());
+				addedColumn.setSubColumns(columnPath.getValue().getSubColumns());
+				
+				additionalColumns.add(addedColumn);
 				
 				if(columnPath.getValue().isObjectColumn() || columnPath.getValue().isObjectArrayColumn()) {
 					removePropertyPaths(columnPath.getKey(), iterator);

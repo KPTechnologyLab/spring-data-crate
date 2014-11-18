@@ -23,6 +23,7 @@ import static org.springframework.data.crate.core.mapping.CrateDataType.getCrate
 import static org.springframework.util.Assert.hasText;
 import static org.springframework.util.Assert.notNull;
 
+import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
 
@@ -137,5 +138,19 @@ class Column {
 	
 	public boolean isPrimitiveElementType(String elementType) {
 		return !OBJECT.equalsIgnoreCase(elementType);
+	}
+	
+	@Override
+	public String toString() {
+		return "name=".concat(name)
+					  .concat(", ")
+					  .concat("crateType=")
+					  .concat(crateType)
+					  .concat(", ")
+					  .concat("crateElementType=")
+					  .concat(crateElementType == null ? "\"\"" : crateElementType)
+					  .concat(", ")
+					  .concat("subColumns=")
+					  .concat(getSubColumns().toString());
 	}
 }

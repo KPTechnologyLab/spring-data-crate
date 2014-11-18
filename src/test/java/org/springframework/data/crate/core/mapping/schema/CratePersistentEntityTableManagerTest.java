@@ -6,8 +6,6 @@ import static org.hamcrest.Matchers.is;
 import static org.hamcrest.Matchers.notNullValue;
 import static org.junit.Assert.assertThat;
 import static org.springframework.data.crate.core.mapping.CrateDataType.ARRAY;
-import static org.springframework.data.crate.core.mapping.CrateDataType.DOUBLE;
-import static org.springframework.data.crate.core.mapping.CrateDataType.INTEGER;
 import static org.springframework.data.crate.core.mapping.CrateDataType.LONG;
 import static org.springframework.data.crate.core.mapping.CrateDataType.OBJECT;
 import static org.springframework.data.crate.core.mapping.CrateDataType.STRING;
@@ -18,7 +16,6 @@ import java.util.Map;
 import java.util.Set;
 
 import org.junit.Before;
-import org.junit.Ignore;
 import org.junit.Test;
 import org.springframework.data.crate.core.mapping.CrateMappingContext;
 import org.springframework.data.crate.core.mapping.annotations.Table;
@@ -169,7 +166,7 @@ public class CratePersistentEntityTableManagerTest {
 		assertThat(tableDefinition.getName(), is("levelOne"));
 		assertThat(tableDefinition.getColumns().isEmpty(), is(false));
 		assertThat(tableDefinition.getColumns().size(), is(1));
-		assertThat(tableDefinition.getColumns().get(0).getName(), is("field2"));
+		assertThat(tableDefinition.getColumns().get(0).getName(), is("zero.field2"));
 		assertThat(tableDefinition.getColumns().get(0).getCrateType(), is(LONG));
 	}
 	
@@ -193,7 +190,7 @@ public class CratePersistentEntityTableManagerTest {
 		assertThat(tableDefinition.getName(), is("levelThree"));
 		assertThat(tableDefinition.getColumns().isEmpty(), is(false));
 		assertThat(tableDefinition.getColumns().size(), is(1));
-		assertThat(tableDefinition.getColumns().get(0).getName(), is("field1"));
+		assertThat(tableDefinition.getColumns().get(0).getName(), is("twos.one.zero.field1"));
 		assertThat(tableDefinition.getColumns().get(0).getCrateType(), is(STRING));
 	}
 
