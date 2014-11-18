@@ -127,8 +127,6 @@ public class CratePersistentEntityTableManagerTest {
 		assertThat(tableDefinition.getColumns().size(), is(1));
 		assertThat(tableDefinition.getColumns().get(0).getName(), is("one"));
 		assertThat(tableDefinition.getColumns().get(0).getCrateType(), is(OBJECT));
-		assertThat(tableDefinition.getColumns().get(0).getSubColumns().size(), is(1));
-		assertThat(tableDefinition.getColumns().get(0).getSubColumns().get(0).getSubColumns().size(), is(2));
 	}
 	
 	@Test
@@ -147,7 +145,6 @@ public class CratePersistentEntityTableManagerTest {
 		assertThat(tableDefinition.getColumns().get(0).getName(), is("zeros"));
 		assertThat(tableDefinition.getColumns().get(0).getCrateType(), is(ARRAY));
 		assertThat(tableDefinition.getColumns().get(0).getElementCrateType(), is(OBJECT));
-		assertThat(tableDefinition.getColumns().get(0).getSubColumns().size(), is(2));
 	}
 	
 	@Test
