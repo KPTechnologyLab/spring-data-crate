@@ -16,11 +16,12 @@
 
 package org.springframework.data.crate.core.mapping.schema;
 
+import static org.apache.commons.lang.StringUtils.split;
 import static java.lang.String.format;
 import static org.springframework.data.crate.core.mapping.CrateDataType.OBJECT;
 import static org.springframework.util.Assert.hasText;
 import static org.springframework.util.Assert.notNull;
-import static org.springframework.util.StringUtils.split;
+
 import io.crate.action.sql.SQLRequest;
 
 import java.util.Iterator;
@@ -78,10 +79,10 @@ class AlterTableAction implements CrateSQLAction {
 	
 	private String toSqlPath(Column column) {
 		
-		String[] tokens = org.apache.commons.lang.StringUtils.split(column.getName(), ".");
+		String[] tokens = split(column.getName(), ".");
 		
-		if(tokens == null) {
-			return column.getName();
+		if(tokens.length == 1) {
+			return tokens[0];
 		}
 		
 		StringBuilder sqlPath = new StringBuilder(tokens[0]);
@@ -120,16 +121,6 @@ class AlterTableAction implements CrateSQLAction {
 		
 		return builder.toString();
 	}
-	
-	/*private void toSqlPath(Column column, StringBuilder pathBuilder, String path) {
-		if(column.isObjectColumn()) {
-			String sqlPath = StringUtils.hasText(path) ? format(SQL_PATH_TEMPLATE, column.getName()) : column.getName();
-			pathBuilder.append(sqlPath);
-			for(Column subColumn : column.getSubColumns()) {
-				toSqlPath(subColumn, pathBuilder, sqlPath);
-			}
-		}
-	}*/
 	
 	private void createObjectColumnStatement(Column column, StringBuilder builder) {
 		
@@ -185,17 +176,4 @@ class AlterTableAction implements CrateSQLAction {
 				   .append(PRIMARY_KEY);
 		}
 	}
-
-	/*private String createSqlPath(String name, String sqlPath) {
-//		String path = null;
-		
-		return StringUtils.hasText(sqlPath) ? sqlPath.concat(format(SQL_PATH_TEMPLATE, name)) : name; 
-		
-		if(StringUtils.hasText(sqlPath)) {
-			sqlPath.concat(format(SQL_PATH_TEMPLATE, name));
-		}else {
-			path = "\"".concat(name).concat("\"");
-		}
-		return path;
-	}*/
 }
