@@ -78,7 +78,7 @@ class CreateTableAction implements CrateSQLAction {
 	
 	private void createStatement(Column column, StringBuilder builder) {
 		
-		// double quotes to preserve case
+		// double quotes to preserve case in crate db
 		builder.append("\"");
 		builder.append(column.getName());
 		builder.append("\"");
