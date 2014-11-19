@@ -77,6 +77,6 @@ class ColumnMetadataAction implements CrateSQLAction, CrateSQLResponseHandler<Li
 			return columns;
 		}
 		
-		throw new NoSuchTableException(format("Table '%s' has no metadata in information_schema. Table does not exist", tableName), null);
+		throw new NoSuchTableException(format("Table '%s' has no metadata in 'information_schema.columns'. Table does not exist", tableName), null);
 	}
 }
