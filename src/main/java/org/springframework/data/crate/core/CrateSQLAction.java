@@ -34,6 +34,7 @@ public interface CrateSQLAction {
 	String CREATE_TABLE = "create table";
 	String DROP_TABLE = "drop table";
 	String ALTER_TABLE = "alter table";
+	String ADD_COLUMN = "add column";
 	
 	public SQLRequest getSQLRequest();
 	public String getSQLStatement();
