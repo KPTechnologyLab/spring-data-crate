@@ -38,7 +38,7 @@ import org.springframework.util.StringUtils;
 class AlterTableAction implements CrateSQLAction {
 	
 	private static final String SQL_PATH_TEMPLATE = "['%s']";
-	
+	private static final String ENCLOSE_DOUBLE_QUOTE_TEMPLATE = "\"%s\"";
 	private String statement;
 	private String tableName;
 	private Column column;	
@@ -69,9 +69,7 @@ class AlterTableAction implements CrateSQLAction {
 															   append(SPACE).
 															   append(ADD_COLUMN).
 															   append(SPACE).
-															   append("\""). // double quotes to preserve case in crate db
 															   append(toSqlPath(column)).
-															   append("\""). // double quotes to preserve case in crate db
 															   append(SPACE).
 															   append(createColumnDefinition(column));
 		return builder.toString();
@@ -81,11 +79,8 @@ class AlterTableAction implements CrateSQLAction {
 		
 		String[] tokens = split(column.getName(), ".");
 		
-		if(tokens.length == 1) {
-			return tokens[0];
-		}
-		
-		StringBuilder sqlPath = new StringBuilder(tokens[0]);
+		// double quotes to preserve case in crate db
+		StringBuilder sqlPath = new StringBuilder(format(ENCLOSE_DOUBLE_QUOTE_TEMPLATE, tokens[0]));
 		
 		for (int i = 1; i < tokens.length; i++) {
 			sqlPath.append(format(SQL_PATH_TEMPLATE, tokens[i]));

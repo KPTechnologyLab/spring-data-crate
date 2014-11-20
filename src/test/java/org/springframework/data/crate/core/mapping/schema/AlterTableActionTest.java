@@ -93,7 +93,7 @@ public class AlterTableActionTest {
 		
 		CrateSQLAction action = new AlterTableAction("testTable", stringCol);
 
-		assertThat(action.getSQLStatement(), is("alter table testTable add column \"Entity['field1']\" integer"));
+		assertThat(action.getSQLStatement(), is("alter table testTable add column \"Entity\"['field1'] integer"));
 	}
 	
 	@Test
@@ -103,7 +103,7 @@ public class AlterTableActionTest {
 		
 		CrateSQLAction action = new AlterTableAction("testTable", arrayCol);
 
-		assertThat(action.getSQLStatement(), is("alter table testTable add column \"entity['longArray']\" array(long)"));
+		assertThat(action.getSQLStatement(), is("alter table testTable add column \"entity\"['longArray'] array(long)"));
 	}
 	
 	@Test
@@ -116,7 +116,7 @@ public class AlterTableActionTest {
 		
 		CrateSQLAction action = new AlterTableAction("testTable", objectArrayCol);
 		
-		StringBuilder sql = new StringBuilder("alter table testTable add column \"entity['nested']['objectArray']\" ");
+		StringBuilder sql = new StringBuilder("alter table testTable add column \"entity\"['nested']['objectArray'] ");
 		sql.append("array(object as (\"strings\" array(string), \"longField\" long))");
 		
 		assertThat(action.getSQLStatement(), is(sql.toString()));
@@ -127,13 +127,13 @@ public class AlterTableActionTest {
 		
 		Column objectColOne = createColumn("map", Map.class, null, false);
 		Column objectColTwo = createColumn("longs", Set.class, Long.class, false);
-		Column objectCol = createColumn("entity.nested.objectArray.element.object", Object.class, null, false);
+		Column objectCol = createColumn("entity.nested.objectArray.Element.object", Object.class, null, false);
 		objectCol.setSubColumns(asList(objectColOne, objectColTwo));
 		
 		CrateSQLAction action = new AlterTableAction("testTable", objectCol);
 		
 		StringBuilder sql = new StringBuilder("alter table testTable add column ");
-		sql.append("\"entity['nested']['objectArray']['element']['object']\" ");
+		sql.append("\"entity\"['nested']['objectArray']['Element']['object'] ");
 		sql.append("object as (\"map\" object, \"longs\" array(long))");
 		
 		assertThat(action.getSQLStatement(), is(sql.toString()));
