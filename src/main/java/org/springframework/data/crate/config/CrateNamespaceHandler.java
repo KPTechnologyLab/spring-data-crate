@@ -25,6 +25,7 @@ import org.springframework.data.repository.config.RepositoryConfigurationExtensi
  * CrateNamespaceHandler
  *
  * @author Rizwan Idrees
+ * @author Hasnain Javed
  */
 public class CrateNamespaceHandler extends NamespaceHandlerSupport {
 
@@ -35,5 +36,6 @@ public class CrateNamespaceHandler extends NamespaceHandlerSupport {
 
         registerBeanDefinitionParser("repositories", parser);
         registerBeanDefinitionParser("client", new CrateClientBeanDefinitionParser());
+        registerBeanDefinitionParser("schema-export", new CratePersistentEntitySchemaManagerBeanDefinitionParser());
     }
 }
