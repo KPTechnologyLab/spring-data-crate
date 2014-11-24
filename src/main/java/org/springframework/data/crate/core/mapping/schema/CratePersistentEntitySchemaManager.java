@@ -58,7 +58,6 @@ public class CratePersistentEntitySchemaManager implements InitializingBean, Dis
 
 	private final Logger logger = getLogger(getClass());
 	private final Map<Class<?>, Boolean> inspectedEntities;
-	private final SchemaExportOption DEFAULT_SCHEMA_EXPORT_OPTION = UPDATE;
 	
 	private MappingContext<? extends CratePersistentEntity<?>, CratePersistentProperty> mappingContext;	
 	private CrateOperations crateOperations;
@@ -72,12 +71,12 @@ public class CratePersistentEntitySchemaManager implements InitializingBean, Dis
 	 * 
 	 * @param crateOperations must not be {@literal null}.
 	 */
-	public CratePersistentEntitySchemaManager(CrateOperations crateOperations) {
+	public CratePersistentEntitySchemaManager(CrateOperations crateOperations, SchemaExportOption exportOption) {
 		super();
 		notNull(crateOperations);
-		
+		notNull(exportOption);
 		this.crateOperations = crateOperations;
-		this.exportOption = DEFAULT_SCHEMA_EXPORT_OPTION; 
+		this.exportOption = exportOption; 
 		this.mappingContext = crateOperations.getConverter().getMappingContext();
 		this.tableManager = new CratePersistentEntityTableManager(mappingContext);
 		this.inspectedEntities = new ConcurrentHashMap<Class<?>, Boolean>();
@@ -90,15 +89,6 @@ public class CratePersistentEntitySchemaManager implements InitializingBean, Dis
 	*/
 	public void setIgnoreFailures(boolean ignoreFailures) {
 		this.ignoreFailures = ignoreFailures;
-	}
-
-	/**
-	* Configures the {@link SchemaExportOption} to be used for exporting tables. Setting {@literal null} will reset the
-	* default of {@value #DEFAULT_SCHEMA_EXPORT_OPTION}.
-	* @param exportOption
-	*/
-	public void setExportOption(SchemaExportOption exportOption) {		
-		this.exportOption = exportOption == null ? DEFAULT_SCHEMA_EXPORT_OPTION : exportOption;
 	}
 	
 	@Override
