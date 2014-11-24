@@ -23,7 +23,6 @@ import static org.springframework.data.crate.core.mapping.CrateDataType.getCrate
 import static org.springframework.util.Assert.hasText;
 import static org.springframework.util.Assert.notNull;
 
-import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
 
@@ -33,7 +32,7 @@ import java.util.Map;
  * @author Hasnain Javed
  * @since 1.0.0
  */
-class Column {
+public class Column {
 	
 	private String name;
 	private String crateType;

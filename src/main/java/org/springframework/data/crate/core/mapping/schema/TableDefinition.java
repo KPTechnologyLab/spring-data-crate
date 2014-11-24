@@ -27,7 +27,7 @@ import java.util.List;
  * @author Hasnain Javed
  * @since 1.0.0
  */
-class TableDefinition {
+public class TableDefinition {
 	
 	private String name;
 	
