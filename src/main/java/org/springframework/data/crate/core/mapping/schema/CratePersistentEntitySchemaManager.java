@@ -23,6 +23,7 @@ import static org.springframework.data.crate.core.mapping.schema.SchemaOption.CR
 import static org.springframework.data.crate.core.mapping.schema.SchemaOption.UPDATE;
 import static org.springframework.data.crate.core.mapping.schema.SchemaOption.values;
 import static org.springframework.util.Assert.notNull;
+import io.crate.action.sql.SQLRequest;
 
 import java.util.Arrays;
 import java.util.List;
@@ -36,9 +37,14 @@ import org.springframework.dao.DataAccessException;
 import org.springframework.dao.InvalidDataAccessResourceUsageException;
 import org.springframework.data.crate.NoSuchTableException;
 import org.springframework.data.crate.core.CrateOperations;
+import org.springframework.data.crate.core.CrateSQLAction;
 import org.springframework.data.crate.core.mapping.CrateMappingContext;
 import org.springframework.data.crate.core.mapping.CratePersistentEntity;
 import org.springframework.data.crate.core.mapping.CratePersistentProperty;
+import org.springframework.data.crate.core.sql.AlterTable;
+import org.springframework.data.crate.core.sql.CrateSQLStatement;
+import org.springframework.data.crate.core.sql.CreateTable;
+import org.springframework.data.crate.core.sql.DropTable;
 import org.springframework.data.mapping.context.MappingContext;
 
 /**
@@ -221,5 +227,81 @@ public class CratePersistentEntitySchemaManager implements InitializingBean, Dis
 		ColumnMetadataAction action = new ColumnMetadataAction(entity.getTableName());
 		List<ColumnMetadata> columns = crateOperations.execute(action, action);
 		return new TableMetadata(entity.getTableName(), columns);
+	}
+	
+	 /**
+	 * {@link CreateTableAction} implementation of {@link CrateSQLAction} to execute create table command.
+	 * 
+	 * @author Hasnain Javed
+	 * @since 1.0.0
+	 */
+	private class CreateTableAction implements CrateSQLAction {
+		
+		private CrateSQLStatement createTable;
+		
+		public CreateTableAction(TableDefinition tableDefinition) {
+			super();
+			this.createTable = new CreateTable(tableDefinition);
+		}
+
+		@Override
+		public SQLRequest getSQLRequest() {
+			return new SQLRequest(getSQLStatement());
+		}
+		
+		@Override
+		public String getSQLStatement() {
+			return createTable.createStatement();
+		}
+	}
+	
+	/**
+	 * {@link AlterTableAction} implementation of {@link CrateSQLAction} to execute alter table command.
+	 * 
+	 * @author Hasnain Javed
+	 * @since 1.0.0
+	 */
+	private class AlterTableAction implements CrateSQLAction {
+		
+		private CrateSQLStatement alterTable;
+		
+		public AlterTableAction(String tableName, Column column) {
+			this.alterTable = new AlterTable(tableName, column);
+		}
+
+		@Override
+		public SQLRequest getSQLRequest() {
+			return new SQLRequest(getSQLStatement());
+		}
+
+		@Override
+		public String getSQLStatement() {
+			return alterTable.createStatement();
+		}
+	}
+	
+	/**
+	 * {@link DropTableAction} implementation of {@link CrateSQLAction} to execute drop table command.
+	 * @author Hasnain Javed 
+	 * @since 1.0.0
+	 */
+	class DropTableAction implements CrateSQLAction {
+		
+		private CrateSQLStatement dropTable;
+		
+		public DropTableAction(String tableName) {
+			super();
+			this.dropTable = new DropTable(tableName);
+		}
+
+		@Override
+		public SQLRequest getSQLRequest() {
+			return new SQLRequest(getSQLStatement());
+		}
+
+		@Override
+		public String getSQLStatement() {
+			return dropTable.createStatement();
+		}
 	}
 }

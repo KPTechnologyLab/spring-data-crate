@@ -76,8 +76,8 @@ public class CratePersistentEntitySchemaManagerTest {
 		
 		initializeMappingContext(Person.class);
 		
-		doReturn(mock(SQLResponse.class)).when(crateOperations).execute(isA(DropTableAction.class));
-		when(crateOperations.execute(isA(CreateTableAction.class))).thenThrow(new InvalidDataAccessResourceUsageException("Error!!"));
+		doReturn(mock(SQLResponse.class)).when(crateOperations).execute(isA(CrateSQLAction.class));
+		when(crateOperations.execute(isA(CrateSQLAction.class))).thenThrow(new InvalidDataAccessResourceUsageException("Error!!"));
 		
 		try {
 			new CratePersistentEntitySchemaManager(crateOperations, CREATE).afterPropertiesSet();
@@ -95,8 +95,8 @@ public class CratePersistentEntitySchemaManagerTest {
 		
 		initializeMappingContext(Person.class);
 		
-		when(crateOperations.execute(isA(DropTableAction.class))).thenThrow(new NoSuchTableException("table does not exist", null));
-		when(crateOperations.execute(isA(CreateTableAction.class))).thenThrow(new InvalidDataAccessResourceUsageException("Error!!"));
+		when(crateOperations.execute(isA(CrateSQLAction.class))).thenThrow(new NoSuchTableException("table does not exist", null));
+		when(crateOperations.execute(isA(CrateSQLAction.class))).thenThrow(new InvalidDataAccessResourceUsageException("Error!!"));
 		
 		CratePersistentEntitySchemaManager manager = new CratePersistentEntitySchemaManager(crateOperations, CREATE);
 		manager.setIgnoreFailures(true);
@@ -110,8 +110,8 @@ public class CratePersistentEntitySchemaManagerTest {
 		
 		initializeMappingContext(Person.class);
 		
-		when(crateOperations.execute(isA(DropTableAction.class))).thenThrow(new NoSuchTableException("table does not exist", null));
-		doReturn(mock(SQLResponse.class)).when(crateOperations).execute(isA(CreateTableAction.class));
+		when(crateOperations.execute(isA(CrateSQLAction.class))).thenThrow(new NoSuchTableException("table does not exist", null));
+		doReturn(mock(SQLResponse.class)).when(crateOperations).execute(isA(CrateSQLAction.class));
 		
 		new CratePersistentEntitySchemaManager(crateOperations, CREATE).afterPropertiesSet();
 		
@@ -123,8 +123,8 @@ public class CratePersistentEntitySchemaManagerTest {
 		
 		initializeMappingContext(Person.class);
 		
-		doReturn(mock(SQLResponse.class)).when(crateOperations).execute(isA(DropTableAction.class));
-		doReturn(mock(SQLResponse.class)).when(crateOperations).execute(isA(CreateTableAction.class));
+		doReturn(mock(SQLResponse.class)).when(crateOperations).execute(isA(CrateSQLAction.class));
+		doReturn(mock(SQLResponse.class)).when(crateOperations).execute(isA(CrateSQLAction.class));
 		
 		new CratePersistentEntitySchemaManager(crateOperations, CREATE).afterPropertiesSet();
 		
@@ -136,9 +136,9 @@ public class CratePersistentEntitySchemaManagerTest {
 		
 		initializeMappingContext(Person.class);
 		
-		when(crateOperations.execute(isA(DropTableAction.class))).thenThrow(new NoSuchTableException("table does not exist", null)).
-																  thenReturn(mock(SQLResponse.class));
-		doReturn(mock(SQLResponse.class)).when(crateOperations).execute(isA(CreateTableAction.class));
+		when(crateOperations.execute(isA(CrateSQLAction.class))).thenThrow(new NoSuchTableException("table does not exist", null)).
+																 thenReturn(mock(SQLResponse.class));
+		doReturn(mock(SQLResponse.class)).when(crateOperations).execute(isA(CrateSQLAction.class));
 		
 		CratePersistentEntitySchemaManager manager = new CratePersistentEntitySchemaManager(crateOperations, CREATE_DROP);
 		
@@ -153,8 +153,8 @@ public class CratePersistentEntitySchemaManagerTest {
 		
 		initializeMappingContext(Person.class);
 		
-		doReturn(mock(SQLResponse.class)).when(crateOperations).execute(isA(DropTableAction.class));
-		doReturn(mock(SQLResponse.class)).when(crateOperations).execute(isA(CreateTableAction.class));
+		doReturn(mock(SQLResponse.class)).when(crateOperations).execute(isA(CrateSQLAction.class));
+		doReturn(mock(SQLResponse.class)).when(crateOperations).execute(isA(CrateSQLAction.class));
 		
 		CratePersistentEntitySchemaManager manager = new CratePersistentEntitySchemaManager(crateOperations, CREATE_DROP);
 		
@@ -175,7 +175,7 @@ public class CratePersistentEntitySchemaManagerTest {
 		CratePersistentEntitySchemaManager manager = new CratePersistentEntitySchemaManager(crateOperations);
 		manager.afterPropertiesSet();
 		
-		verify(crateOperations).execute(isA(CreateTableAction.class));
+		verify(crateOperations).execute(isA(CrateSQLAction.class));
 	}
 	
 	@Test(expected=DataAccessException.class)
@@ -188,7 +188,7 @@ public class CratePersistentEntitySchemaManagerTest {
 		
 		when(crateOperations.execute(isA(ColumnMetadataAction.class),
 									 isA(ColumnMetadataAction.class))).thenReturn(columns);
-		when(crateOperations.execute(isA(AlterTableAction.class))).thenThrow(new InvalidDataAccessResourceUsageException("Error!!"));
+		when(crateOperations.execute(isA(CrateSQLAction.class))).thenThrow(new InvalidDataAccessResourceUsageException("Error!!"));
 		
 		CratePersistentEntitySchemaManager manager = new CratePersistentEntitySchemaManager(crateOperations);
 		manager.afterPropertiesSet();
@@ -208,7 +208,7 @@ public class CratePersistentEntitySchemaManagerTest {
 		CratePersistentEntitySchemaManager manager = new CratePersistentEntitySchemaManager(crateOperations);
 		manager.afterPropertiesSet();
 		
-		verify(crateOperations, never()).execute(isA(AlterTableAction.class));
+		verify(crateOperations, never()).execute(isA(CrateSQLAction.class));
 	}
 	
 	@Test
@@ -224,7 +224,7 @@ public class CratePersistentEntitySchemaManagerTest {
 		CratePersistentEntitySchemaManager manager = new CratePersistentEntitySchemaManager(crateOperations);
 		manager.afterPropertiesSet();
 		
-		verify(crateOperations).execute(isA(AlterTableAction.class));
+		verify(crateOperations).execute(isA(CrateSQLAction.class));
 	}
 	
 	private ColumnMetadata createColumnMetadata(String sqlPath, String crateType) {
