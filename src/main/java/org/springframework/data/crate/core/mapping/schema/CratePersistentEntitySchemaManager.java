@@ -49,29 +49,23 @@ import org.springframework.data.mapping.context.MappingContext;
 
 /**
  * Component that inspects {@link CratePersistentEntity} instances contained in the given {@link CrateMappingContext}
- * for creating/altering/dropping tables in Crate DB.
+ * for creating/altering tables in Crate DB.
  *
  * @author Hasnain Javed
  * @since 1.0.0
- */
-
-/*
- *  TODO: add feature to support executing scripts as in spring-jdbc.
- *  scripts take priority ?
- *  scripts can be added as a property List<String> scripts ?
  */
 public class CratePersistentEntitySchemaManager implements InitializingBean, DisposableBean {
 
 	private final Logger logger = getLogger(getClass());
 	private final Map<Class<?>, Boolean> inspectedEntities;
+	private final SchemaExportOption DEFAULT_SCHEMA_EXPORT_OPTION = UPDATE;
 	
 	private MappingContext<? extends CratePersistentEntity<?>, CratePersistentProperty> mappingContext;	
-	private CrateOperations crateOperations;	
-	private SchemaExportOption schemaOption;	
+	private CrateOperations crateOperations;
+	private SchemaExportOption exportOption;	
 	private CratePersistentEntityTableManager tableManager;
 	
 	private boolean ignoreFailures = false;
-//	private boolean ignoreFailedDrops = true;
 	
 	/**
 	 * Creates a new {@link CratePersistentEntitySchemaManager} for the given {@link CrateOperations}
@@ -79,28 +73,14 @@ public class CratePersistentEntitySchemaManager implements InitializingBean, Dis
 	 * @param crateOperations must not be {@literal null}.
 	 */
 	public CratePersistentEntitySchemaManager(CrateOperations crateOperations) {
-		this(crateOperations, UPDATE);
-	}
-	
-	/**
-	 * Creates a new {@link CratePersistentEntitySchemaManager} for the given {@link CrateOperations},
-	 * {@link SchemaExportOption}.
-	 * 
-	 * @param crateOperations must not be {@literal null}.
-	 * @param schemaOption must not be {@literal null}.
-	 * @param ignoreFailures if exception needs to be thrown on error.
-	 * @param ignoreFailedDrops if exception needs to be thrown on failed drop statements.
-	 */
-	public CratePersistentEntitySchemaManager(CrateOperations crateOperations, SchemaExportOption schemaOption) {
 		super();
 		notNull(crateOperations);
-		notNull(schemaOption);
 		
 		this.crateOperations = crateOperations;
+		this.exportOption = DEFAULT_SCHEMA_EXPORT_OPTION; 
 		this.mappingContext = crateOperations.getConverter().getMappingContext();
-		this.schemaOption = schemaOption;
 		this.tableManager = new CratePersistentEntityTableManager(mappingContext);
-		this.inspectedEntities = new ConcurrentHashMap<Class<?>, Boolean>();		
+		this.inspectedEntities = new ConcurrentHashMap<Class<?>, Boolean>();
 	}
 	
 	/**
@@ -113,14 +93,14 @@ public class CratePersistentEntitySchemaManager implements InitializingBean, Dis
 	}
 
 	/**
-	* Flag to indicate that all failures in drop statement(s) should be logged but not cause the exception to propagate.
-	* Defaults to {@code false}.
-	* @param ignoreFailedDrops {@code true} if drop statement(s) should continue to be executed on failure.
+	* Configures the {@link SchemaExportOption} to be used for exporting tables. Setting {@literal null} will reset the
+	* default of {@value #DEFAULT_SCHEMA_EXPORT_OPTION}.
+	* @param exportOption
+	*/
+	public void setExportOption(SchemaExportOption exportOption) {		
+		this.exportOption = exportOption == null ? DEFAULT_SCHEMA_EXPORT_OPTION : exportOption;
+	}
 	
-	public void setIgnoreFailedDrops(boolean ignoreFailedDrops) {
-		this.ignoreFailedDrops = ignoreFailedDrops;
-	}*/
-
 	@Override
 	public void afterPropertiesSet() throws Exception {
 		execute();
@@ -129,7 +109,7 @@ public class CratePersistentEntitySchemaManager implements InitializingBean, Dis
 	@Override
 	public void destroy() throws Exception {
 		
-		if(schemaOption == CREATE_DROP) {
+		if(exportOption == CREATE_DROP) {
 			for(Class<?> clazz : inspectedEntities.keySet()) {
 				dropTable(mappingContext.getPersistentEntity(clazz));
 			}
@@ -139,7 +119,7 @@ public class CratePersistentEntitySchemaManager implements InitializingBean, Dis
 	private void execute() {
 		
 		try {
-			switch (schemaOption) {
+			switch (exportOption) {
 			case CREATE:
 			case CREATE_DROP:
 				dropAndCreateTables();
@@ -148,8 +128,8 @@ public class CratePersistentEntitySchemaManager implements InitializingBean, Dis
 				updateTables();
 				break;
 			default:
-				throw new IllegalArgumentException(format("unknown SchemaOption %s. valid values are %s", schemaOption,
-																										  Arrays.toString(values())));
+				throw new IllegalArgumentException(format("unknown SchemaExportOption %s. valid values are %s", exportOption,
+																										  		Arrays.toString(values())));
 			}
 		}catch(DataAccessException e) {
 			if(!ignoreFailures) {
