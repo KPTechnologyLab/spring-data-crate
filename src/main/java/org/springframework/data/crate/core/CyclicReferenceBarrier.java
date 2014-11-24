@@ -61,9 +61,9 @@ public class CyclicReferenceBarrier {
 			throw new CyclicReferenceException(property.getFieldName(), property.getOwner().getType(), dotPath);
 		}
 		
-		String propertyTypeKey = createKey(property);
+		String type = property.getActualType().getName();
 		
-		List<VisitedPath> paths = visitedPaths.get(propertyTypeKey);
+		List<VisitedPath> paths = visitedPaths.get(type);
 		
 		if(paths == null) {
 			paths = new LinkedList<VisitedPath>();
@@ -71,8 +71,8 @@ public class CyclicReferenceBarrier {
 		
 		paths.add(new VisitedPath(property));
 		
-		if(!visitedPaths.containsKey(propertyTypeKey)) {
-			visitedPaths.put(propertyTypeKey, paths);
+		if(!visitedPaths.containsKey(type)) {
+			visitedPaths.put(type, paths);
 		}
 		
 		if(hasText(dotPath)) {
@@ -80,10 +80,6 @@ public class CyclicReferenceBarrier {
 		}else {
 			dotPath  = property.getFieldName();
 		}
-	}
-	
-	private String createKey(CratePersistentProperty property) {
-		return property.getActualType().getName().concat(":").concat(property.getFieldName());
 	}
 	
 	/**
@@ -94,11 +90,11 @@ public class CyclicReferenceBarrier {
 		
 		VisitedPath path  = null;
 		
-		String propertyTypeKey = createKey(property);
+		String type = property.getActualType().getName();
 		
-		if(visitedPaths.containsKey(propertyTypeKey)) {
+		if(visitedPaths.containsKey(type)) {
 			
-			List<VisitedPath> paths = visitedPaths.get(propertyTypeKey);
+			List<VisitedPath> paths = visitedPaths.get(type);
 			
 			if(paths != null && !paths.isEmpty()) {
 				for (VisitedPath visitedPath : paths) {
@@ -133,7 +129,8 @@ public class CyclicReferenceBarrier {
 		}
 		
 		boolean isCyclic(CratePersistentProperty property) {
-			return (referer.equals(property.getOwner().getType()) && 
+			return (fieldName.equals(property.getFieldName()) &&
+					referer.equals(property.getOwner().getType()) && 
 					referee.equals(property.getActualType()));
 		}
 		
