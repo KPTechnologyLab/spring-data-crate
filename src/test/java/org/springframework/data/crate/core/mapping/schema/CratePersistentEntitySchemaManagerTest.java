@@ -29,8 +29,8 @@ import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 import static org.springframework.data.crate.core.mapping.CrateDataType.INTEGER;
 import static org.springframework.data.crate.core.mapping.CrateDataType.STRING;
-import static org.springframework.data.crate.core.mapping.schema.SchemaOption.CREATE;
-import static org.springframework.data.crate.core.mapping.schema.SchemaOption.CREATE_DROP;
+import static org.springframework.data.crate.core.mapping.schema.SchemaExportOption.CREATE;
+import static org.springframework.data.crate.core.mapping.schema.SchemaExportOption.CREATE_DROP;
 import io.crate.action.sql.SQLResponse;
 
 import java.util.List;

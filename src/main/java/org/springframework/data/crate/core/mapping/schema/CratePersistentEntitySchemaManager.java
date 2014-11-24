@@ -19,9 +19,9 @@ package org.springframework.data.crate.core.mapping.schema;
 import static java.lang.Boolean.TRUE;
 import static java.lang.String.format;
 import static org.slf4j.LoggerFactory.getLogger;
-import static org.springframework.data.crate.core.mapping.schema.SchemaOption.CREATE_DROP;
-import static org.springframework.data.crate.core.mapping.schema.SchemaOption.UPDATE;
-import static org.springframework.data.crate.core.mapping.schema.SchemaOption.values;
+import static org.springframework.data.crate.core.mapping.schema.SchemaExportOption.CREATE_DROP;
+import static org.springframework.data.crate.core.mapping.schema.SchemaExportOption.UPDATE;
+import static org.springframework.data.crate.core.mapping.schema.SchemaExportOption.values;
 import static org.springframework.util.Assert.notNull;
 import io.crate.action.sql.SQLRequest;
 
@@ -67,7 +67,7 @@ public class CratePersistentEntitySchemaManager implements InitializingBean, Dis
 	
 	private MappingContext<? extends CratePersistentEntity<?>, CratePersistentProperty> mappingContext;	
 	private CrateOperations crateOperations;	
-	private SchemaOption schemaOption;	
+	private SchemaExportOption schemaOption;	
 	private CratePersistentEntityTableManager tableManager;
 	
 	private boolean ignoreFailures = false;
@@ -84,14 +84,14 @@ public class CratePersistentEntitySchemaManager implements InitializingBean, Dis
 	
 	/**
 	 * Creates a new {@link CratePersistentEntitySchemaManager} for the given {@link CrateOperations},
-	 * {@link SchemaOption}.
+	 * {@link SchemaExportOption}.
 	 * 
 	 * @param crateOperations must not be {@literal null}.
 	 * @param schemaOption must not be {@literal null}.
 	 * @param ignoreFailures if exception needs to be thrown on error.
 	 * @param ignoreFailedDrops if exception needs to be thrown on failed drop statements.
 	 */
-	public CratePersistentEntitySchemaManager(CrateOperations crateOperations, SchemaOption schemaOption) {
+	public CratePersistentEntitySchemaManager(CrateOperations crateOperations, SchemaExportOption schemaOption) {
 		super();
 		notNull(crateOperations);
 		notNull(schemaOption);
