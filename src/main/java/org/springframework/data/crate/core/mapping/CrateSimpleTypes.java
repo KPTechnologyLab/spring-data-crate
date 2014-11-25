@@ -16,6 +16,11 @@
 
 package org.springframework.data.crate.core.mapping;
 
+import static java.util.Collections.unmodifiableSet;
+
+import java.util.HashSet;
+import java.util.Set;
+
 import org.springframework.data.mapping.model.SimpleTypeHolder;
 
 /**
@@ -25,7 +30,15 @@ import org.springframework.data.mapping.model.SimpleTypeHolder;
  */
 public class CrateSimpleTypes {
 	
-	public static final SimpleTypeHolder HOLDER = new SimpleTypeHolder();
+	static {
+	    Set<Class<?>> simpleTypes = new HashSet<Class<?>>();
+	    simpleTypes.add(CrateDocument.class);
+	    simpleTypes.add(CrateArray.class);
+	    CRATE_SIMPLE_TYPES = unmodifiableSet(simpleTypes);
+	}
+	
+	private static final Set<Class<?>> CRATE_SIMPLE_TYPES;
+	public static final SimpleTypeHolder HOLDER = new SimpleTypeHolder(CRATE_SIMPLE_TYPES, true);
 	
 	private CrateSimpleTypes() {
 	}
