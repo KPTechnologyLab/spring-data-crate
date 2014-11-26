@@ -1,5 +1,5 @@
 /*
- * Copyright 2014 the original author or authors.
+ * Copyright 2002-2014 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -16,19 +16,23 @@
 package org.springframework.data.crate.core.convert;
 
 import org.springframework.core.convert.ConversionService;
+import org.springframework.data.convert.EntityConverter;
+import org.springframework.data.convert.EntityReader;
+import org.springframework.data.crate.core.mapping.CrateDocument;
 import org.springframework.data.crate.core.mapping.CratePersistentEntity;
 import org.springframework.data.crate.core.mapping.CratePersistentProperty;
 import org.springframework.data.mapping.context.MappingContext;
 
 /**
- * CrateConverter
+ * Central Crate specific converter interface which reads from/writes to CrateDocument.
  *
  * @author Rizwan Idrees
  * @author Hasnain Javed
  */
 
-public interface CrateConverter {
-
+public interface CrateConverter extends EntityConverter<CratePersistentEntity<?>, CratePersistentProperty, Object, CrateDocument>, 
+										CrateWriter<Object>, 
+										EntityReader<Object, CrateDocument> {
 	/**
 	 * Returns the underlying {@link org.springframework.data.mapping.context.MappingContext} used by the converter.
 	 *
