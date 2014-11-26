@@ -26,8 +26,6 @@ import org.springframework.data.crate.core.mapping.CrateDocument;
  */
 public class DefaultCrateTypeMapper extends DefaultTypeMapper<CrateDocument> implements CrateTypeMapper {
 	
-	public static final String DEFAULT_TYPE_KEY = "_class";
-
 	public DefaultCrateTypeMapper(String typeKey) {
 		super(new CrateDocumentTypeAliasAccessor(typeKey));
 	}
