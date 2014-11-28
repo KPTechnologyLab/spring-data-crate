@@ -15,6 +15,8 @@
  */
 package org.springframework.data.crate.core.convert;
 
+import static org.springframework.util.Assert.notNull;
+
 import org.springframework.beans.factory.InitializingBean;
 import org.springframework.core.convert.ConversionService;
 import org.springframework.core.convert.support.DefaultConversionService;
@@ -45,6 +47,8 @@ public abstract class AbstractCrateConverter implements CrateConverter, Initiali
 
 	@Override
 	public void afterPropertiesSet() throws Exception {
+		notNull(instantiators, "An instance of EntityInstantiators is required");
+		notNull(conversions, "An instance of CustomConversions is required");
 		initializeConverters();
 	}
 	
@@ -62,7 +66,7 @@ public abstract class AbstractCrateConverter implements CrateConverter, Initiali
 	 * @param instantiators
 	 */
 	public void setInstantiators(EntityInstantiators instantiators) {
-		this.instantiators = instantiators == null ? new EntityInstantiators() : instantiators;
+		this.instantiators = instantiators;
 	}
 	
 	/**
