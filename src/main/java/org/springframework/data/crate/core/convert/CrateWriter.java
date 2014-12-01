@@ -17,6 +17,7 @@ package org.springframework.data.crate.core.convert;
 
 import org.springframework.data.convert.EntityWriter;
 import org.springframework.data.crate.core.mapping.CrateDocument;
+import org.springframework.data.util.TypeInformation;
 
 /**
  * CrateWriter marker interface for converting an object of type T to crate document representation {@link CrateDocument}.
@@ -26,4 +27,15 @@ import org.springframework.data.crate.core.mapping.CrateDocument;
  * @param <T> the type of the object to be converted to a CrateDocument
  */
 public interface CrateWriter<T> extends EntityWriter<T, CrateDocument> {
+	
+	/**
+	 * Converts the given object into a representation that Crate will be able to store natively but retains the type information in case
+	 * the given {@link TypeInformation} differs from the given object type. 
+	 * One possible use case is to convert complex id types
+	 * 
+	 * @param obj can be {@literal null}.
+	 * @param typeInformation can be {@literal null}.
+	 * @return
+	 */
+	Object convertToCrateType(Object obj, TypeInformation<?> typeInformation);
 }
