@@ -29,6 +29,7 @@ import java.util.Set;
  * Crate specific {@link org.springframework.data.mapping.PersistentProperty} implementation processing
  *
  * @author Rizwan Idrees
+ * @author Hasnain Javed
  */
 public class SimpleCratePersistentProperty extends
         AnnotationBasedPersistentProperty<CratePersistentProperty> implements CratePersistentProperty {
@@ -37,6 +38,7 @@ public class SimpleCratePersistentProperty extends
 
 	static {
 		SUPPORTED_ID_PROPERTY_NAMES.add("id");
+		SUPPORTED_ID_PROPERTY_NAMES.add("_id");
 	}
 
 	public SimpleCratePersistentProperty(Field field, PropertyDescriptor propertyDescriptor,
