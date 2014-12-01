@@ -27,4 +27,11 @@ import org.springframework.data.crate.core.mapping.CrateDocument;
 public interface CrateTypeMapper extends TypeMapper<CrateDocument> {
 	
 	String DEFAULT_TYPE_KEY = "_class";
+	
+	/**
+	 * Returns whether the given key is the type key.
+	 * 
+	 * @return
+	 */
+	boolean isTypeKey(String typeKey);
 }

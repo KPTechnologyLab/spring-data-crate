@@ -15,6 +15,8 @@
  */
 package org.springframework.data.crate.core.convert;
 
+import static org.springframework.util.StringUtils.hasText;
+
 import org.springframework.data.convert.DefaultTypeMapper;
 import org.springframework.data.convert.TypeAliasAccessor;
 import org.springframework.data.crate.core.mapping.CrateDocument;
@@ -26,8 +28,17 @@ import org.springframework.data.crate.core.mapping.CrateDocument;
  */
 public class DefaultCrateTypeMapper extends DefaultTypeMapper<CrateDocument> implements CrateTypeMapper {
 	
+	public DefaultCrateTypeMapper() {
+		this(DEFAULT_TYPE_KEY);
+	}
+	
 	public DefaultCrateTypeMapper(String typeKey) {
 		super(new CrateDocumentTypeAliasAccessor(typeKey));
+	}
+	
+	@Override
+	public boolean isTypeKey(String typeKey) {
+		return hasText(typeKey) ? typeKey.equals(typeKey) : false;
 	}
 	
 	public static class CrateDocumentTypeAliasAccessor implements TypeAliasAccessor<CrateDocument> {
