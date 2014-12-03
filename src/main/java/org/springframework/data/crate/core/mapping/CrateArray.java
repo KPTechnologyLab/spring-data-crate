@@ -27,4 +27,10 @@ public class CrateArray extends LinkedList<Object> implements CrateDBObject {
 
 	private static final long serialVersionUID = -7257092605681328365L;
 	
+	public CrateArray() {
+	}
+	
+	public CrateArray(Object value) {
+		add(value);
+	}
 }
