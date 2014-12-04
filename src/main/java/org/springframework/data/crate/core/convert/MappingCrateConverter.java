@@ -50,7 +50,6 @@ import org.springframework.data.crate.core.mapping.CratePersistentProperty;
 import org.springframework.data.mapping.Association;
 import org.springframework.data.mapping.AssociationHandler;
 import org.springframework.data.mapping.PreferredConstructor.Parameter;
-import org.springframework.data.mapping.PropertyHandler;
 import org.springframework.data.mapping.context.MappingContext;
 import org.springframework.data.mapping.model.BeanWrapper;
 import org.springframework.data.mapping.model.DefaultSpELExpressionEvaluator;
@@ -239,23 +238,26 @@ public class MappingCrateConverter extends AbstractCrateConverter implements App
 	    R instance = instantiator.createInstance(entity, provider);
 	    final BeanWrapper<R> wrapper = create(instance, conversionService);
 	    final R result = wrapper.getBean();
+	    final CratePersistentProperty idProperty = entity.getIdProperty();
 	    
-	    entity.doWithProperties(new PropertyHandler<CratePersistentProperty>() {
-	    	
-	      @Override
-	      public void doWithPersistentProperty(final CratePersistentProperty prop) {
-	    	  
-	    	  if (!sourceHasProperty(prop) || entity.isConstructorArgument(prop)) {
-	    		  return;
-	    	  }	    	  
-	    	  wrapper.setProperty(prop, getValueInternal(prop, source, result));
-	      }
-	      
-	      private boolean sourceHasProperty(final CratePersistentProperty property) {
-	        return property.isIdProperty() || source.containsKey(property.getFieldName());
-	      }
-	    });
+	    if(idProperty != null) {
+	    	Object idValue = getValueInternal(idProperty, source, result);
+	    	wrapper.setProperty(idProperty, idValue);
+	    }
+	    
+	    for(CratePersistentProperty property : entity.getPersistentProperties()) {
+	    	// skip id property as it may have potentially be set above.  
+			if (idProperty != null && idProperty.equals(property)) {
+				continue;
+			}
 
+			if (!source.containsKey(property.getFieldName()) || entity.isConstructorArgument(property)) {
+				continue;
+			}
+
+			wrapper.setProperty(property, getValueInternal(property, source, result));
+	    }
+	    
 	    entity.doWithAssociations(new AssociationHandler<CratePersistentProperty>() {
 	    	
 	      @Override
@@ -371,9 +373,9 @@ public class MappingCrateConverter extends AbstractCrateConverter implements App
 	    final CratePersistentProperty versionProperty = entity.getVersionProperty();
 	    
 	    if (idProperty != null && !sink.containsKey("_id")) {
-	    	
 	    	try {
-	    		Object id = convertToCrateType(wrapper.getProperty(idProperty, Object.class), null);
+	    		Object id = convertToCrateType(wrapper.getProperty(idProperty, Object.class),
+	    									   null);
 	    		sink.put("_id", id);
 	    	}catch(ConversionException e) {
 	    		logger.warn("Failed to convert id property '{}'. {}", new Object[]{idProperty.getName(),

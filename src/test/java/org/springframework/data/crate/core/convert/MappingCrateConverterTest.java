@@ -15,9 +15,10 @@
  */
 package org.springframework.data.crate.core.convert;
 
-//import static org.mockito.Matchers.*;
 import static java.util.Arrays.asList;
 import static java.util.Collections.emptyList;
+import static java.util.Collections.singletonList;
+import static java.util.Collections.singletonMap;
 import static java.util.Locale.CANADA;
 import static org.hamcrest.Matchers.hasEntry;
 import static org.hamcrest.Matchers.hasItems;
@@ -28,6 +29,7 @@ import static org.hamcrest.Matchers.notNullValue;
 import static org.hamcrest.Matchers.nullValue;
 import static org.junit.Assert.assertThat;
 
+import java.util.Collection;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -261,7 +263,7 @@ public class MappingCrateConverterTest {
 	@Test
 	public void shouldReadCollectionOfPrimitive() {
 		
-		List<String> strings = asList("STRINGS");
+		CrateArray strings = new CrateArray("STRINGS");
 		
 		CrateDocument document = new CrateDocument();
 		document.put("strings", strings);
@@ -272,6 +274,45 @@ public class MappingCrateConverterTest {
 		assertThat(entity.strings, is(notNullValue()));
 		assertThat(entity.strings.size(), is(1));
 		assertThat(entity.strings.get(0), is("STRINGS"));
+	}
+	
+	@Test
+	public void shouldWriteCollectionOfMaps() {
+		
+		CollectionOfMaps entity = new CollectionOfMaps();
+		entity.maps = singletonList(singletonMap("STRING", 1));
+		
+		CrateDocument map = new CrateDocument("STRING", 1);
+		CrateArray collectionDocument = new CrateArray(map);
+		
+		Map<String, Object> expected = new HashMap<String, Object>();
+		expected.put("_class", CollectionOfMaps.class.getName());
+		expected.put("maps", collectionDocument);
+		
+		CrateDocument document = new CrateDocument();
+		
+		converter.write(entity, document);
+		
+		assertThat(expected.equals(document), is(true));
+	}
+	
+	@Test
+	public void shouldReadCollectionOfMaps() {
+		
+		CrateDocument map = new CrateDocument("STRING", 1);
+		CrateArray collectionDocument = new CrateArray(map);
+		
+		CrateDocument document = new CrateDocument();
+		document.put("_class", CollectionOfMaps.class.getName());
+		document.put("maps", collectionDocument);
+		
+		CollectionOfMaps entity = converter.read(CollectionOfMaps.class, document);
+		
+		assertThat(entity, is(notNullValue()));
+		assertThat(entity.maps, is(notNullValue()));
+		assertThat(entity.maps.size(), is(1));
+		assertThat(entity.maps.iterator().next(), is(notNullValue()));
+		assertThat(entity.maps.iterator().next(), hasEntry("STRING", 1));
 	}
 	
 	@Test
@@ -659,6 +700,41 @@ public class MappingCrateConverterTest {
 	}
 	
 	@Test
+	public void shouldWriteGenericTypeCorrectly() {
+
+		GenericType<Language> genericType = new GenericType<Language>();
+		genericType.content = new Language("aLanguage");
+
+		CrateDocument document = new CrateDocument();
+		converter.write(genericType, document);
+
+		assertThat(document, hasEntry("_class", (Object)GenericType.class.getName()));
+		assertThat(document, hasKey("content"));
+		
+		CrateDocument languageDocument = (CrateDocument) document.get("content");
+		assertThat(languageDocument, is(notNullValue()));
+		assertThat(languageDocument, hasEntry("_class", (Object)Language.class.getName()));
+		assertThat(languageDocument, hasEntry("name", (Object)"aLanguage"));
+	}
+	
+	@Test
+	@SuppressWarnings("unchecked")
+	public void shouldReadGenericTypeCorrectly() {
+
+		CrateDocument languageDocument = new CrateDocument("_class", Language.class.getName());
+		languageDocument.put("name", "aLanguage");
+		
+		CrateDocument document = new CrateDocument("_class", GenericType.class.getName());
+		document.put("content", languageDocument);
+		
+		GenericType<Language> genericType =  converter.read(GenericType.class, document);
+
+		assertThat(genericType, is(notNullValue()));
+		assertThat(genericType.content, is(notNullValue()));
+		assertThat(genericType.content.name, is("aLanguage"));
+	}
+	
+	@Test
 	public void shouldWriteMapAsGenericFieldCorrectly() {
 
 		Map<String, GenericClass<String>> map = new HashMap<String, GenericClass<String>>();
@@ -680,6 +756,164 @@ public class MappingCrateConverterTest {
 		assertThat((String) inner.get("_class"), is(GenericClass.class.getName()));
 		assertThat((String) inner.get("valueType"), is(String.class.getName()));
 		assertThat((String) inner.get("value"), is("testValue"));
+	}
+	
+	@Test
+	public void shouldWriteWithSimpleId() {
+		
+		SimpleStringId stringId = new SimpleStringId();
+		stringId.stringId = "stringId";
+		
+		CrateDocument stringIdDocument = new CrateDocument();
+		
+		converter.write(stringId, stringIdDocument);
+		
+		assertThat(stringIdDocument, hasEntry("_class", (Object)SimpleStringId.class.getName()));
+		assertThat(stringIdDocument, hasEntry("_id", (Object)"stringId"));
+		
+		SimpleIntId intId = new SimpleIntId();
+		intId.intId = 2620;
+		
+		CrateDocument intIdDocument = new CrateDocument();
+		
+		converter.write(intId, intIdDocument);
+		
+		assertThat(intIdDocument, hasEntry("_class", (Object)SimpleIntId.class.getName()));
+		assertThat(intIdDocument, hasEntry("_id", (Object)2620));
+		
+		SimpleLongId longId = new SimpleLongId();
+		longId.longId = 4732L;
+		
+		CrateDocument longIdDocument = new CrateDocument();
+		
+		converter.write(longId, longIdDocument);
+		
+		assertThat(longIdDocument, hasEntry("_class", (Object)SimpleLongId.class.getName()));
+		assertThat(longIdDocument, hasEntry("_id", (Object)4732L));
+	}
+	
+	@Test
+	public void shouldReadWithSimpleId() {
+		
+		SimpleStringId stringId = converter.read(SimpleStringId.class, new CrateDocument("_id", "stringId"));
+		
+		assertThat(stringId, is(notNullValue()));
+		assertThat(stringId.stringId, is("stringId"));
+		
+		SimpleIntId intId = converter.read(SimpleIntId.class, new CrateDocument("_id", 2620));
+		
+		assertThat(intId, is(notNullValue()));
+		assertThat(intId.intId, is(2620));
+		
+		SimpleLongId longId = new SimpleLongId();
+		longId.longId = 4732L;
+		
+		converter.read(SimpleLongId.class, new CrateDocument("_id", 4732L));
+		
+		assertThat(longId, is(notNullValue()));
+		assertThat(longId.longId, is(4732L));
+	}
+	
+	@Test
+	public void shouldWriteWithComplexId() {
+		
+		Country country = new Country("aCountry", asList(new Language("aLanguage")));
+		Address address = new Address();
+		address.country = country;
+		address.city = "aCity";
+		address.street = "aStreet";
+		
+		Person person = new Person();
+		person.name = "aName";
+		person.address = address;
+		person.emails = new HashSet<MappingCrateConverterTest.Email>(asList(new Email("email@test.com")));
+		
+		ComplexId entity = new ComplexId();
+		entity.person = person;
+		entity.string = "STRING";
+		
+		CrateDocument languageDocument = new CrateDocument("name", "aLanguage");
+		
+		CrateDocument emailDocument = new CrateDocument("email", "email@test.com");
+		
+		CrateArray languagesArray = new CrateArray(languageDocument);
+		CrateArray emailsArray = new CrateArray(emailDocument);
+		
+		CrateDocument countryDocument = new CrateDocument();
+		countryDocument.put("name", "aCountry");
+		countryDocument.put("languages", languagesArray);
+		
+		CrateDocument addressDocument = new CrateDocument();
+		addressDocument.put("country", countryDocument);
+		addressDocument.put("city", "aCity");
+		addressDocument.put("street", "aStreet");
+		
+		CrateDocument personDocument = new CrateDocument();
+		personDocument.put("name", "aName");
+		personDocument.put("address", addressDocument);
+		personDocument.put("emails", emailsArray);
+		
+		Map<String, Object> expected = new HashMap<String, Object>();
+		expected.put("_class", ComplexId.class.getName());
+		expected.put("string", "STRING");
+		expected.put("_id", personDocument);
+		
+		CrateDocument document = new CrateDocument();
+		
+		converter.write(entity, document);
+		
+		assertThat(expected.equals(document), is(true));
+	}
+	
+	@Test
+	public void shouldReadWithComplexId() {
+		
+		CrateDocument languageDocument = new CrateDocument("name", "aLanguage");
+		
+		CrateDocument emailDocument = new CrateDocument("email", "email@test.com");
+		
+		CrateArray languagesArray = new CrateArray(languageDocument);
+		CrateArray emailsArray = new CrateArray(emailDocument);
+		
+		CrateDocument countryDocument = new CrateDocument();
+		countryDocument.put("name", "aCountry");
+		countryDocument.put("languages", languagesArray);
+		
+		CrateDocument addressDocument = new CrateDocument();
+		addressDocument.put("country", countryDocument);
+		addressDocument.put("city", "aCity");
+		addressDocument.put("street", "aStreet");
+		
+		CrateDocument personDocument = new CrateDocument();
+		personDocument.put("name", "aName");
+		personDocument.put("address", addressDocument);
+		personDocument.put("emails", emailsArray);
+		
+		CrateDocument document = new CrateDocument();
+		document.put("_class", ComplexId.class.getName());
+		document.put("string", "STRING");
+		document.put("_id", personDocument);
+		
+		ComplexId entity = converter.read(ComplexId.class, document);
+		
+		assertThat(entity, is(notNullValue()));
+		assertThat(entity.string, is("STRING"));
+		assertThat(entity.person, is(notNullValue()));
+		assertThat(entity.person.name, is("aName"));
+		assertThat(entity.person.address, is(notNullValue()));
+		assertThat(entity.person.address.country, is(notNullValue()));
+		assertThat(entity.person.address.country.name, is("aCountry"));
+		assertThat(entity.person.address.country.languages, is(notNullValue()));
+		assertThat(entity.person.address.country.languages.size(), is(1));
+		assertThat(entity.person.address.country.languages.get(0), is(notNullValue()));
+		assertThat(entity.person.address.country.languages.get(0).name, is("aLanguage"));
+		assertThat(entity.person.address.city, is("aCity"));
+		assertThat(entity.person.address.street, is("aStreet"));
+		assertThat(entity.person.emails, is(notNullValue()));
+		assertThat(entity.person.emails.size(), is(1));
+		assertThat(entity.person.emails.iterator().next(), is(notNullValue()));
+		assertThat(entity.person.emails.iterator().next().email, is("email@test.com"));
+		
 	}
 	
 	static class NestedCollections {
@@ -720,6 +954,10 @@ public class MappingCrateConverterTest {
 		Boolean[] booleans;
 	}
 	
+	static class CollectionOfMaps {
+		Collection<Map<String, Integer>> maps;
+	}
+	
 	static class MapOfPrimitive {
 		Map<Double, String> map;
 	}
@@ -756,10 +994,7 @@ public class MappingCrateConverterTest {
 		}
 	}
 	
-	static interface Addressable {
-	}
-	
-	static class Address implements Addressable {
+	static class Address {
 		Country country;
 		String street;
 		String city;
@@ -789,5 +1024,30 @@ public class MappingCrateConverterTest {
 			this.valueType = value.getClass().getName();
 			this.value = value;
 		}
+	}
+	
+	static class GenericType<T> {
+		T content;
+	}
+	
+	static class ComplexId {
+		@Id
+		Person person;
+		String string;
+	}
+	
+	static class SimpleStringId {
+		@Id
+		String stringId;
+	}
+	
+	static class SimpleIntId {
+		@Id
+		int intId;
+	}
+	
+	static class SimpleLongId {
+		@Id		
+		long longId;
 	}
 }

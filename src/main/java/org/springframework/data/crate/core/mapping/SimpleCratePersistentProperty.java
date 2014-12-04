@@ -15,15 +15,18 @@
  */
 package org.springframework.data.crate.core.mapping;
 
-import org.springframework.data.mapping.Association;
-import org.springframework.data.mapping.PersistentEntity;
-import org.springframework.data.mapping.model.AnnotationBasedPersistentProperty;
-import org.springframework.data.mapping.model.SimpleTypeHolder;
+import static org.slf4j.LoggerFactory.getLogger;
 
 import java.beans.PropertyDescriptor;
 import java.lang.reflect.Field;
 import java.util.HashSet;
 import java.util.Set;
+
+import org.slf4j.Logger;
+import org.springframework.data.mapping.Association;
+import org.springframework.data.mapping.PersistentEntity;
+import org.springframework.data.mapping.model.AnnotationBasedPersistentProperty;
+import org.springframework.data.mapping.model.SimpleTypeHolder;
 
 /**
  * Crate specific {@link org.springframework.data.mapping.PersistentProperty} implementation processing
@@ -31,8 +34,11 @@ import java.util.Set;
  * @author Rizwan Idrees
  * @author Hasnain Javed
  */
-public class SimpleCratePersistentProperty extends
-        AnnotationBasedPersistentProperty<CratePersistentProperty> implements CratePersistentProperty {
+public class SimpleCratePersistentProperty extends AnnotationBasedPersistentProperty<CratePersistentProperty> implements CratePersistentProperty {
+	
+	private final Logger logger = getLogger(getClass()); 
+	
+	private static final String ID_FIELD_NAME = "_id";
 
 	private static final Set<String> SUPPORTED_ID_PROPERTY_NAMES = new HashSet<String>();
 
@@ -41,19 +47,39 @@ public class SimpleCratePersistentProperty extends
 		SUPPORTED_ID_PROPERTY_NAMES.add("_id");
 	}
 
-	public SimpleCratePersistentProperty(Field field, PropertyDescriptor propertyDescriptor,
-                                         PersistentEntity<?, CratePersistentProperty> owner, SimpleTypeHolder simpleTypeHolder) {
+	public SimpleCratePersistentProperty(Field field, PropertyDescriptor propertyDescriptor, 
+										 PersistentEntity<?, CratePersistentProperty> owner, SimpleTypeHolder simpleTypeHolder) {
 		super(field, propertyDescriptor, owner, simpleTypeHolder);
+		
+		if (isIdProperty() && getFieldName() != ID_FIELD_NAME) {
+			logger.warn("Customizing field name for id property not allowed! Custom name will not be considered!");
+		}
 	}
 
 	@Override
 	public String getFieldName() {
+		
+		if (isIdProperty()) {
+
+			if (owner == null) {
+				return ID_FIELD_NAME;
+			}
+
+			if (owner.getIdProperty() == null) {
+				return ID_FIELD_NAME;
+			}
+
+			if (owner.isIdProperty(this)) {
+				return ID_FIELD_NAME;
+			}
+		}
+		
 		return field.getName();
 	}
 
 	@Override
 	public boolean isIdProperty() {
-		return super.isIdProperty() || (field != null && SUPPORTED_ID_PROPERTY_NAMES.contains(getFieldName()));
+		return super.isIdProperty() || (field != null && SUPPORTED_ID_PROPERTY_NAMES.contains(getName()));
 	}
 
 	@Override
