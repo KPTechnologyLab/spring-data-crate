@@ -28,17 +28,20 @@ import org.springframework.data.crate.core.mapping.CrateDocument;
  */
 public class DefaultCrateTypeMapper extends DefaultTypeMapper<CrateDocument> implements CrateTypeMapper {
 	
+	private final String typeKey;
+	
 	public DefaultCrateTypeMapper() {
 		this(DEFAULT_TYPE_KEY);
 	}
 	
 	public DefaultCrateTypeMapper(String typeKey) {
 		super(new CrateDocumentTypeAliasAccessor(typeKey));
+		this.typeKey = typeKey;
 	}
 	
 	@Override
 	public boolean isTypeKey(String typeKey) {
-		return hasText(typeKey) ? typeKey.equals(typeKey) : false;
+		return hasText(typeKey) ? this.typeKey.equals(typeKey) : false;
 	}
 	
 	public static class CrateDocumentTypeAliasAccessor implements TypeAliasAccessor<CrateDocument> {
