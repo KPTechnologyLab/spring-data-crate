@@ -375,7 +375,7 @@ public class MappingCrateConverter extends AbstractCrateConverter implements App
 	    if (idProperty != null && !sink.containsKey("_id")) {
 	    	try {
 	    		Object id = convertToCrateType(wrapper.getProperty(idProperty, Object.class),
-	    									   null);
+	    									   idProperty.getTypeInformation());
 	    		sink.put("_id", id);
 	    	}catch(ConversionException e) {
 	    		logger.warn("Failed to convert id property '{}'. {}", new Object[]{idProperty.getName(),
