@@ -15,7 +15,9 @@
  */
 package org.springframework.data.crate.core.sql;
 
+import static org.springframework.data.crate.core.convert.CrateTypeMapper.DEFAULT_TYPE_KEY;
 import static org.springframework.data.crate.core.mapping.CrateDataType.OBJECT;
+import static org.springframework.data.crate.core.mapping.CrateDataType.STRING;
 import static org.springframework.util.Assert.notNull;
 import static org.springframework.util.StringUtils.hasText;
 
@@ -47,8 +49,13 @@ public class CreateTable extends AbstractStatement {
 			StringBuilder builder = new StringBuilder(CREATE_TABLE).append(SPACE)
 																   .append(tableDefinition.getName())
 																   .append(SPACE)
-																   .append(OPEN_BRACE);
-
+																   .append(OPEN_BRACE)
+																   .append(doubleQuote(DEFAULT_TYPE_KEY))
+																   .append(SPACE)
+																   .append(STRING)
+																   .append(COMMA)
+																   .append(SPACE);
+			
 			Iterator<Column> iterator = tableDefinition.getColumns().iterator();
 			
 			while(iterator.hasNext()) {

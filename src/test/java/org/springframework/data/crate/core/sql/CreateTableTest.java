@@ -42,7 +42,7 @@ public class CreateTableTest {
 		
 		CrateSQLStatement statement = new CreateTable(tableDefinition);
 		
-		assertThat(statement.createStatement(), is("CREATE TABLE entity (\"longField\" long PRIMARY KEY)"));
+		assertThat(statement.createStatement(), is("CREATE TABLE entity (\"_class\" string, \"longField\" long PRIMARY KEY)"));
 	}
 	
 	@Test
@@ -54,7 +54,7 @@ public class CreateTableTest {
 		
 		CrateSQLStatement statement = new CreateTable(tableDefinition);
 		
-		assertThat(statement.createStatement(), is("CREATE TABLE entity (\"stringField\" string PRIMARY KEY, \"integerField\" integer)"));
+		assertThat(statement.createStatement(), is("CREATE TABLE entity (\"_class\" string, \"stringField\" string PRIMARY KEY, \"integerField\" integer)"));
 	}
 	
 	@Test
@@ -65,7 +65,7 @@ public class CreateTableTest {
 
 		CrateSQLStatement statement = new CreateTable(tableDefinition);
 		
-		assertThat(statement.createStatement(), is("CREATE TABLE entity (\"integers\" array(integer))"));
+		assertThat(statement.createStatement(), is("CREATE TABLE entity (\"_class\" string, \"integers\" array(integer))"));
 	}
 	
 	@Test
@@ -76,7 +76,7 @@ public class CreateTableTest {
 		
 		CrateSQLStatement statement = new CreateTable(tableDefinition);
 		
-		assertThat(statement.createStatement(), is("CREATE TABLE entity (\"map\" object)"));
+		assertThat(statement.createStatement(), is("CREATE TABLE entity (\"_class\" string, \"map\" object)"));
 	}
 	
 	@Test
@@ -93,7 +93,7 @@ public class CreateTableTest {
 		
 		CrateSQLStatement statement = new CreateTable(tableDefinition);
 		
-		StringBuilder sql = new StringBuilder("CREATE TABLE entity (\"stringField\" string, \"nestedEntity\" object AS (");
+		StringBuilder sql = new StringBuilder("CREATE TABLE entity (\"_class\" string, \"stringField\" string, \"nestedEntity\" object AS (");
 		sql.append("\"stringField\" string, \"integerField\" integer))");
 		
 		assertThat(statement.createStatement(), is(sql.toString()));
@@ -113,7 +113,7 @@ public class CreateTableTest {
 		
 		CrateSQLStatement statement = new CreateTable(tableDefinition);
 		
-		StringBuilder sql = new StringBuilder("CREATE TABLE entity (\"stringField\" string, \"nestedEntities\" array(");
+		StringBuilder sql = new StringBuilder("CREATE TABLE entity (\"_class\" string, \"stringField\" string, \"nestedEntities\" array(");
 		sql.append("object AS (\"stringField\" string, \"integerField\" integer)))");
 		
 		assertThat(statement.createStatement(), is(sql.toString()));
@@ -137,7 +137,7 @@ public class CreateTableTest {
 		
 		CrateSQLStatement statement = new CreateTable(tableDefinition);
 		
-		StringBuilder sql = new StringBuilder("CREATE TABLE entity (\"stringField\" string, \"nestedEntities\" array(");
+		StringBuilder sql = new StringBuilder("CREATE TABLE entity (\"_class\" string, \"stringField\" string, \"nestedEntities\" array(");
 		sql.append("object AS (\"stringField\" string, \"nested\" object AS (");
 		sql.append("\"stringField\" string, \"integerField\" integer))))");
 		
