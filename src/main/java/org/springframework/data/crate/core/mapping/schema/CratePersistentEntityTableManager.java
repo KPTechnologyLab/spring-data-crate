@@ -15,21 +15,17 @@
  */
 package org.springframework.data.crate.core.mapping.schema;
 
-import static java.util.regex.Pattern.compile;
 import static org.slf4j.LoggerFactory.getLogger;
+import static org.springframework.data.crate.core.sql.CrateSQLUtil.sqlToDotPath;
 import static org.springframework.util.Assert.notNull;
-import static org.springframework.util.StringUtils.collectionToDelimitedString;
 import static org.springframework.util.StringUtils.hasText;
 
-import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.LinkedHashMap;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
 
 import org.slf4j.Logger;
 import org.springframework.data.crate.core.mapping.CrateMappingContext;
@@ -45,9 +41,6 @@ import org.springframework.data.mapping.context.MappingContext;
  * @since 1.0.0
  */
 public class CratePersistentEntityTableManager {
-	
-	private static final Pattern PATTERN = compile("\\['([^\\]]*)'\\]");
-    private static final Pattern CRATE_SQL_PATTERN = compile("(.+?)(?:\\['([^\\]])*'\\])+");
 	
 	private final Logger logger = getLogger(getClass());
 	
@@ -89,7 +82,7 @@ public class CratePersistentEntityTableManager {
 		List<Column> columns = entityColumnMapper.toColumns(entity);
 		
 		Map<String, Column> columnPaths = columnToDotPath(columns);
-		Map<String, String> sqlPaths = sqlToDotPath(tableMetadata.getColumns());
+		Map<String, String> sqlPaths = convertToDotPath(tableMetadata.getColumns());
 		
 		List<Column> additionalColumns = new LinkedList<Column>();
 		
@@ -159,42 +152,18 @@ public class CratePersistentEntityTableManager {
 										   propertyName;
 	}
 	
-	private Map<String, String> sqlToDotPath(List<ColumnMetadata> columns) {
+	private Map<String, String> convertToDotPath(List<ColumnMetadata> columns) {
 		
 		Map<String, String> sqlPaths = new LinkedHashMap<String, String>(columns.size());
 		
 		for(ColumnMetadata metadata : columns) {
 			
-			String dotPath = toDotPath(metadata.getSqlPath());
+			String dotPath = sqlToDotPath(metadata.getSqlPath());
 			String type = metadata.getCrateType();
 			logger.debug("pushing sqlPath under key '{}'", dotPath);
 			sqlPaths.put(dotPath, type);
 		}
 		
 		return sqlPaths;
-	}
-	
-	private String toDotPath(String sqlPath) {
-		
-		if (!CRATE_SQL_PATTERN.matcher(sqlPath).find()) {
-        	return sqlPath;
-        }
-
-        int index = sqlPath.indexOf('[');
-        
-        List<String> tokens = new ArrayList<String>();
-        tokens.add(sqlPath.substring(0, index));
-        
-        Matcher matcher = PATTERN.matcher(sqlPath);
-        while (matcher.find(index)) {
-            String group = matcher.group(1);
-            if (group == null) {
-            	group = "";
-            }
-            tokens.add(group);            
-            index = matcher.end();
-        }
-        
-        return collectionToDelimitedString(tokens, ".");
 	}
 }

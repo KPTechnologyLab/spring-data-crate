@@ -19,6 +19,7 @@ import static java.lang.String.format;
 import static org.apache.commons.lang.StringUtils.split;
 import static org.springframework.util.Assert.hasText;
 import static org.springframework.util.Assert.notNull;
+import static org.springframework.data.crate.core.sql.CrateSQLUtil.*;
 
 import org.springframework.data.crate.core.mapping.schema.Column;
 
@@ -29,9 +30,6 @@ import org.springframework.data.crate.core.mapping.schema.Column;
  */
 public abstract class AbstractStatement implements CrateSQLStatement {
 	
-	private static final String DOUBLE_QUOTE_TEMPLATE = "\"%s\"";
-	private static final String SQL_PATH_TEMPLATE = "['%s']";
-	
 	protected String statement;
 
 	public String getStatement() {
@@ -40,20 +38,11 @@ public abstract class AbstractStatement implements CrateSQLStatement {
 	
 	protected String doubleQuote(String toQuote) {
 		hasText(toQuote);
-		return format(DOUBLE_QUOTE_TEMPLATE, toQuote);
+		return CrateSQLUtil.doubleQuote(toQuote);
 	}
 	
 	protected String toSqlPath(Column column) {
-		
-		String[] tokens = split(column.getName(), ".");
-		
-		// double quotes to preserve case in crate db
-		StringBuilder sqlPath = new StringBuilder(doubleQuote(tokens[0]));
-		
-		for (int i = 1; i < tokens.length; i++) {
-			sqlPath.append(format(SQL_PATH_TEMPLATE, tokens[i]));
-		}
-		
-		return sqlPath.toString();
+		notNull(column);
+		return dotToSqlPath(column.getName());
 	}
 }
