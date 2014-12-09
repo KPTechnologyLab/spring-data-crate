@@ -15,7 +15,8 @@
  */
 package org.springframework.data.crate.core.convert;
 
-import static org.apache.commons.lang.ArrayUtils.*;
+import static org.apache.commons.lang.ArrayUtils.getLength;
+import static org.apache.commons.lang.ArrayUtils.isNotEmpty;
 import static org.apache.commons.lang.builder.ToStringBuilder.reflectionToString;
 import static org.slf4j.LoggerFactory.getLogger;
 import static org.springframework.data.crate.core.mapping.CrateDataType.ARRAY_SUFFIX;
