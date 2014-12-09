@@ -22,10 +22,13 @@ import org.springframework.data.mapping.PersistentProperty;
  * CratePersistentProperty
  *
  * @author Rizwan Idrees
+ * @author Hasnain Javed
  */
 
 public interface CratePersistentProperty extends PersistentProperty<CratePersistentProperty> {
-
+	
+	String ID_FIELD_NAME = "_id";
+	
 	String getFieldName();
 
 	public enum PropertyToFieldNameConverter implements Converter<CratePersistentProperty, String> {
