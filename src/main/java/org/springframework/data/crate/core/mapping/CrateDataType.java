@@ -28,6 +28,8 @@ import java.util.Map;
  */
 public class CrateDataType {
 	
+	public static final String ARRAY_SUFFIX = "_array";
+	
 	public static final String BOOLEAN = "boolean";
 	public static final String STRING = "string";
 	public static final String INTEGER = "integer";
