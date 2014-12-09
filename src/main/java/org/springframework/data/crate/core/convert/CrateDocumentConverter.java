@@ -15,7 +15,7 @@
  */
 package org.springframework.data.crate.core.convert;
 
-import static org.apache.commons.lang.ArrayUtils.getLength;
+import static org.apache.commons.lang.ArrayUtils.*;
 import static org.apache.commons.lang.builder.ToStringBuilder.reflectionToString;
 import static org.slf4j.LoggerFactory.getLogger;
 import static org.springframework.data.crate.core.mapping.CrateDataType.ARRAY_SUFFIX;
@@ -29,6 +29,7 @@ import io.crate.types.DataType;
 
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
@@ -59,7 +60,7 @@ public class CrateDocumentConverter {
 		notEmpty(columns);
 		notEmpty(types);
 		
-		this.rows = initRows(columns, types, rows);
+		this.rows = isNotEmpty(rows) ? initRows(columns, types, rows) : Collections.<Row>emptyList();
 	}
 	
 	public CrateDocument toDocument() {

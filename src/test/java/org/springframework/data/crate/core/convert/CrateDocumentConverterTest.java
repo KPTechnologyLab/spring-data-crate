@@ -63,6 +63,13 @@ public class CrateDocumentConverterTest {
 		
 		assertThat(document, is(notNullValue()));
 		assertThat(document.isEmpty(), is(true));
+		
+		converter = new CrateDocumentConverter(columns, types, null);
+		
+		document = converter.toDocument();
+		
+		assertThat(document, is(notNullValue()));
+		assertThat(document.isEmpty(), is(true));
 	}
 
 	@Test
