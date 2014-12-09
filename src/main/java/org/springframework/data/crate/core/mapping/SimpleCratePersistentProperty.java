@@ -15,7 +15,10 @@
  */
 package org.springframework.data.crate.core.mapping;
 
+import static java.lang.String.format;
 import static org.slf4j.LoggerFactory.getLogger;
+import static org.springframework.data.mapping.model.PropertyNameFieldNamingStrategy.INSTANCE;
+import static org.springframework.util.StringUtils.hasText;
 
 import java.beans.PropertyDescriptor;
 import java.lang.reflect.Field;
@@ -26,6 +29,8 @@ import org.slf4j.Logger;
 import org.springframework.data.mapping.Association;
 import org.springframework.data.mapping.PersistentEntity;
 import org.springframework.data.mapping.model.AnnotationBasedPersistentProperty;
+import org.springframework.data.mapping.model.FieldNamingStrategy;
+import org.springframework.data.mapping.model.MappingException;
 import org.springframework.data.mapping.model.SimpleTypeHolder;
 
 /**
@@ -38,9 +43,10 @@ public class SimpleCratePersistentProperty extends AnnotationBasedPersistentProp
 	
 	private final Logger logger = getLogger(getClass()); 
 	
-	private static final String ID_FIELD_NAME = "_id";
-
 	private static final Set<String> SUPPORTED_ID_PROPERTY_NAMES = new HashSet<String>();
+	
+	private final FieldNamingStrategy fieldNamingStrategy;
+
 
 	static {
 		SUPPORTED_ID_PROPERTY_NAMES.add("id");
@@ -51,11 +57,18 @@ public class SimpleCratePersistentProperty extends AnnotationBasedPersistentProp
 										 PersistentEntity<?, CratePersistentProperty> owner, SimpleTypeHolder simpleTypeHolder) {
 		super(field, propertyDescriptor, owner, simpleTypeHolder);
 		
+		this.fieldNamingStrategy = INSTANCE;
+		
 		if (isIdProperty() && getFieldName() != ID_FIELD_NAME) {
 			logger.warn("Customizing field name for id property not allowed! Custom name will not be considered!");
 		}
 	}
 
+	/**
+	 * Returns the key to be used to store the value of the property inside a Crate {@link CrateDBObject}.
+	 * 
+	 * @return
+	 */
 	@Override
 	public String getFieldName() {
 		
@@ -74,7 +87,14 @@ public class SimpleCratePersistentProperty extends AnnotationBasedPersistentProp
 			}
 		}
 		
-		return field.getName();
+		String fieldName = fieldNamingStrategy.getFieldName(this);
+		
+		if (!hasText(fieldName)) {
+			throw new MappingException(format("Invalid (null or empty) field name returned for property %s by %s!",
+											  this, fieldNamingStrategy.getClass()));
+		}
+		
+		return fieldName;
 	}
 
 	@Override
