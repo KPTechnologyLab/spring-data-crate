@@ -64,9 +64,9 @@ public class SimpleCratePersistentEntityTest {
 	@Test
 	public void shouldGetPropertyNames() {
 		
-		List<String> propertyNames = prepareMappingContext(Book.class).
-									 getPersistentEntity(Book.class).
-								     getPropertyNames();
+		Set<String> propertyNames = prepareMappingContext(Book.class).
+									getPersistentEntity(Book.class).
+								    getPropertyNames();
 		
 		assertThat(propertyNames, is(notNullValue()));
 		assertThat(propertyNames.isEmpty(), is(false));

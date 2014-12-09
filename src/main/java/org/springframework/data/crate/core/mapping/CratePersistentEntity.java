@@ -15,7 +15,6 @@
  */
 package org.springframework.data.crate.core.mapping;
 
-import java.util.List;
 import java.util.Set;
 
 import org.springframework.data.mapping.PersistentEntity;
@@ -30,7 +29,7 @@ import org.springframework.data.mapping.PersistentEntity;
 public interface CratePersistentEntity<T> extends PersistentEntity<T, CratePersistentProperty> {
 	
 	String getTableName();
-	List<String> getPropertyNames();
+	Set<String> getPropertyNames();
 	Set<CratePersistentProperty> getPersistentProperties();
 	Set<CratePersistentProperty> getPrimitiveProperties();
 	Set<CratePersistentProperty> getEntityProperties();

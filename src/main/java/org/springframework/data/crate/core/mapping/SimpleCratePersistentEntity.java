@@ -68,11 +68,11 @@ public class SimpleCratePersistentEntity<T> extends BasicPersistentEntity<T, Cra
 	}
 	
 	@Override
-	public List<String> getPropertyNames() {
+	public Set<String> getPropertyNames() {
 		
 		Set<CratePersistentProperty> properties = getPersistentProperties();
 		
-		List<String> propertyNames = new ArrayList<String>(properties.size());
+		Set<String> propertyNames = new LinkedHashSet<String>(properties.size());
 		
 		for(CratePersistentProperty property : properties) {
 			propertyNames.add(property.getFieldName());
