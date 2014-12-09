@@ -17,11 +17,13 @@
 package org.springframework.data.crate.core.mapping;
 
 import static java.util.Collections.singleton;
+import static org.hamcrest.Matchers.hasItems;
 import static org.hamcrest.Matchers.is;
 import static org.hamcrest.Matchers.notNullValue;
 import static org.junit.Assert.assertThat;
 import static org.springframework.util.StringUtils.replace;
 
+import java.util.List;
 import java.util.Set;
 
 import org.junit.Test;
@@ -57,6 +59,18 @@ public class SimpleCratePersistentEntityTest {
 		
 		assertThat(tableName, is(notNullValue()));
 		assertThat(tableName, is(Book.class.getAnnotation(Table.class).name()));
+	}
+	
+	@Test
+	public void shouldGetPropertyNames() {
+		
+		List<String> propertyNames = prepareMappingContext(Book.class).
+									 getPersistentEntity(Book.class).
+								     getPropertyNames();
+		
+		assertThat(propertyNames, is(notNullValue()));
+		assertThat(propertyNames.isEmpty(), is(false));
+		assertThat(propertyNames, hasItems("_id", "title", "isbn"));
 	}
 	
 	@Test

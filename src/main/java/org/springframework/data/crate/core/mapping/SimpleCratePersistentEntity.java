@@ -16,9 +16,11 @@
 package org.springframework.data.crate.core.mapping;
 
 import static org.springframework.util.Assert.hasText;
-import static org.springframework.util.StringUtils.*;
+import static org.springframework.util.StringUtils.replace;
 
+import java.util.ArrayList;
 import java.util.LinkedHashSet;
+import java.util.List;
 import java.util.Set;
 
 import org.springframework.beans.BeansException;
@@ -42,6 +44,7 @@ import org.springframework.expression.spel.support.StandardEvaluationContext;
 public class SimpleCratePersistentEntity<T> extends BasicPersistentEntity<T, CratePersistentProperty>
 		implements CratePersistentEntity<T>, ApplicationContextAware {
 
+	
 	private final StandardEvaluationContext context;
 	
 	private final String tableName;
@@ -49,7 +52,7 @@ public class SimpleCratePersistentEntity<T> extends BasicPersistentEntity<T, Cra
 	public SimpleCratePersistentEntity(TypeInformation<T> typeInformation) {
 		super(typeInformation);
 		this.context = new StandardEvaluationContext();
-		tableName = resolveTableName(typeInformation);
+		this.tableName = resolveTableName(typeInformation);
  	}
 	
 	@Override
@@ -62,6 +65,20 @@ public class SimpleCratePersistentEntity<T> extends BasicPersistentEntity<T, Cra
 	@Override
 	public String getTableName() {
 		return tableName;
+	}
+	
+	@Override
+	public List<String> getPropertyNames() {
+		
+		Set<CratePersistentProperty> properties = getPersistentProperties();
+		
+		List<String> propertyNames = new ArrayList<String>(properties.size());
+		
+		for(CratePersistentProperty property : properties) {
+			propertyNames.add(property.getFieldName());
+		}
+		
+		return propertyNames;
 	}
 	
 	/**
