@@ -57,21 +57,18 @@ public class SimpleCratePersistentProperty extends AnnotationBasedPersistentProp
 		super(field, propertyDescriptor, owner, simpleTypeHolder);
 		
 		this.fieldNamingStrategy = INSTANCE;
+
+		String fieldName = getFieldName();
 		
-		if (isIdProperty()) {
-			
-			String fieldName = getFieldName();
-			
-			if(RESERVED_ID_FIELD_NAME.equals(fieldName)) {				
-				throw new InvalidCrateApiUsageException(format(RESERVED_ID, fieldName, owner.getType()));
-			}
-			
-			if(startsWithIgnoreCase(fieldName, "_")) {
-				throw new InvalidCrateApiUsageException(format(STARTS_WITH_UNDERSCORE, fieldName, owner.getType()));
-			}
+		if(RESERVED_ID_FIELD_NAME.equals(fieldName)) {				
+			throw new InvalidCrateApiUsageException(format(RESERVED_ID, fieldName, owner.getType()));
+		}
+		
+		if(startsWithIgnoreCase(fieldName, "_")) {
+			throw new InvalidCrateApiUsageException(format(STARTS_WITH_UNDERSCORE, fieldName, owner.getType()));
 		}
 	}
-
+	
 	/**
 	 * Returns the key to be used to store the value of the property inside a Crate {@link CrateDBObject}.
 	 * 

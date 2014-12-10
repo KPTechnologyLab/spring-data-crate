@@ -23,10 +23,11 @@ import static org.hamcrest.Matchers.notNullValue;
 import static org.junit.Assert.assertThat;
 import static org.springframework.util.StringUtils.replace;
 
-import java.util.List;
 import java.util.Set;
 
 import org.junit.Test;
+import org.springframework.data.annotation.Id;
+import org.springframework.data.crate.InvalidCrateApiUsageException;
 import org.springframework.data.crate.core.mapping.annotations.Table;
 import org.springframework.data.sample.entities.Book;
 import org.springframework.data.sample.entities.PropertiesContainer;
@@ -38,6 +39,16 @@ import org.springframework.data.sample.entities.SampleEntity;
  * @since 1.0.0
  */
 public class SimpleCratePersistentEntityTest {
+	
+	@Test(expected=InvalidCrateApiUsageException.class)
+	public void shouldNotCreatePersistentEntity() {
+		prepareMappingContext(EntityWithInvalidColumnName.class);
+	}
+	
+	@Test(expected=InvalidCrateApiUsageException.class)
+	public void shouldNotCreatePersistentEntityWithReservedIdName() {
+		prepareMappingContext(EntityWithReservedIdName.class);
+	}
 	
 	@Test
 	public void shouldGetTableNameFromClass() {
@@ -164,5 +175,14 @@ public class SimpleCratePersistentEntityTest {
 		mappingContext.initialize();
 		
 		return mappingContext;
+	}
+	
+	static class EntityWithInvalidColumnName {
+		String _stringColumn;
+	}
+	
+	static class EntityWithReservedIdName {
+		@Id		
+		long _id;
 	}
 }
