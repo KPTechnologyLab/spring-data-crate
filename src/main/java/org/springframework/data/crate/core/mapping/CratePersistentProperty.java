@@ -27,7 +27,7 @@ import org.springframework.data.mapping.PersistentProperty;
 
 public interface CratePersistentProperty extends PersistentProperty<CratePersistentProperty> {
 	
-	String ID_FIELD_NAME = "_id";
+	String RESERVED_ID_FIELD_NAME = "_id";
 	
 	String getFieldName();
 

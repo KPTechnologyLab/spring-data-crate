@@ -16,16 +16,16 @@
 package org.springframework.data.crate.core.mapping;
 
 import static java.lang.String.format;
-import static org.slf4j.LoggerFactory.getLogger;
 import static org.springframework.data.mapping.model.PropertyNameFieldNamingStrategy.INSTANCE;
 import static org.springframework.util.StringUtils.hasText;
+import static org.springframework.util.StringUtils.startsWithIgnoreCase;
 
 import java.beans.PropertyDescriptor;
 import java.lang.reflect.Field;
 import java.util.HashSet;
 import java.util.Set;
 
-import org.slf4j.Logger;
+import org.springframework.data.crate.InvalidCrateApiUsageException;
 import org.springframework.data.mapping.Association;
 import org.springframework.data.mapping.PersistentEntity;
 import org.springframework.data.mapping.model.AnnotationBasedPersistentProperty;
@@ -41,16 +41,15 @@ import org.springframework.data.mapping.model.SimpleTypeHolder;
  */
 public class SimpleCratePersistentProperty extends AnnotationBasedPersistentProperty<CratePersistentProperty> implements CratePersistentProperty {
 	
-	private final Logger logger = getLogger(getClass()); 
-	
-	private static final Set<String> SUPPORTED_ID_PROPERTY_NAMES = new HashSet<String>();
+	private static final Set<String> SUPPORTED_ID_PROPERTY_NAMES = new HashSet<String>(1);
 	
 	private final FieldNamingStrategy fieldNamingStrategy;
-
-
+	
+	private final static String RESERVED_ID = "'_id' is reserved in crate db and cannot be used as user-defined column name for '%s' in class '%s'";
+	private final static String STARTS_WITH_UNDERSCORE = "Column identity '%s' must not start with '_' in class '%s'";
+	
 	static {
 		SUPPORTED_ID_PROPERTY_NAMES.add("id");
-		SUPPORTED_ID_PROPERTY_NAMES.add("_id");
 	}
 
 	public SimpleCratePersistentProperty(Field field, PropertyDescriptor propertyDescriptor, 
@@ -59,33 +58,27 @@ public class SimpleCratePersistentProperty extends AnnotationBasedPersistentProp
 		
 		this.fieldNamingStrategy = INSTANCE;
 		
-		if (isIdProperty() && getFieldName() != ID_FIELD_NAME) {
-			logger.warn("Customizing field name for id property not allowed! Custom name will not be considered!");
+		if (isIdProperty()) {
+			
+			String fieldName = getFieldName();
+			
+			if(RESERVED_ID_FIELD_NAME.equals(fieldName)) {				
+				throw new InvalidCrateApiUsageException(format(RESERVED_ID, fieldName, owner.getType()));
+			}
+			
+			if(startsWithIgnoreCase(fieldName, "_")) {
+				throw new InvalidCrateApiUsageException(format(STARTS_WITH_UNDERSCORE, fieldName, owner.getType()));
+			}
 		}
 	}
 
 	/**
 	 * Returns the key to be used to store the value of the property inside a Crate {@link CrateDBObject}.
 	 * 
-	 * @return
+	 * @return name of field
 	 */
 	@Override
 	public String getFieldName() {
-		
-		if (isIdProperty()) {
-
-			if (owner == null) {
-				return ID_FIELD_NAME;
-			}
-
-			if (owner.getIdProperty() == null) {
-				return ID_FIELD_NAME;
-			}
-
-			if (owner.isIdProperty(this)) {
-				return ID_FIELD_NAME;
-			}
-		}
 		
 		String fieldName = fieldNamingStrategy.getFieldName(this);
 		
@@ -99,9 +92,9 @@ public class SimpleCratePersistentProperty extends AnnotationBasedPersistentProp
 
 	@Override
 	public boolean isIdProperty() {
-		return super.isIdProperty() || (field != null && SUPPORTED_ID_PROPERTY_NAMES.contains(getName()));
+		return super.isIdProperty() || SUPPORTED_ID_PROPERTY_NAMES.contains(getName());
 	}
-
+	
 	@Override
 	protected Association<CratePersistentProperty> createAssociation() {
 		throw new UnsupportedOperationException("@Reference is not supported!");

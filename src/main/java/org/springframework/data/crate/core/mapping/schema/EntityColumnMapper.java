@@ -123,16 +123,16 @@ class EntityColumnMapper {
 		Column column = null;
 		
 		if(property.isCollectionLike()) {
-			column = new Column(property.getName(), property.getRawType(), property.getComponentType());
+			column = new Column(property.getFieldName(), property.getRawType(), property.getComponentType());
 		}else {
-			column = new Column(property.getName(), property.getRawType());
+			column = new Column(property.getFieldName(), property.getRawType());
 		}
 		
 		if(property.isIdProperty()) {
 			column.setPrimaryKey(TRUE);
 		}
 		
-		logger.debug("mapped field '{}' of type '{}' to crate type '{}'", new Object[]{property.getName(),
+		logger.debug("mapped field '{}' of type '{}' to crate type '{}'", new Object[]{property.getFieldName(),
 																					   property.getRawType(),
 																					   column.getCrateType()});
 		return column;

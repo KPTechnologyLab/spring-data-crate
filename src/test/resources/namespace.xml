@@ -17,6 +17,6 @@
 
     <crate:repositories base-package="org.springframework.data.sample.repositories"/>
 
-	<crate:schema-export ignoreFailures="true" export-option="CREATE_DROP"/>
+	<crate:schema-export ignoreFailures="false" export-option="CREATE_DROP"/>
 	
 </beans>

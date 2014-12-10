@@ -372,13 +372,13 @@ public class MappingCrateConverter extends AbstractCrateConverter implements App
 	    final CratePersistentProperty idProperty = entity.getIdProperty();
 	    final CratePersistentProperty versionProperty = entity.getVersionProperty();
 	    
-	    if (idProperty != null && !sink.containsKey("_id")) {
+	    if (idProperty != null && !sink.containsKey(idProperty.getFieldName())) {
 	    	try {
 	    		Object id = convertToCrateType(wrapper.getProperty(idProperty, Object.class),
 	    									   idProperty.getTypeInformation());
-	    		sink.put("_id", id);
+	    		sink.put(idProperty.getFieldName(), id);
 	    	}catch(ConversionException e) {
-	    		logger.warn("Failed to convert id property '{}'. {}", new Object[]{idProperty.getName(),
+	    		logger.warn("Failed to convert id property '{}'. {}", new Object[]{idProperty.getFieldName(),
 	    								 										   e.getMessage()});
 	    	}
 	    }

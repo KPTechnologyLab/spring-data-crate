@@ -15,6 +15,7 @@
  */
 package org.springframework.data.crate.core.convert;
 
+import static org.springframework.data.crate.core.convert.CrateTypeMapper.DEFAULT_TYPE_KEY;
 import static java.util.Arrays.asList;
 import static java.util.Collections.emptyList;
 import static java.util.Collections.singletonList;
@@ -198,7 +199,7 @@ public class MappingCrateConverterTest {
 		entity.locale = CANADA;
 		
 		Map<String, Object> expected = new HashMap<String, Object>();
-	    expected.put("_class", entity.getClass().getName());
+	    expected.put(DEFAULT_TYPE_KEY, entity.getClass().getName());
 	    expected.put("string", "STRING");
 	    expected.put("integer", 0);
 	    expected.put("date", date);
@@ -220,7 +221,7 @@ public class MappingCrateConverterTest {
 		Date date = new Date();
 		
 		CrateDocument document = new CrateDocument();
-		document.put("_class", SimpleTypesEntity.class.getName());
+		document.put(DEFAULT_TYPE_KEY, SimpleTypesEntity.class.getName());
 		document.put("string", "STRING");
 		document.put("integer", 0);
 		document.put("date", date);
@@ -243,7 +244,7 @@ public class MappingCrateConverterTest {
 		List<String> strings = asList("STRINGS");
 		
 		Map<String, Object> expected = new HashMap<String, Object>();
-		expected.put("_class", PrimitiveCollection.class.getName());
+		expected.put(DEFAULT_TYPE_KEY, PrimitiveCollection.class.getName());
 		expected.put("strings", strings);
 		
 		PrimitiveCollection entity = new PrimitiveCollection();
@@ -253,7 +254,7 @@ public class MappingCrateConverterTest {
 		
 		converter.write(entity, document);
 		
-		assertThat(document, hasEntry("_class", (Object)entity.getClass().getName()));
+		assertThat(document, hasEntry(DEFAULT_TYPE_KEY, (Object)entity.getClass().getName()));
 		assertThat(document, hasKey("strings"));
 		assertThat(document.get("strings"), is(instanceOf(CrateArray.class)));
 		assertThat(((CrateArray)document.get("strings")).size(), is(1));
@@ -286,7 +287,7 @@ public class MappingCrateConverterTest {
 		CrateArray collectionDocument = new CrateArray(map);
 		
 		Map<String, Object> expected = new HashMap<String, Object>();
-		expected.put("_class", CollectionOfMaps.class.getName());
+		expected.put(DEFAULT_TYPE_KEY, CollectionOfMaps.class.getName());
 		expected.put("maps", collectionDocument);
 		
 		CrateDocument document = new CrateDocument();
@@ -303,7 +304,7 @@ public class MappingCrateConverterTest {
 		CrateArray collectionDocument = new CrateArray(map);
 		
 		CrateDocument document = new CrateDocument();
-		document.put("_class", CollectionOfMaps.class.getName());
+		document.put(DEFAULT_TYPE_KEY, CollectionOfMaps.class.getName());
 		document.put("maps", collectionDocument);
 		
 		CollectionOfMaps entity = converter.read(CollectionOfMaps.class, document);
@@ -319,7 +320,7 @@ public class MappingCrateConverterTest {
 	public void shouldWriteEmptyCollection() {
 		
 		Map<String, Object> expected = new HashMap<String, Object>();
-		expected.put("_class", PrimitiveCollection.class.getName());
+		expected.put(DEFAULT_TYPE_KEY, PrimitiveCollection.class.getName());
 		expected.put("strings", emptyList());
 		
 		PrimitiveCollection entity = new PrimitiveCollection();
@@ -329,7 +330,7 @@ public class MappingCrateConverterTest {
 		
 		converter.write(entity, document);
 		
-		assertThat(document, hasEntry("_class", (Object)entity.getClass().getName()));
+		assertThat(document, hasEntry(DEFAULT_TYPE_KEY, (Object)entity.getClass().getName()));
 		assertThat(document, hasKey("strings"));
 		assertThat(document.get("strings"), is(instanceOf(CrateArray.class)));
 		assertThat(((CrateArray)document.get("strings")), is(notNullValue()));
@@ -355,7 +356,7 @@ public class MappingCrateConverterTest {
 		List<String> strings = asList("STRINGS", null);
 		
 		Map<String, Object> expected = new HashMap<String, Object>();
-		expected.put("_class", PrimitiveCollection.class.getName());
+		expected.put(DEFAULT_TYPE_KEY, PrimitiveCollection.class.getName());
 		expected.put("strings", strings);
 		
 		PrimitiveCollection entity = new PrimitiveCollection();
@@ -365,7 +366,7 @@ public class MappingCrateConverterTest {
 		
 		converter.write(entity, document);
 		
-		assertThat(document, hasEntry("_class", (Object)entity.getClass().getName()));
+		assertThat(document, hasEntry(DEFAULT_TYPE_KEY, (Object)entity.getClass().getName()));
 		assertThat(document, hasKey("strings"));
 		assertThat(document.get("strings"), is(instanceOf(CrateArray.class)));
 		assertThat(((CrateArray)document.get("strings")).size(), is(2));
@@ -397,7 +398,7 @@ public class MappingCrateConverterTest {
 		array[0] = true;
 		
 		Map<String, Object> expected = new HashMap<String, Object>();
-		expected.put("_class", PrimitiveArray.class.getName());
+		expected.put(DEFAULT_TYPE_KEY, PrimitiveArray.class.getName());
 		expected.put("booleans", array);
 		
 		PrimitiveArray entity = new PrimitiveArray();
@@ -407,7 +408,7 @@ public class MappingCrateConverterTest {
 		
 		converter.write(entity, document);
 		
-		assertThat(document, hasEntry("_class", (Object)PrimitiveArray.class.getName()));
+		assertThat(document, hasEntry(DEFAULT_TYPE_KEY, (Object)PrimitiveArray.class.getName()));
 		assertThat(document, hasKey("booleans"));
 		assertThat(document.get("booleans"), is(instanceOf(CrateArray.class)));
 		assertThat(((CrateArray)document.get("booleans")).size(), is(1));
@@ -436,7 +437,7 @@ public class MappingCrateConverterTest {
 		map.put(1.0, "STRING");
 		
 		Map<String, Object> expected = new HashMap<String, Object>();
-		expected.put("_class", MapOfPrimitive.class.getName());
+		expected.put(DEFAULT_TYPE_KEY, MapOfPrimitive.class.getName());
 		expected.put("map", map);
 		
 		MapOfPrimitive entity = new MapOfPrimitive();
@@ -446,7 +447,7 @@ public class MappingCrateConverterTest {
 		
 		converter.write(entity, document);
 		
-		assertThat(document, hasEntry("_class", (Object)entity.getClass().getName()));
+		assertThat(document, hasEntry(DEFAULT_TYPE_KEY, (Object)entity.getClass().getName()));
 		assertThat(document, hasKey("map"));
 		assertThat(document.get("map"), is(instanceOf(CrateDocument.class)));
 		assertThat(((CrateDocument)document.get("map")), hasEntry("1.0", (Object)"STRING"));
@@ -459,7 +460,7 @@ public class MappingCrateConverterTest {
 		map.put("1.0", "STRING");
 		
 		CrateDocument document = new CrateDocument();
-		document.put("_class", MapOfPrimitive.class.getName());
+		document.put(DEFAULT_TYPE_KEY, MapOfPrimitive.class.getName());
 		document.put("map", map);
 		
 		MapOfPrimitive entity = converter.read(MapOfPrimitive.class, document);
@@ -483,7 +484,7 @@ public class MappingCrateConverterTest {
 		CrateDocument mapDocument = new CrateDocument("country", countryDocument);
 		
 		Map<String, Object> expected = new HashMap<String, Object>();
-		expected.put("_class", MapOfObject.class.getName());
+		expected.put(DEFAULT_TYPE_KEY, MapOfObject.class.getName());
 		expected.put("map", mapDocument);
 		
 		Map<String, Country> map = new HashMap<String, Country>();
@@ -513,7 +514,7 @@ public class MappingCrateConverterTest {
 		CrateDocument mapDocument = new CrateDocument("country", countryDocument);
 		
 		CrateDocument document = new CrateDocument();
-		document.put("_class", MapOfObject.class.getName());
+		document.put(DEFAULT_TYPE_KEY, MapOfObject.class.getName());
 		document.put("map", mapDocument);
 		
 		MapOfObject entity = converter.read(MapOfObject.class, document);
@@ -538,7 +539,7 @@ public class MappingCrateConverterTest {
 		map.put(2.0, null);
 		
 		Map<String, Object> expected = new HashMap<String, Object>();
-		expected.put("_class", MapOfPrimitive.class.getName());
+		expected.put(DEFAULT_TYPE_KEY, MapOfPrimitive.class.getName());
 		expected.put("map", map);
 		
 		MapOfPrimitive entity = new MapOfPrimitive();
@@ -548,7 +549,7 @@ public class MappingCrateConverterTest {
 		
 		converter.write(entity, document);
 		
-		assertThat(document, hasEntry("_class", (Object)entity.getClass().getName()));
+		assertThat(document, hasEntry(DEFAULT_TYPE_KEY, (Object)entity.getClass().getName()));
 		assertThat(document, hasKey("map"));
 		assertThat(document.get("map"), is(instanceOf(CrateDocument.class)));
 		assertThat(((CrateDocument)document.get("map")), hasEntry("1.0", (Object)"STRING"));
@@ -563,7 +564,7 @@ public class MappingCrateConverterTest {
 		map.put(2.0, null);
 		
 		CrateDocument document = new CrateDocument();
-		document.put("_class", MapOfPrimitive.class.getName());
+		document.put(DEFAULT_TYPE_KEY, MapOfPrimitive.class.getName());
 		document.put("map", map);
 		
 		MapOfPrimitive entity = converter.read(MapOfPrimitive.class, document);
@@ -584,7 +585,7 @@ public class MappingCrateConverterTest {
 		map.put("Key", nested);
 		
 		Map<String, Object> expected = new HashMap<String, Object>();
-		expected.put("_class", NestedMaps.class.getName());
+		expected.put(DEFAULT_TYPE_KEY, NestedMaps.class.getName());
 		expected.put("map", new CrateDocument("Key", new CrateDocument("1", asList(true, false))));
 		
 		NestedMaps entity = new NestedMaps();
@@ -643,7 +644,7 @@ public class MappingCrateConverterTest {
 		addressDocument.put("street", "aStreet");
 		
 		Map<String, Object> expected = new HashMap<String, Object>();
-		expected.put("_class", Person.class.getName());
+		expected.put(DEFAULT_TYPE_KEY, Person.class.getName());
 		expected.put("name", "aName");
 		expected.put("address", addressDocument);
 		expected.put("emails", emailsArray);
@@ -675,7 +676,7 @@ public class MappingCrateConverterTest {
 		addressDocument.put("street", "aStreet");
 		
 		CrateDocument document = new CrateDocument();
-		document.put("_class", Person.class.getName());
+		document.put(DEFAULT_TYPE_KEY, Person.class.getName());
 		document.put("name", "aName");
 		document.put("address", addressDocument);
 		document.put("emails", emailsArray);
@@ -708,12 +709,12 @@ public class MappingCrateConverterTest {
 		CrateDocument document = new CrateDocument();
 		converter.write(genericType, document);
 
-		assertThat(document, hasEntry("_class", (Object)GenericType.class.getName()));
+		assertThat(document, hasEntry(DEFAULT_TYPE_KEY, (Object)GenericType.class.getName()));
 		assertThat(document, hasKey("content"));
 		
 		CrateDocument languageDocument = (CrateDocument) document.get("content");
 		assertThat(languageDocument, is(notNullValue()));
-		assertThat(languageDocument, hasEntry("_class", (Object)Language.class.getName()));
+		assertThat(languageDocument, hasEntry(DEFAULT_TYPE_KEY, (Object)Language.class.getName()));
 		assertThat(languageDocument, hasEntry("name", (Object)"aLanguage"));
 	}
 	
@@ -721,10 +722,10 @@ public class MappingCrateConverterTest {
 	@SuppressWarnings("unchecked")
 	public void shouldReadGenericTypeCorrectly() {
 
-		CrateDocument languageDocument = new CrateDocument("_class", Language.class.getName());
+		CrateDocument languageDocument = new CrateDocument(DEFAULT_TYPE_KEY, Language.class.getName());
 		languageDocument.put("name", "aLanguage");
 		
-		CrateDocument document = new CrateDocument("_class", GenericType.class.getName());
+		CrateDocument document = new CrateDocument(DEFAULT_TYPE_KEY, GenericType.class.getName());
 		document.put("content", languageDocument);
 		
 		GenericType<Language> genericType =  converter.read(GenericType.class, document);
@@ -745,7 +746,7 @@ public class MappingCrateConverterTest {
 
 		converter.write(genericClass, document);
 
-		assertThat((String) document.get("_class"), is(GenericClass.class.getName()));
+		assertThat((String) document.get(DEFAULT_TYPE_KEY), is(GenericClass.class.getName()));
 		assertThat((String) document.get("valueType"), is(HashMap.class.getName()));
 
 		CrateDocument object = (CrateDocument) document.get("value");
@@ -753,7 +754,7 @@ public class MappingCrateConverterTest {
 
 		CrateDocument inner = (CrateDocument) object.get("test");
 		assertThat(inner, is(notNullValue()));
-		assertThat((String) inner.get("_class"), is(GenericClass.class.getName()));
+		assertThat((String) inner.get(DEFAULT_TYPE_KEY), is(GenericClass.class.getName()));
 		assertThat((String) inner.get("valueType"), is(String.class.getName()));
 		assertThat((String) inner.get("value"), is("testValue"));
 	}
@@ -762,14 +763,14 @@ public class MappingCrateConverterTest {
 	public void shouldWriteWithSimpleId() {
 		
 		SimpleStringId stringId = new SimpleStringId();
-		stringId.stringId = "stringId";
+		stringId.stringId = "CRATE";
 		
 		CrateDocument stringIdDocument = new CrateDocument();
 		
 		converter.write(stringId, stringIdDocument);
 		
-		assertThat(stringIdDocument, hasEntry("_class", (Object)SimpleStringId.class.getName()));
-		assertThat(stringIdDocument, hasEntry("_id", (Object)"stringId"));
+		assertThat(stringIdDocument, hasEntry(DEFAULT_TYPE_KEY, (Object)SimpleStringId.class.getName()));
+		assertThat(stringIdDocument, hasEntry("stringId", (Object)"CRATE"));
 		
 		SimpleIntId intId = new SimpleIntId();
 		intId.intId = 2620;
@@ -778,8 +779,8 @@ public class MappingCrateConverterTest {
 		
 		converter.write(intId, intIdDocument);
 		
-		assertThat(intIdDocument, hasEntry("_class", (Object)SimpleIntId.class.getName()));
-		assertThat(intIdDocument, hasEntry("_id", (Object)2620));
+		assertThat(intIdDocument, hasEntry(DEFAULT_TYPE_KEY, (Object)SimpleIntId.class.getName()));
+		assertThat(intIdDocument, hasEntry("intId", (Object)2620));
 		
 		SimpleLongId longId = new SimpleLongId();
 		longId.longId = 4732L;
@@ -788,19 +789,19 @@ public class MappingCrateConverterTest {
 		
 		converter.write(longId, longIdDocument);
 		
-		assertThat(longIdDocument, hasEntry("_class", (Object)SimpleLongId.class.getName()));
-		assertThat(longIdDocument, hasEntry("_id", (Object)4732L));
+		assertThat(longIdDocument, hasEntry(DEFAULT_TYPE_KEY, (Object)SimpleLongId.class.getName()));
+		assertThat(longIdDocument, hasEntry("longId", (Object)4732L));
 	}
 	
 	@Test
 	public void shouldReadWithSimpleId() {
 		
-		SimpleStringId stringId = converter.read(SimpleStringId.class, new CrateDocument("_id", "stringId"));
+		SimpleStringId stringId = converter.read(SimpleStringId.class, new CrateDocument("stringId", "CRATE"));
 		
 		assertThat(stringId, is(notNullValue()));
-		assertThat(stringId.stringId, is("stringId"));
+		assertThat(stringId.stringId, is("CRATE"));
 		
-		SimpleIntId intId = converter.read(SimpleIntId.class, new CrateDocument("_id", 2620));
+		SimpleIntId intId = converter.read(SimpleIntId.class, new CrateDocument("intId", 2620));
 		
 		assertThat(intId, is(notNullValue()));
 		assertThat(intId.intId, is(2620));
@@ -808,7 +809,7 @@ public class MappingCrateConverterTest {
 		SimpleLongId longId = new SimpleLongId();
 		longId.longId = 4732L;
 		
-		converter.read(SimpleLongId.class, new CrateDocument("_id", 4732L));
+		converter.read(SimpleLongId.class, new CrateDocument("longId", 4732L));
 		
 		assertThat(longId, is(notNullValue()));
 		assertThat(longId.longId, is(4732L));
@@ -829,7 +830,7 @@ public class MappingCrateConverterTest {
 		person.emails = new HashSet<MappingCrateConverterTest.Email>(asList(new Email("email@test.com")));
 		
 		ComplexId entity = new ComplexId();
-		entity.person = person;
+		entity.pk = person;
 		entity.string = "STRING";
 		
 		CrateDocument languageDocument = new CrateDocument("name", "aLanguage");
@@ -854,9 +855,9 @@ public class MappingCrateConverterTest {
 		personDocument.put("emails", emailsArray);
 		
 		Map<String, Object> expected = new HashMap<String, Object>();
-		expected.put("_class", ComplexId.class.getName());
+		expected.put(DEFAULT_TYPE_KEY, ComplexId.class.getName());
 		expected.put("string", "STRING");
-		expected.put("_id", personDocument);
+		expected.put("pk", personDocument);
 		
 		CrateDocument document = new CrateDocument();
 		
@@ -890,29 +891,29 @@ public class MappingCrateConverterTest {
 		personDocument.put("emails", emailsArray);
 		
 		CrateDocument document = new CrateDocument();
-		document.put("_class", ComplexId.class.getName());
+		document.put(DEFAULT_TYPE_KEY, ComplexId.class.getName());
 		document.put("string", "STRING");
-		document.put("_id", personDocument);
+		document.put("pk", personDocument);
 		
 		ComplexId entity = converter.read(ComplexId.class, document);
 		
 		assertThat(entity, is(notNullValue()));
 		assertThat(entity.string, is("STRING"));
-		assertThat(entity.person, is(notNullValue()));
-		assertThat(entity.person.name, is("aName"));
-		assertThat(entity.person.address, is(notNullValue()));
-		assertThat(entity.person.address.country, is(notNullValue()));
-		assertThat(entity.person.address.country.name, is("aCountry"));
-		assertThat(entity.person.address.country.languages, is(notNullValue()));
-		assertThat(entity.person.address.country.languages.size(), is(1));
-		assertThat(entity.person.address.country.languages.get(0), is(notNullValue()));
-		assertThat(entity.person.address.country.languages.get(0).name, is("aLanguage"));
-		assertThat(entity.person.address.city, is("aCity"));
-		assertThat(entity.person.address.street, is("aStreet"));
-		assertThat(entity.person.emails, is(notNullValue()));
-		assertThat(entity.person.emails.size(), is(1));
-		assertThat(entity.person.emails.iterator().next(), is(notNullValue()));
-		assertThat(entity.person.emails.iterator().next().email, is("email@test.com"));
+		assertThat(entity.pk, is(notNullValue()));
+		assertThat(entity.pk.name, is("aName"));
+		assertThat(entity.pk.address, is(notNullValue()));
+		assertThat(entity.pk.address.country, is(notNullValue()));
+		assertThat(entity.pk.address.country.name, is("aCountry"));
+		assertThat(entity.pk.address.country.languages, is(notNullValue()));
+		assertThat(entity.pk.address.country.languages.size(), is(1));
+		assertThat(entity.pk.address.country.languages.get(0), is(notNullValue()));
+		assertThat(entity.pk.address.country.languages.get(0).name, is("aLanguage"));
+		assertThat(entity.pk.address.city, is("aCity"));
+		assertThat(entity.pk.address.street, is("aStreet"));
+		assertThat(entity.pk.emails, is(notNullValue()));
+		assertThat(entity.pk.emails.size(), is(1));
+		assertThat(entity.pk.emails.iterator().next(), is(notNullValue()));
+		assertThat(entity.pk.emails.iterator().next().email, is("email@test.com"));
 		
 	}
 	
@@ -1032,7 +1033,7 @@ public class MappingCrateConverterTest {
 	
 	static class ComplexId {
 		@Id
-		Person person;
+		Person pk;
 		String string;
 	}
 	

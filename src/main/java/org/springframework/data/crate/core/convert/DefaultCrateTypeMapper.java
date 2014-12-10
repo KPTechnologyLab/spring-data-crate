@@ -16,9 +16,11 @@
 package org.springframework.data.crate.core.convert;
 
 import static org.springframework.util.StringUtils.hasText;
+import static org.springframework.util.StringUtils.startsWithIgnoreCase;
 
 import org.springframework.data.convert.DefaultTypeMapper;
 import org.springframework.data.convert.TypeAliasAccessor;
+import org.springframework.data.crate.InvalidCrateApiUsageException;
 import org.springframework.data.crate.core.mapping.CrateDocument;
 
 /**
@@ -50,6 +52,7 @@ public class DefaultCrateTypeMapper extends DefaultTypeMapper<CrateDocument> imp
 		
 		private CrateDocumentTypeAliasAccessor(String typeKey) {
 			super();
+			validateTypeKey(typeKey);
 			this.typeKey = typeKey;
 		}
 		
@@ -64,5 +67,11 @@ public class DefaultCrateTypeMapper extends DefaultTypeMapper<CrateDocument> imp
 				sink.put(typeKey, alias);
 			}
 		}		
+	}
+	
+	private static void validateTypeKey(String typeKey) {
+		if(startsWithIgnoreCase(typeKey, "_")) {
+			throw new InvalidCrateApiUsageException("Type key can not start with an '_'");
+		}
 	}
 }

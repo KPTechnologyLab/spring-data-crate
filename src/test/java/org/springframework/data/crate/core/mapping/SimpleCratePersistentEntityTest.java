@@ -70,7 +70,7 @@ public class SimpleCratePersistentEntityTest {
 		
 		assertThat(propertyNames, is(notNullValue()));
 		assertThat(propertyNames.isEmpty(), is(false));
-		assertThat(propertyNames, hasItems("_id", "title", "isbn"));
+		assertThat(propertyNames, hasItems("id", "title", "isbn"));
 	}
 	
 	@Test
