@@ -204,7 +204,7 @@ public class MappingCrateConverterTest {
 	    expected.put("integer", 0);
 	    expected.put("date", date);
 	    expected.put("bool", true);
-	    expected.put("locale", CANADA);
+	    expected.put("locale", CANADA.toString());
 		
 		CrateDocument document = new CrateDocument();
 		
