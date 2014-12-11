@@ -19,9 +19,11 @@ import static org.hamcrest.Matchers.hasItem;
 import static org.hamcrest.Matchers.hasSize;
 import static org.hamcrest.Matchers.is;
 import static org.junit.Assert.assertThat;
+import static org.springframework.data.crate.core.mapping.schema.SchemaExportOption.CREATE_DROP;
 
 import org.junit.Test;
 import org.springframework.data.crate.core.mapping.annotations.Table;
+import org.springframework.data.crate.core.mapping.schema.SchemaExportOption;
 
 /**
  * 
@@ -39,7 +41,11 @@ public class AbstractCrateConfigurationTest {
 		assertThat(configuration.getInitialEntitySet(), hasItem(Entity.class));
 	}
 	
-	class SampleCrateConfiguration extends AbstractCrateConfiguration {		
+	class SampleCrateConfiguration extends AbstractCrateConfiguration {
+		@Override
+		public SchemaExportOption getSchemaExportOption() {
+			return CREATE_DROP;
+		}
 	}
 	
 	@Table(name="entity")
