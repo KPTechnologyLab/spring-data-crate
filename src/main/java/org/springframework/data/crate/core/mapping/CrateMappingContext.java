@@ -43,8 +43,4 @@ public class CrateMappingContext extends AbstractMappingContext<SimpleCratePersi
 																	   SimpleCratePersistentEntity<?> owner, SimpleTypeHolder simpleTypeHolder) {
 		return new SimpleCratePersistentProperty(field, descriptor, owner, simpleTypeHolder);
 	}
-	
-	public boolean isSimpleType(Class<?> clazz) {
-		return HOLDER.isSimpleType(clazz); 
-	}
 }
