@@ -50,5 +50,6 @@ public class AbstractCrateConfigurationTest {
 	
 	@Table(name="entity")
 	static class Entity {
+		String name;
 	}
 }
