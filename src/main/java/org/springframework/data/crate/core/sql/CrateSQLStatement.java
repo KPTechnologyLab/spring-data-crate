@@ -32,6 +32,9 @@ public interface CrateSQLStatement {
 	String DROP_TABLE = "DROP TABLE";
 	String ALTER_TABLE = "ALTER TABLE";
 	String ADD_COLUMN = "ADD COLUMN";
+	String INSERT_INTO = "INSERT INTO";
+	String WHERE = "WHERE";
+	String VALUES = "VALUES";
 	
 	String createStatement();
 }
