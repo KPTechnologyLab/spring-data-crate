@@ -20,6 +20,9 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
+import org.springframework.data.crate.core.mapping.annotations.Table;
+
+@Table
 public class PropertiesContainer {
 	
 	public String simpleField;

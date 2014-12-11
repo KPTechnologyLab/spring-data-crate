@@ -19,10 +19,13 @@ import org.apache.commons.lang.builder.EqualsBuilder;
 import org.apache.commons.lang.builder.HashCodeBuilder;
 import org.springframework.data.annotation.Id;
 import org.springframework.data.annotation.Version;
+import org.springframework.data.crate.core.mapping.annotations.Table;
 
 /**
  * @author Rizwan Idrees
+ * @author Hasnain Javed 
  */
+@Table
 public class SampleEntity {
 
     @Id

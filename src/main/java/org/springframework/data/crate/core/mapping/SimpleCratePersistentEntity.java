@@ -15,12 +15,10 @@
  */
 package org.springframework.data.crate.core.mapping;
 
-import static org.springframework.util.Assert.hasText;
+import static org.springframework.util.StringUtils.hasText;
 import static org.springframework.util.StringUtils.replace;
 
-import java.util.ArrayList;
 import java.util.LinkedHashSet;
-import java.util.List;
 import java.util.Set;
 
 import org.springframework.beans.BeansException;
@@ -33,6 +31,7 @@ import org.springframework.data.mapping.PropertyHandler;
 import org.springframework.data.mapping.model.BasicPersistentEntity;
 import org.springframework.data.util.TypeInformation;
 import org.springframework.expression.spel.support.StandardEvaluationContext;
+
 
 /**
  * Crate specific {@link org.springframework.data.mapping.PersistentEntity} implementation holding
@@ -207,16 +206,16 @@ public class SimpleCratePersistentEntity<T> extends BasicPersistentEntity<T, Cra
 	
 	private String resolveTableName(TypeInformation<T> typeInformation) {
 		
+		String fallback = replace(typeInformation.getType().getName(), ".", "_");
+		
 		String tableName = null;
 		
-		Class<T> clazz = typeInformation.getType();
+		Table annotation = findAnnotation(Table.class);
 		
-		if(clazz.isAnnotationPresent(Table.class)) {
-			String name = typeInformation.getType().getAnnotation(Table.class).name();
-			hasText(name, "Invalid name. Make sure the name is defined. e.g @Table(name=\"foo\")");
-			tableName = name;
+		if(annotation != null) {
+			tableName = hasText(annotation.name()) ? replace(annotation.name(), " ", "_") : fallback;
 		}else {
-			tableName = replace(clazz.getName(), ".", "_");
+			tableName = fallback;
 		}
 		
 		return tableName;

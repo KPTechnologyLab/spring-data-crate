@@ -177,10 +177,12 @@ public class SimpleCratePersistentEntityTest {
 		return mappingContext;
 	}
 	
+	@Table
 	static class EntityWithInvalidColumnName {
 		String _stringColumn;
 	}
 	
+	@Table
 	static class EntityWithReservedIdName {
 		@Id		
 		long _id;
