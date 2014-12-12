@@ -15,9 +15,12 @@
  */
 package org.springframework.data.crate.core.convert;
 
+import java.util.Date;
 import java.util.Locale;
 
 import org.springframework.core.convert.converter.Converter;
+import org.springframework.data.convert.ReadingConverter;
+import org.springframework.data.convert.WritingConverter;
 
 /**
  * Wrapper class to contain useful converters for the usage with Crate.
@@ -33,10 +36,33 @@ public abstract class CrateConverters {
 	private CrateConverters() {
 	}
 	
+	@WritingConverter
 	public static enum LocaleToStringConverter implements Converter<Locale, String> {
 		INSTANCE;
+		
+		@Override
 		public String convert(Locale locale) {
 			return locale == null ? null : locale.toString();
+		}
+	}
+	
+	@WritingConverter
+	public static enum DateToLongConverter implements Converter<Date, Long> {
+		INSTANCE;
+
+		@Override
+		public Long convert(Date source) {
+			return source == null ? 0L: source.getTime();
+		}
+	}
+	
+	@ReadingConverter
+	public static enum LongToDateConverter implements Converter<Long, Date> {
+		INSTANCE;
+
+		@Override
+		public Date convert(Long source) {
+			return source == null ? null : new Date(source);
 		}
 	}
 }
