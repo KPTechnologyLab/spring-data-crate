@@ -471,14 +471,17 @@ public class MappingCrateConverter extends AbstractCrateConverter implements App
 	private CrateDocument writeMapInternal(final Map<Object, Object> source, final CrateDocument sink, final TypeInformation<?> type) {
 
 		for (Map.Entry<Object, Object> entry : source.entrySet()) {
+			
 			Object key = entry.getKey();
 			Object val = entry.getValue();
+			
 			if (conversions.isSimpleType(key.getClass())) {
 				
 				String simpleKey = key.toString();
-				if (val == null || conversions.isSimpleType(val.getClass())) {
+				
+				if(val == null || (conversions.isSimpleType(val.getClass()) && !val.getClass().isArray())) {
 					writeSimpleInternal(val, sink, simpleKey);
-				}else if (val instanceof Collection || val.getClass().isArray()) {
+				}else if(val instanceof Collection || val.getClass().isArray()) {
 					sink.put(simpleKey, writeCollectionInternal(asCollection(val), new CrateArray(), type.getMapValueType()));
 				}else {
 					CrateDocument document = new CrateDocument();

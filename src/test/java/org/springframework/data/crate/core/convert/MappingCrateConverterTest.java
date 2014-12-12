@@ -434,9 +434,10 @@ public class MappingCrateConverterTest {
 		
 		Integer[] array = new Integer[]{new Integer(1)};
 		
+		CrateArray crateArray = new CrateArray(new Integer(1));
 		Map<String, Object> expected = new HashMap<String, Object>();
 		expected.put(DEFAULT_TYPE_KEY, PrimitiveWrapperArray.class.getName());
-		expected.put("integers", array);
+		expected.put("integers", crateArray);
 		
 		PrimitiveWrapperArray entity = new PrimitiveWrapperArray();
 		entity.integers = array;
@@ -544,6 +545,102 @@ public class MappingCrateConverterTest {
 		assertThat(entity, is(notNullValue()));
 		assertThat(entity.map, is(notNullValue()));
 		assertThat(entity.map, hasEntry(1.0, "STRING"));
+	}
+	
+	@Test
+	public void shouldWriteMapOfPrimitiveArray() {
+		
+		int[] array = new int[]{1};
+		
+		Map<String, int[]> map = new HashMap<String, int[]>();
+		map.put("STRING", array);
+		
+		CrateArray expectedArray = new CrateArray(1); 
+		Map<String, Object> expected = new HashMap<String, Object>();
+		expected.put(DEFAULT_TYPE_KEY, MapOfPrimitiveArray.class.getName());
+		expected.put("map", expectedArray);
+		
+		MapOfPrimitiveArray entity = new MapOfPrimitiveArray();
+		entity.map = map;
+		
+		CrateDocument document = new CrateDocument();
+		
+		converter.write(entity, document);
+		
+		assertThat(document, hasEntry(DEFAULT_TYPE_KEY, (Object)entity.getClass().getName()));
+		assertThat(document, hasKey("map"));
+		assertThat(document.get("map"), is(instanceOf(CrateDocument.class)));
+		assertThat(((CrateDocument)document.get("map")), hasEntry("STRING", (Object)expectedArray));
+	}
+	
+	@Test
+	public void shouldReadMapOfPrimitiveArray() {
+		
+		int[] array = new int[]{1};
+		
+		CrateArray crateArray = new CrateArray(1);
+		CrateDocument map = new CrateDocument();
+		map.put("STRING", crateArray);
+		
+		CrateDocument document = new CrateDocument();
+		document.put(DEFAULT_TYPE_KEY, MapOfPrimitiveArray.class.getName());
+		document.put("map", map);
+		
+		MapOfPrimitiveArray entity = converter.read(MapOfPrimitiveArray.class, document);
+
+		assertThat(entity, is(notNullValue()));
+		assertThat(entity.map, is(notNullValue()));
+		assertThat(entity.map, hasEntry("STRING", (Object)array));
+	}
+	
+	@Test
+	public void shouldWriteMapOfPrimitiveWrapperArray() {
+		
+		Boolean[] array = new Boolean[]{true, false};
+		
+		Map<String, Boolean[]> map = new HashMap<String, Boolean[]>();
+		map.put("STRING", array);
+
+		CrateArray expectedArray = new CrateArray();
+		expectedArray.addAll(asList(array));
+		
+		Map<String, Object> expected = new HashMap<String, Object>();
+		expected.put(DEFAULT_TYPE_KEY, MapOfPrimitiveWrapperArray.class.getName());
+		expected.put("map", map);
+		
+		MapOfPrimitiveWrapperArray entity = new MapOfPrimitiveWrapperArray();
+		entity.map = map;
+		
+		CrateDocument document = new CrateDocument();
+		
+		converter.write(entity, document);
+		
+		assertThat(document, hasEntry(DEFAULT_TYPE_KEY, (Object)entity.getClass().getName()));
+		assertThat(document, hasKey("map"));
+		assertThat(document.get("map"), is(instanceOf(CrateDocument.class)));
+		assertThat(((CrateDocument)document.get("map")), hasEntry("STRING", (Object)expectedArray));
+	}
+	
+	@Test
+	public void shouldReadMapOfPrimitiveWrapperArray() {
+		
+		Boolean[] array = new Boolean[]{true, false};
+		
+		CrateArray crateArray = new CrateArray();
+		crateArray.addAll(asList(array));
+		
+		CrateDocument map = new CrateDocument();
+		map.put("STRING", crateArray);
+		
+		CrateDocument document = new CrateDocument();
+		document.put(DEFAULT_TYPE_KEY, MapOfPrimitiveWrapperArray.class.getName());
+		document.put("map", map);
+		
+		MapOfPrimitiveWrapperArray entity = converter.read(MapOfPrimitiveWrapperArray.class, document);
+
+		assertThat(entity, is(notNullValue()));
+		assertThat(entity.map, is(notNullValue()));
+		assertThat(entity.map, hasEntry("STRING", (Object)array));
 	}
 	
 	@Test
@@ -1045,6 +1142,14 @@ public class MappingCrateConverterTest {
 	
 	static class MapOfPrimitive {
 		Map<Double, String> map;
+	}
+	
+	static class MapOfPrimitiveArray {
+		Map<String, int[]> map;
+	}
+	
+	static class MapOfPrimitiveWrapperArray {
+		Map<String, Boolean[]> map;
 	}
 	
 	static class MapOfObject {
