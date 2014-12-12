@@ -34,6 +34,14 @@ public class CrateSimpleTypes {
 	    Set<Class<?>> simpleTypes = new HashSet<Class<?>>();
 	    simpleTypes.add(CrateDocument.class);
 	    simpleTypes.add(CrateArray.class);
+	    simpleTypes.add(Boolean[].class);
+	    simpleTypes.add(Long[].class);
+	    simpleTypes.add(Short[].class);
+	    simpleTypes.add(Integer[].class);
+	    simpleTypes.add(Byte[].class);
+	    simpleTypes.add(Float[].class);
+	    simpleTypes.add(Double[].class);
+	    simpleTypes.add(Character[].class);
 	    CRATE_SIMPLE_TYPES = unmodifiableSet(simpleTypes);
 	}
 	

@@ -392,7 +392,7 @@ public class MappingCrateConverter extends AbstractCrateConverter implements App
 	    	Object propertyObj = wrapper.getProperty(property, property.getType());
 	    	
 	        if (propertyObj != null) {
-	        	if(!conversions.isSimpleType(propertyObj.getClass())) {
+	        	if(!conversions.isSimpleType(propertyObj.getClass()) || isPrimitiveArray(property)) {
 	        		writePropertyInternal(propertyObj, sink, property);
 	        	}else {
 	        		writeSimpleInternal(propertyObj, sink, property.getFieldName());
@@ -738,6 +738,10 @@ public class MappingCrateConverter extends AbstractCrateConverter implements App
 	   */
 	private boolean isSubtype(final Class<?> left, final Class<?> right) {
 		return left.isAssignableFrom(right) && !left.equals(right);
+	}
+	
+	private boolean isPrimitiveArray(CratePersistentProperty property) {
+		return property.isArray() && conversions.isSimpleType(property.getType());
 	}
 	
 	/**

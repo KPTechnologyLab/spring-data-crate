@@ -394,8 +394,7 @@ public class MappingCrateConverterTest {
 	@Test
 	public void shouldWriteArrayOfPrimitive() {
 		
-		Boolean[] array = new Boolean[1];
-		array[0] = true;
+		boolean[] array = new boolean[]{true};
 		
 		Map<String, Object> expected = new HashMap<String, Object>();
 		expected.put(DEFAULT_TYPE_KEY, PrimitiveArray.class.getName());
@@ -428,6 +427,83 @@ public class MappingCrateConverterTest {
 		assertThat(entity, is(notNullValue()));
 		assertThat(entity.booleans, is(notNullValue()));
 		assertThat(entity.booleans[0], is(true));
+	}
+	
+	@Test
+	public void shouldWriteArrayOfPrimitiveWrapper() {
+		
+		Integer[] array = new Integer[]{new Integer(1)};
+		
+		Map<String, Object> expected = new HashMap<String, Object>();
+		expected.put(DEFAULT_TYPE_KEY, PrimitiveWrapperArray.class.getName());
+		expected.put("integers", array);
+		
+		PrimitiveWrapperArray entity = new PrimitiveWrapperArray();
+		entity.integers = array;
+		
+		CrateDocument document = new CrateDocument();
+		
+		converter.write(entity, document);
+		
+		assertThat(document, hasEntry(DEFAULT_TYPE_KEY, (Object)PrimitiveWrapperArray.class.getName()));
+		assertThat(document, hasKey("integers"));
+		assertThat(document.get("integers"), is(instanceOf(CrateArray.class)));
+		assertThat(((CrateArray)document.get("integers")).size(), is(1));
+		assertThat(((CrateArray)document.get("integers")).get(0).toString(), is("1"));
+	}
+	
+	@Test
+	public void shouldReadArrayOfPrimitiveWrapper() {
+		
+		CrateArray array = new CrateArray(new Integer(1));
+		
+		CrateDocument document = new CrateDocument();
+		document.put("integers", array);
+		
+		PrimitiveWrapperArray entity = converter.read(PrimitiveWrapperArray.class, document);
+		
+		assertThat(entity, is(notNullValue()));
+		assertThat(entity.integers, is(notNullValue()));
+		assertThat(entity.integers[0], is(1));
+	}
+	
+	@Test
+	public void shouldWriteArrayOfString() {
+		
+		String[] array = new String[]{"C","R","A","T","E"};
+		
+		Map<String, Object> expected = new HashMap<String, Object>();
+		expected.put(DEFAULT_TYPE_KEY, StringArray.class.getName());
+		expected.put("strings", array);
+		
+		StringArray entity = new StringArray();
+		entity.strings = array;
+		
+		CrateDocument document = new CrateDocument();
+		
+		converter.write(entity, document);
+		
+		assertThat(document, hasEntry(DEFAULT_TYPE_KEY, (Object)StringArray.class.getName()));
+		assertThat(document, hasKey("strings"));
+		assertThat(document.get("strings"), is(instanceOf(CrateArray.class)));
+		assertThat(((CrateArray)document.get("strings")).size(), is(5));
+		assertThat(((CrateArray)document.get("strings")).toArray(), is((Object)array));
+	}
+	
+	@Test
+	public void shouldReadArrayOfString() {
+		
+		CrateArray array = new CrateArray();
+		array.addAll(asList("C","R","A","T","E"));
+		
+		CrateDocument document = new CrateDocument();
+		document.put("strings", array);
+		
+		StringArray entity = converter.read(StringArray.class, document);
+		
+		assertThat(entity, is(notNullValue()));
+		assertThat(entity.strings, is(notNullValue()));
+		assertThat(entity.strings, is(array.toArray()));
 	}
 	
 	@Test
@@ -952,7 +1028,15 @@ public class MappingCrateConverterTest {
 	}
 	
 	static class PrimitiveArray {
-		Boolean[] booleans;
+		boolean[] booleans;
+	}
+	
+	static class PrimitiveWrapperArray {
+		Integer[] integers;
+	}
+	
+	static class StringArray {
+		String[] strings;
 	}
 	
 	static class CollectionOfMaps {
