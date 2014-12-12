@@ -202,7 +202,7 @@ public class MappingCrateConverterTest {
 	    expected.put(DEFAULT_TYPE_KEY, entity.getClass().getName());
 	    expected.put("string", "STRING");
 	    expected.put("integer", 0);
-	    expected.put("date", date);
+	    expected.put("date", date.getTime());
 	    expected.put("bool", true);
 	    expected.put("locale", CANADA.toString());
 		
