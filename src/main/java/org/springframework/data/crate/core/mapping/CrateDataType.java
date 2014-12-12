@@ -19,6 +19,7 @@ package org.springframework.data.crate.core.mapping;
 import java.util.Collection;
 import java.util.Date;
 import java.util.HashMap;
+import java.util.Locale;
 import java.util.Map;
 
 /**
@@ -70,6 +71,10 @@ public class CrateDataType {
 		
 		if(clazz.isArray() || Collection.class.isAssignableFrom(clazz)) {
 			return ARRAY;
+		}
+
+		if(Enum.class.isAssignableFrom(clazz) || clazz.isEnum() || Locale.class.isAssignableFrom(clazz)) {
+			return STRING;
 		}
 		
 		if(Map.class.isAssignableFrom(clazz)) {
