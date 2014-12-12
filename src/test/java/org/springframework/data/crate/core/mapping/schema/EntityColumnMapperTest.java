@@ -34,6 +34,7 @@ import static org.springframework.data.crate.core.mapping.CrateDataType.TIMESTAM
 import java.util.Collection;
 import java.util.Date;
 import java.util.List;
+import java.util.Locale;
 import java.util.Map;
 import java.util.Set;
 
@@ -48,6 +49,7 @@ import org.springframework.data.crate.core.mapping.schema.EntityColumnMapperTest
 import org.springframework.data.crate.core.mapping.schema.EntityColumnMapperTest.EntityTypeColumnMappingTest;
 import org.springframework.data.crate.core.mapping.schema.EntityColumnMapperTest.MapTypeColumnMappingTest;
 import org.springframework.data.crate.core.mapping.schema.EntityColumnMapperTest.PrimitivesColumnMappingTest;
+import org.springframework.util.ClassUtils;
 
 /**
  * @author Hasnain Javed
@@ -177,6 +179,16 @@ public class EntityColumnMapperTest {
 			assertThat(columns.iterator().next().getCrateType(), is(TIMESTAMP));
 		}
 		
+		@Test
+		public void shouldCreateEnumColumn() {
+			
+			List<Column> columns = initMappingContextAndGetColumns(EntityWithEnum.class);
+			
+			assertThat(columns, is(notNullValue()));
+			assertThat(columns.size(), is(1));
+			assertThat(columns.iterator().next().getCrateType(), is(STRING));
+		}
+		
 		static class EntityWithString {
 			String string;
 		}
@@ -218,6 +230,10 @@ public class EntityColumnMapperTest {
 		
 		static class EntityWithDate {
 			Date dateField;
+		}
+		
+		static class EntityWithEnum {
+			Locale locale;
 		}
 	}
 	
