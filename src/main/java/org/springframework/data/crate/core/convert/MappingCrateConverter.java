@@ -626,7 +626,7 @@ public class MappingCrateConverter extends AbstractCrateConverter implements App
 		if (customTarget != null) {
 			return conversionService.convert(value, customTarget);
 		} else {
-			return Enum.class.isAssignableFrom(value.getClass()) ? ((Enum<?>) value).name() : value;
+			return Enum.class.isAssignableFrom(value.getClass()) ? ((Enum<?>) value).toString() : value;
 		}
 	}
 	
