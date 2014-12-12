@@ -35,7 +35,9 @@ import org.springframework.core.convert.converter.GenericConverter;
 import org.springframework.core.convert.support.GenericConversionService;
 import org.springframework.data.convert.ReadingConverter;
 import org.springframework.data.convert.WritingConverter;
+import org.springframework.data.crate.core.convert.CrateConverters.DateToLongConverter;
 import org.springframework.data.crate.core.convert.CrateConverters.LocaleToStringConverter;
+import org.springframework.data.crate.core.convert.CrateConverters.LongToDateConverter;
 import org.springframework.data.mapping.model.SimpleTypeHolder;
 
 /**
@@ -87,6 +89,8 @@ public class CustomConversions {
     this.converters = new ArrayList<Object>();
     this.converters.addAll(converters);
     this.converters.add(LocaleToStringConverter.INSTANCE);
+    this.converters.add(DateToLongConverter.INSTANCE);
+    this.converters.add(LongToDateConverter.INSTANCE);
     
     for (Object converter : this.converters) {
       registerConversion(converter);
