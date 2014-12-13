@@ -17,9 +17,7 @@ package org.springframework.data.crate.core.convert;
 
 import static java.util.Arrays.asList;
 import static java.util.Locale.CANADA;
-import static org.hamcrest.Matchers.hasEntry;
 import static org.hamcrest.Matchers.hasItems;
-import static org.hamcrest.Matchers.hasKey;
 import static org.hamcrest.Matchers.instanceOf;
 import static org.hamcrest.Matchers.is;
 import static org.hamcrest.Matchers.notNullValue;
@@ -51,11 +49,11 @@ public class CrateDocumentConverterTest {
 	@Test
 	public void shouldCreateEmptyDocument() {
 		
-		Object[][] rows = new Object[0][0];
-		
 		String[] columns = {"string"};
 		
 		DataType<?>[] types = { StringType.INSTANCE };
+		
+		Object[][] rows = new Object[0][0];
 		
 		converter = new CrateDocumentConverter(columns, types, rows);
 		
@@ -75,23 +73,25 @@ public class CrateDocumentConverterTest {
 	@Test
 	public void shouldMapSimpleTypes() {
 		
-		Object[][] rows = new Object[][]{new Object[]{"DOCUMENT", 1, true, CANADA}};
-		
 		String[] columns = {"string", "integer", "bool", "locale"};
 		
 		DataType<?>[] types = { StringType.INSTANCE, IntegerType.INSTANCE, 
-							    BooleanType.INSTANCE, StringType.INSTANCE }; 
+							    BooleanType.INSTANCE, StringType.INSTANCE };
+		
+		Object[][] rows = new Object[][]{new Object[]{"DOCUMENT", 1, true, CANADA}};
+		
+		Map<String, Object> expected = new HashMap<String, Object>();
+		expected.put("string", "DOCUMENT");
+		expected.put("integer", 1);
+		expected.put("bool", true);
+		expected.put("locale", CANADA);
 		
 		converter = new CrateDocumentConverter(columns, types, rows);
 		
 		CrateDocument document = converter.toDocument();
 		
 		assertThat(document, is(notNullValue()));
-		assertThat(document.size(), is(4));
-		assertThat(document, hasEntry("string", (Object)"DOCUMENT"));
-		assertThat(document, hasEntry("integer", (Object)1));
-		assertThat(document, hasEntry("bool", (Object)true));
-		assertThat(document, hasEntry("locale", (Object)CANADA));
+		assertThat(document.equals(expected), is(true));
 	}
 	
 	@Test
@@ -100,21 +100,53 @@ public class CrateDocumentConverterTest {
 		List<String> strings = asList("C", "R", "A", "T", "E");
 		List<Integer> integers = asList(1, 2);
 		
-		Object[][] rows = new Object[][]{new Object[]{strings, integers}};
-		
 		String[] columns = {"strings", "integers"};
 		
 		DataType<?>[] types = { new ArrayType(StringType.INSTANCE), 
 								new ArrayType(IntegerType.INSTANCE) };
+		
+		Object[][] rows = new Object[][]{new Object[]{strings, integers}};
+		
+		CrateArray stringsArray = new CrateArray();
+		stringsArray.addAll(strings);
+		
+		CrateArray integersArray = new CrateArray();
+		integersArray.addAll(integers);
+		
+		Map<String, Object> expected = new HashMap<String, Object>();
+		expected.put("strings", stringsArray);
+		expected.put("integers", integersArray);
 		
 		converter = new CrateDocumentConverter(columns, types, rows);
 		
 		CrateDocument document = converter.toDocument();
 		
 		assertThat(document, is(notNullValue()));
-		assertThat(document.size(), is(2));
-		assertThat(document, hasEntry("strings", (Object)strings));
-		assertThat(document, hasEntry("integers", (Object)integers));
+		assertThat(document.equals(expected), is(true));
+	}
+	
+	@Test
+	public void shouldMapArrayTypes() {
+		
+		String[] strings = {"C", "R", "A", "T", "E"};
+		
+		String[] columns = {"strings"};
+		
+		DataType<?>[] types = { new ArrayType(StringType.INSTANCE) };
+		
+		Object[][] rows = new Object[][]{new Object[]{strings}};
+		
+		CrateArray stringsArray = new CrateArray();
+		stringsArray.addAll(asList(strings));
+		Map<String, Object> expected = new HashMap<String, Object>();
+		expected.put("strings", stringsArray);
+		
+		converter = new CrateDocumentConverter(columns, types, rows);
+		
+		CrateDocument document = converter.toDocument();
+		
+		assertThat(document, is(notNullValue()));
+		assertThat(document.equals(expected), is(true));
 	}
 	
 	@Test
@@ -124,22 +156,21 @@ public class CrateDocumentConverterTest {
 		nested.put("string", "STRING_FIELD");
 		nested.put("integer", 1);
 		
-		Map<String, Object> root = new HashMap<String, Object>();
-		root.put("nested", nested);
+		Map<String, Object> expected = new HashMap<String, Object>();
+		expected.put("nested", nested);
 		
 		String[] columns = {"nested"};
 		
 		DataType<?>[] types = { ObjectType.INSTANCE };
 		
-		Object[][] rows = new Object[][]{new Object[]{root}};
+		Object[][] rows = new Object[][]{new Object[]{nested}};
 		
 		converter = new CrateDocumentConverter(columns, types, rows);
 		
 		CrateDocument document = converter.toDocument();
 		
 		assertThat(document, is(notNullValue()));
-		assertThat(document.size(), is(1));
-		assertThat(document.equals(root), is(true));
+		assertThat(document.equals(expected), is(true));
 	}
 	
 	@Test
@@ -155,22 +186,22 @@ public class CrateDocumentConverterTest {
 		
 		List<Map<String, Object>> objects = asList(object_1, object_2);
 		
-		Map<String, Object> root = new HashMap<String, Object>();
-		root.put("objects", objects);
+		CrateArray array = new CrateArray();
+		array.addAll(objects);
+		Map<String, Object> expected = new HashMap<String, Object>();
+		expected.put("objects", array);
 		
 		String[] columns = {"objects"};
 		
-		DataType<?>[] types = { ObjectType.INSTANCE };
+		DataType<?>[] types = { new ArrayType(ObjectType.INSTANCE) };
 		
-		Object[][] rows = new Object[][]{new Object[]{root}};
+		Object[][] rows = new Object[][]{new Object[]{objects}};
 		
 		converter = new CrateDocumentConverter(columns, types, rows);
 		
 		CrateDocument document = converter.toDocument();
 		
 		assertThat(document, is(notNullValue()));
-		assertThat(document.size(), is(1));
-		assertThat(document, hasKey("objects"));
 		assertThat(document.get("objects"), is(instanceOf(CrateArray.class)));
 		assertThat(((CrateArray)document.get("objects")).size(), is(2));
 		assertThat(((CrateArray)document.get("objects")), hasItems((Object)object_1, (Object)object_2));
@@ -198,16 +229,16 @@ public class CrateDocumentConverterTest {
 		addressDocument.put("city", "aCity");
 		addressDocument.put("street", "aStreet");
 		
-		Map<String, Object> root = new HashMap<String, Object>();
-		root.put("name", "aName");
-		root.put("address", addressDocument);
-		root.put("emails", emailsArray);
+		Map<String, Object> expected = new HashMap<String, Object>();
+		expected.put("name", "aName");
+		expected.put("address", addressDocument);
+		expected.put("emails", emailsArray);
 		
 		String[] columns = {"name", "address", "emails"};
 		
-		DataType<?>[] types = { ObjectType.INSTANCE };
+		DataType<?>[] types = { StringType.INSTANCE, ObjectType.INSTANCE, new ArrayType(ObjectType.INSTANCE) };
 		
-		Object[][] rows = new Object[][]{new Object[]{root}};
+		Object[][] rows = new Object[][]{new Object[]{"aName", addressDocument, emailsArray}};
 		
 		converter = new CrateDocumentConverter(columns, types, rows);
 		
@@ -215,6 +246,6 @@ public class CrateDocumentConverterTest {
 		
 		assertThat(document, is(notNullValue()));
 		assertThat(document.size(), is(3));
-		assertThat(document.equals(root), is(true));
+		assertThat(document.equals(expected), is(true));
 	}
 }

@@ -15,6 +15,7 @@
  */
 package org.springframework.data.crate.core.convert;
 
+import static java.util.Arrays.asList;
 import static org.apache.commons.lang.ArrayUtils.getLength;
 import static org.apache.commons.lang.ArrayUtils.isNotEmpty;
 import static org.apache.commons.lang.builder.ToStringBuilder.reflectionToString;
@@ -70,7 +71,9 @@ public class CrateDocumentConverter {
 		
 		for(Row row : rows) {
 			if(row.isObject()) {
-				toCrateDocument(root, row.getPayload());
+				CrateDocument document = new CrateDocument();
+				toCrateDocument(document, row.getPayload());
+				root.put(row.getColumn(), document);
 				logger.debug("pushed '{}' as CrateDocument to root CrateDocument", row.getColumn());
 			}else if(row.isArray()) {
 				CrateArray array = new CrateArray();
@@ -119,7 +122,7 @@ public class CrateDocumentConverter {
 	}
 
 	/**
-	 * Nesting ARRAY or Collection types is not supported by crate. It is safe to assume that the payload
+	 * Nesting Array or Collection types is not supported by crate. It is safe to assume that the payload
 	 * will contain either a Map or a primitive type. Map types will be converted to {@link CrateDocument}
 	 * while simple types will be added without any conversion
 	 * @param array {@link CrateArray} for adding either Map or Simple types
@@ -128,7 +131,7 @@ public class CrateDocumentConverter {
 	@SuppressWarnings("unchecked")
 	private void toCrateArray(CrateArray array, Object payload) {
 		
-		Collection<Object> objects = (Collection<Object>)payload; 
+		Collection<Object> objects = (Collection<Object>)(payload.getClass().isArray() ? asList((Object[])payload) : payload);
 		
 		for(Object object : objects) {
 			
