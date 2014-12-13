@@ -15,12 +15,14 @@
  */
 package org.springframework.data.crate.core.convert;
 
-import static org.springframework.data.crate.core.convert.CrateTypeMapper.DEFAULT_TYPE_KEY;
 import static java.util.Arrays.asList;
 import static java.util.Collections.emptyList;
 import static java.util.Collections.singletonList;
 import static java.util.Collections.singletonMap;
 import static java.util.Locale.CANADA;
+import static org.apache.commons.lang.builder.EqualsBuilder.reflectionEquals;
+import static org.apache.commons.lang.builder.HashCodeBuilder.reflectionHashCode;
+import static org.apache.commons.lang.builder.ToStringBuilder.reflectionToString;
 import static org.hamcrest.Matchers.hasEntry;
 import static org.hamcrest.Matchers.hasItems;
 import static org.hamcrest.Matchers.hasKey;
@@ -29,6 +31,7 @@ import static org.hamcrest.Matchers.is;
 import static org.hamcrest.Matchers.notNullValue;
 import static org.hamcrest.Matchers.nullValue;
 import static org.junit.Assert.assertThat;
+import static org.springframework.data.crate.core.convert.CrateTypeMapper.DEFAULT_TYPE_KEY;
 
 import java.util.Collection;
 import java.util.Date;
@@ -505,6 +508,53 @@ public class MappingCrateConverterTest {
 		assertThat(entity, is(notNullValue()));
 		assertThat(entity.strings, is(notNullValue()));
 		assertThat(entity.strings, is(array.toArray()));
+	}
+	
+	@Test
+	public void shouldWriteArrayOfObjects() {
+		
+		CrateDocument lang1 = new CrateDocument("name", "A"); 
+		CrateDocument lang2 = new CrateDocument("name", "B");
+		
+		CrateArray languagesArray = new CrateArray();
+		languagesArray.addAll(asList(lang1, lang2));
+		
+		CrateDocument root = new CrateDocument();
+		root.put(DEFAULT_TYPE_KEY, ObjectArray.class.getName());
+		root.put("languages", languagesArray);
+		
+		Language[] array = {new Language("A"), new Language("B")};
+		
+		ObjectArray entity = converter.read(ObjectArray.class, root);
+		
+		assertThat(entity, is(notNullValue()));
+		assertThat(entity.languages, is(array));
+	}
+	
+	@Test
+	public void shouldReadArrayOfObjects() {
+		
+		Language[] array = {new Language("A"), new Language("B")};
+		
+		ObjectArray entity = new ObjectArray();
+		entity.languages = array;
+		
+		CrateDocument lang1 = new CrateDocument("name", "A"); 
+		CrateDocument lang2 = new CrateDocument("name", "B");
+		
+		CrateArray languagesArray = new CrateArray();
+		languagesArray.addAll(asList(lang1, lang2));
+		
+		Map<String, Object> expected = new HashMap<String, Object>();
+		expected.put(DEFAULT_TYPE_KEY, ObjectArray.class.getName());
+		expected.put("languages", languagesArray);
+		
+		CrateDocument document = new CrateDocument();
+		
+		converter.write(entity, document);
+		
+		assertThat(document, hasEntry(DEFAULT_TYPE_KEY, (Object)ObjectArray.class.getName()));
+		assertThat(document.equals(expected), is(true));
 	}
 	
 	@Test
@@ -1136,6 +1186,10 @@ public class MappingCrateConverterTest {
 		String[] strings;
 	}
 	
+	static class ObjectArray {
+		Language[] languages;
+	}
+	
 	static class CollectionOfMaps {
 		Collection<Map<String, Integer>> maps;
 	}
@@ -1165,6 +1219,30 @@ public class MappingCrateConverterTest {
 		
 		public Language(String name) {
 			this.name = name;
+		}
+		
+		@Override
+		public boolean equals(Object obj) {
+			
+			if (!(obj instanceof Language)) {
+	            return false;
+	        }
+			
+	        if (this == obj) {
+	            return true;
+	        }
+	        
+			return reflectionEquals(this, obj);
+		}
+		
+		@Override
+		public int hashCode() {
+			return reflectionHashCode(7, 11, this);
+		}
+		
+		@Override
+		public String toString() {
+			return reflectionToString(this);
 		}
 	}
 	

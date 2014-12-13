@@ -109,13 +109,13 @@ public class MappingCrateConverter extends AbstractCrateConverter implements App
 	@Override
 	public void write(Object source, CrateDocument sink) {
 
-		if (source == null) {
+		if(source == null) {
 			return;
 		}
 
 		TypeInformation<?> type = from(source.getClass());
 
-		if (!conversions.hasCustomWriteTarget(source.getClass(), sink.getClass())) {
+		if(!conversions.hasCustomWriteTarget(source.getClass(), sink.getClass())) {
 			typeMapper.writeType(type, sink);
 		}
 
@@ -126,26 +126,26 @@ public class MappingCrateConverter extends AbstractCrateConverter implements App
 	@Override
 	public Object convertToCrateType(Object obj, TypeInformation<?> typeInformation) {
 		
-		if (obj == null) {
+		if(obj == null) {
 			return null;
 		}
 		
-		if (conversions.isSimpleType(obj.getClass())) {
+		if(conversions.isSimpleType(obj.getClass())) {
 			return getPotentiallyConvertedSimpleWrite(obj);
 		}
 		
 		Class<?> target = conversions.getCustomWriteTarget(obj.getClass());
-		if (target != null) {
+		if(target != null) {
 			return conversionService.convert(obj, target);
 		}
 		
 		TypeInformation<?> typeHint = typeInformation == null ? OBJECT : typeInformation;
 		
-		if (obj instanceof CrateArray) {
+		if(obj instanceof CrateArray) {
 			return maybeConvertList((CrateArray) obj, typeHint);
 		}
 		
-		if (obj instanceof CrateDocument) {
+		if(obj instanceof CrateDocument) {
 			
 			CrateDocument document = new CrateDocument();
 			for (String key : ((CrateDocument) obj).keySet()) {
@@ -155,27 +155,27 @@ public class MappingCrateConverter extends AbstractCrateConverter implements App
 			return document;
 		}
 		
-		if (obj instanceof Map) {
+		if(obj instanceof Map) {
 			
 			CrateDocument document = new CrateDocument();
-			for (Map.Entry<Object, Object> entry : ((Map<Object, Object>) obj).entrySet()) {
+			for(Map.Entry<Object, Object> entry : ((Map<Object, Object>) obj).entrySet()) {
 				document.put(entry.getKey().toString(), convertToCrateType(entry.getValue(), typeHint));
 			}
 			return document;
 		}
 		
-		if (obj.getClass().isArray()) {
+		if(obj.getClass().isArray()) {
 			return maybeConvertList(asList((Object[]) obj), typeHint);
 		}
 
-		if (obj instanceof Collection) {
+		if(obj instanceof Collection) {
 			return maybeConvertList((Collection<?>) obj, typeHint);
 		}
 		
 		CrateDocument document = new CrateDocument();
 		this.write(obj, document);
 		
-		if (typeInformation == null) {
+		if(typeInformation == null) {
 			return removeTypeInfoRecursively(document);
 		}
 		
@@ -194,24 +194,24 @@ public class MappingCrateConverter extends AbstractCrateConverter implements App
 	@SuppressWarnings("unchecked")
 	protected <R> R read(final TypeInformation<R> type, final CrateDocument source, final Object parent) {
 		
-	    if (source == null) {
+	    if(source == null) {
 	    	return null;
 	    }
 
 	    TypeInformation<? extends R> typeToUse = typeMapper.readType(source, type);
 	    Class<? extends R> rawType = typeToUse.getType();
 
-	    if (conversions.hasCustomReadTarget(source.getClass(), rawType)) {
+	    if(conversions.hasCustomReadTarget(source.getClass(), rawType)) {
 	      return conversionService.convert(source, rawType);
 	    }
 
-	    if (typeToUse.isMap()) {
+	    if(typeToUse.isMap()) {
 	      return (R) readMap(typeToUse, source, parent);
 	    }
 
 	    CratePersistentEntity<R> entity = (CratePersistentEntity<R>) mappingContext.getPersistentEntity(typeToUse);
 	    
-	    if (entity == null) {
+	    if(entity == null) {
 	      throw new MappingException("No mapping metadata found for " + rawType.getName());
 	    }
 	    
@@ -247,11 +247,11 @@ public class MappingCrateConverter extends AbstractCrateConverter implements App
 	    
 	    for(CratePersistentProperty property : entity.getPersistentProperties()) {
 	    	// skip id property as it may have potentially be set above.  
-			if (idProperty != null && idProperty.equals(property)) {
+			if(idProperty != null && idProperty.equals(property)) {
 				continue;
 			}
 
-			if (!source.containsKey(property.getFieldName()) || entity.isConstructorArgument(property)) {
+			if(!source.containsKey(property.getFieldName()) || entity.isConstructorArgument(property)) {
 				continue;
 			}
 
@@ -293,16 +293,16 @@ public class MappingCrateConverter extends AbstractCrateConverter implements App
 
 	        TypeInformation<?> keyTypeInformation = type.getComponentType();
 	        
-		    if (keyTypeInformation != null) {
+		    if(keyTypeInformation != null) {
 		    	Class<?> keyType = keyTypeInformation.getType();
 		        key = conversionService.convert(key, keyType);
 		    }
 	
 		    TypeInformation<?> valueType = type.getMapValueType();
 		    
-		    if (value instanceof CrateDocument) {
+		    if(value instanceof CrateDocument) {
 		    	map.put(key, read(valueType, (CrateDocument) value, parent));
-		    }else if (value instanceof CrateArray) {
+		    }else if(value instanceof CrateArray) {
 		    	map.put(key, readCollection(valueType, (CrateArray) value, parent));
 		    }else {
 		    	Class<?> valueClass = valueType == null ? null : valueType.getType();
@@ -323,23 +323,23 @@ public class MappingCrateConverter extends AbstractCrateConverter implements App
 	@SuppressWarnings("unchecked")
 	protected void writeInternal(final Object source, CrateDocument sink, final TypeInformation<?> typeHint) {
 		
-		if (source == null) {
+		if(source == null) {
 			return;
 		}
 
-		if (Collection.class.isAssignableFrom(source.getClass())) {
+		if(Collection.class.isAssignableFrom(source.getClass())) {
 			throw new IllegalArgumentException("Root Document must be either CrateDocument or Map.");
 		}
 		
 		Class<?> customTarget = getCustomWriteHandler(source.getClass(), CrateDocument.class);
 
-		if (customTarget != null) {
+		if(customTarget != null) {
 			CrateDocument result = conversionService.convert(source, CrateDocument.class);
 			sink.putAll(result);
 			return;
 		}
 
-		if (Map.class.isAssignableFrom(source.getClass())) {
+		if(Map.class.isAssignableFrom(source.getClass())) {
 			writeMapInternal((Map<Object, Object>) source, sink, MAP);
 			return;
 		}
@@ -360,11 +360,11 @@ public class MappingCrateConverter extends AbstractCrateConverter implements App
 	   */
 	  protected void writeInternal(final Object source, final CrateDocument sink, final CratePersistentEntity<?> entity) {
 		  
-	    if (source == null) {
+	    if(source == null) {
 	      return;
 	    }
 
-	    if (entity == null) {
+	    if(entity == null) {
 	      throw new MappingException("No mapping metadata found for entity ".concat(source.getClass().getName()));
 	    }
 	    
@@ -372,7 +372,7 @@ public class MappingCrateConverter extends AbstractCrateConverter implements App
 	    final CratePersistentProperty idProperty = entity.getIdProperty();
 	    final CratePersistentProperty versionProperty = entity.getVersionProperty();
 	    
-	    if (idProperty != null && !sink.containsKey(idProperty.getFieldName())) {
+	    if(idProperty != null && !sink.containsKey(idProperty.getFieldName())) {
 	    	try {
 	    		Object id = convertToCrateType(wrapper.getProperty(idProperty, Object.class),
 	    									   idProperty.getTypeInformation());
@@ -385,13 +385,13 @@ public class MappingCrateConverter extends AbstractCrateConverter implements App
 	    
 	    for(CratePersistentProperty property : entity.getPersistentProperties()) {
 	    	
-	    	if (property.equals(idProperty) || (versionProperty != null && property.equals(versionProperty))) {
+	    	if(property.equals(idProperty) || (versionProperty != null && property.equals(versionProperty))) {
 		          continue;
 	    	}
 	    	
 	    	Object propertyObj = wrapper.getProperty(property, property.getType());
 	    	
-	        if (propertyObj != null) {
+	        if(propertyObj != null) {
 	        	if(!conversions.isSimpleType(propertyObj.getClass()) || isPrimitiveArray(property)) {
 	        		writePropertyInternal(propertyObj, sink, property);
 	        	}else {
@@ -423,7 +423,7 @@ public class MappingCrateConverter extends AbstractCrateConverter implements App
 	  @SuppressWarnings("unchecked")
 	  private void writePropertyInternal(final Object source, final CrateDocument sink, final CratePersistentProperty property) {
 		  
-		  if (source == null) {
+		  if(source == null) {
 			  return;
 		  }
 		  
@@ -431,21 +431,21 @@ public class MappingCrateConverter extends AbstractCrateConverter implements App
 		  TypeInformation<?> valueType = from(source.getClass());
 		  TypeInformation<?> type = property.getTypeInformation();
 	
-		  if (valueType.isCollectionLike()) {
-			  CrateArray collectionDoc = writeCollection(asCollection(source), property);
-		      sink.put(name, collectionDoc);
+		  if(valueType.isCollectionLike()) {
+			  CrateArray array = writeCollection(asCollection(source), property);
+		      sink.put(name, array);
 		      return;
 		  }
 		  
-		  if (valueType.isMap()) {
-			  CrateDocument mapDoc = writeMap((Map<Object, Object>) source, property);
-			  sink.put(name, mapDoc);
+		  if(valueType.isMap()) {
+			  CrateDocument document = writeMap((Map<Object, Object>) source, property);
+			  sink.put(name, document);
 		      return;
 		  }
 		  
 		  Class<?> basicTargetType = conversions.getCustomWriteTarget(source.getClass(), null);
 		  
-		  if (basicTargetType != null) {
+		  if(basicTargetType != null) {
 			  sink.put(name, conversionService.convert(source, basicTargetType));
 		      return;
 		  }
@@ -470,12 +470,12 @@ public class MappingCrateConverter extends AbstractCrateConverter implements App
 	 */
 	private CrateDocument writeMapInternal(final Map<Object, Object> source, final CrateDocument sink, final TypeInformation<?> type) {
 
-		for (Map.Entry<Object, Object> entry : source.entrySet()) {
+		for(Map.Entry<Object, Object> entry : source.entrySet()) {
 			
 			Object key = entry.getKey();
 			Object val = entry.getValue();
 			
-			if (conversions.isSimpleType(key.getClass())) {
+			if(conversions.isSimpleType(key.getClass())) {
 				
 				String simpleKey = key.toString();
 				
@@ -509,13 +509,13 @@ public class MappingCrateConverter extends AbstractCrateConverter implements App
 		
 		TypeInformation<?> componentType = type == null ? null : type.getComponentType();
 
-	    for (Object element : source) {
+	    for(Object element : source) {
 	    	
 	    	validateCollectionLikeElement(element);
 	    	
 	    	Class<?> elementType = element == null ? null : element.getClass();
 	    	
-	    	if (elementType == null || conversions.isSimpleType(elementType)) {
+	    	if(elementType == null || conversions.isSimpleType(elementType)) {
 	    		target.add(element);
 	    	}else {
 	    		CrateDocument document = new CrateDocument();
@@ -541,7 +541,7 @@ public class MappingCrateConverter extends AbstractCrateConverter implements App
 
 	    Class<?> collectionType = targetType.getType();
 	    
-	    if (source.isEmpty()) {
+	    if(source.isEmpty()) {
 	      return getPotentiallyConvertedSimpleRead(new HashSet<Object>(), collectionType);
 	    }
 
@@ -555,7 +555,7 @@ public class MappingCrateConverter extends AbstractCrateConverter implements App
 	    Class<?> rawComponentType = componentType == null ? null : componentType.getType();
 
 	    for(Object object : source) {
-	    	if (object instanceof CrateDocument) {
+	    	if(object instanceof CrateDocument) {
 	    		items.add(read(componentType, (CrateDocument) object, parent));
 	    	}else {
 	    		items.add(getPotentiallyConvertedSimpleRead(object, rawComponentType));
@@ -586,7 +586,7 @@ public class MappingCrateConverter extends AbstractCrateConverter implements App
 	 * @return
 	 */
 	private static Collection<?> asCollection(final Object source) {
-		if (source instanceof Collection) {
+		if(source instanceof Collection) {
 			return (Collection<?>) source;
 		}
 		return source.getClass().isArray() ? arrayToList(source) : singleton(source);
@@ -606,7 +606,7 @@ public class MappingCrateConverter extends AbstractCrateConverter implements App
 		Class<?> valueType = getUserClass(value.getClass());
 
 		boolean notTheSameClass = !valueType.equals(reference);
-		if (notTheSameClass) {
+		if(notTheSameClass) {
 			typeMapper.writeType(valueType, document);
 		}
 	}
@@ -620,13 +620,13 @@ public class MappingCrateConverter extends AbstractCrateConverter implements App
 	 */
 	private Object getPotentiallyConvertedSimpleWrite(Object value) {
 		
-		if (value == null) {
+		if(value == null) {
 			return null;
 		}
 		
 		Class<?> customTarget = conversions.getCustomWriteTarget(value.getClass(), null);
 
-		if (customTarget != null) {
+		if(customTarget != null) {
 			return conversionService.convert(value, customTarget);
 		} else {
 			return Enum.class.isAssignableFrom(value.getClass()) ? ((Enum<?>) value).toString() : value;
@@ -647,11 +647,11 @@ public class MappingCrateConverter extends AbstractCrateConverter implements App
 		  
 		  Class<?> rawType = type.getType();
 		  
-		  if (conversions.hasCustomReadTarget(value.getClass(), rawType)) {
+		  if(conversions.hasCustomReadTarget(value.getClass(), rawType)) {
 			  return (R) conversionService.convert(value, rawType);			  
-		  }else if (value instanceof CrateDocument) {
+		  }else if(value instanceof CrateDocument) {
 			  return (R) read(type, (CrateDocument) value, parent);
-		  }else if (value instanceof CrateArray) {
+		  }else if(value instanceof CrateArray) {
 			  return (R) readCollection(type, (CrateArray) value, parent);
 		  } else {
 			  return (R) getPotentiallyConvertedSimpleRead(value, rawType);
@@ -669,15 +669,15 @@ public class MappingCrateConverter extends AbstractCrateConverter implements App
 	@SuppressWarnings({ "rawtypes", "unchecked" })
 	private Object getPotentiallyConvertedSimpleRead(Object value, Class<?> target) {
 
-		if (value == null || target == null) {
+		if(value == null || target == null) {
 			return value;
 		}
 
-		if (conversions.hasCustomReadTarget(value.getClass(), target)) {
+		if(conversions.hasCustomReadTarget(value.getClass(), target)) {
 			return conversionService.convert(value, target);
 		}
 
-		if (Enum.class.isAssignableFrom(target)) {
+		if(Enum.class.isAssignableFrom(target)) {
 			return Enum.valueOf((Class<Enum>) target, value.toString());
 		}
 
@@ -688,7 +688,7 @@ public class MappingCrateConverter extends AbstractCrateConverter implements App
 		
 		CrateArray array = new CrateArray();
 		
-		for (Object element : source) {
+		for(Object element : source) {
 			validateCollectionLikeElement(element);
 			array.add(convertToCrateType(element, typeInformation));
 		}
@@ -755,7 +755,7 @@ public class MappingCrateConverter extends AbstractCrateConverter implements App
 	 */
 	private Object removeTypeInfoRecursively(Object object) {
 		
-		if (!(object instanceof CrateDocument)) {
+		if(!(object instanceof CrateDocument)) {
 			return object;
 		}
 
@@ -763,7 +763,7 @@ public class MappingCrateConverter extends AbstractCrateConverter implements App
 		
 		String keyToRemove = null;
 		
-		for (String key : document.keySet()) {
+		for(String key : document.keySet()) {
 			
 			if (typeMapper.isTypeKey(key)) {
 				keyToRemove = key;
@@ -812,7 +812,7 @@ public class MappingCrateConverter extends AbstractCrateConverter implements App
 	
 	private void validateCollectionLikeElement(Object element) {
 		if(element != null && (element instanceof Collection || element.getClass().isArray())) {
-			throw new MappingException("Currently crate does not support nested arrays/collections of arrays/collections");
+			throw new MappingException("Nesting Array or Collection types is not supported by crate");
 		}
 	}
 	
@@ -858,7 +858,7 @@ public class MappingCrateConverter extends AbstractCrateConverter implements App
 	      
 	      Object value = expression != null ? evaluator.evaluate(expression) : source.get(property.getFieldName());
 	      
-	      if (value == null) {
+	      if(value == null) {
 	        return null;
 	      }
 	      
