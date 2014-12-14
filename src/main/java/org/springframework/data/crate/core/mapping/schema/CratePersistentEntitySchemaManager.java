@@ -20,7 +20,6 @@ import static java.lang.Boolean.TRUE;
 import static java.lang.String.format;
 import static org.slf4j.LoggerFactory.getLogger;
 import static org.springframework.data.crate.core.mapping.schema.SchemaExportOption.CREATE_DROP;
-import static org.springframework.data.crate.core.mapping.schema.SchemaExportOption.UPDATE;
 import static org.springframework.data.crate.core.mapping.schema.SchemaExportOption.values;
 import static org.springframework.util.Assert.notNull;
 import io.crate.action.sql.SQLRequest;
@@ -64,7 +63,8 @@ public class CratePersistentEntitySchemaManager implements InitializingBean, Dis
 	private SchemaExportOption exportOption;	
 	private CratePersistentEntityTableManager tableManager;
 	
-	private boolean ignoreFailures = false;
+	private boolean ignoreFailures;
+	private boolean enabled;
 	
 	/**
 	 * Creates a new {@link CratePersistentEntitySchemaManager} for the given {@link CrateOperations}
@@ -80,6 +80,8 @@ public class CratePersistentEntitySchemaManager implements InitializingBean, Dis
 		this.mappingContext = crateOperations.getConverter().getMappingContext();
 		this.tableManager = new CratePersistentEntityTableManager(mappingContext);
 		this.inspectedEntities = new ConcurrentHashMap<Class<?>, Boolean>();
+		this.ignoreFailures = false;
+		this.enabled = true;
 	}
 	
 	/**
@@ -90,10 +92,22 @@ public class CratePersistentEntitySchemaManager implements InitializingBean, Dis
 	public void setIgnoreFailures(boolean ignoreFailures) {
 		this.ignoreFailures = ignoreFailures;
 	}
-	
+
+	/**
+	* Flag to explicitly enable or disable exporting schema to crate db.
+	* @param enabled {@code true} if the schema should be exported
+	*/
+	public void setEnabled(boolean enabled) {
+		this.enabled = enabled;
+	}
+
 	@Override
 	public void afterPropertiesSet() throws Exception {
-		execute();
+		if(enabled) {
+			export();
+		}else {
+			logger.debug("skipping scehma export as the schema manager is disabled");
+		}
 	}
 	
 	@Override
@@ -106,7 +120,7 @@ public class CratePersistentEntitySchemaManager implements InitializingBean, Dis
 		}
 	}
 	
-	private void execute() {
+	private void export() {
 		
 		try {
 			switch (exportOption) {

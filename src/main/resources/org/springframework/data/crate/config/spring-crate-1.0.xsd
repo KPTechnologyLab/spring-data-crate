@@ -68,7 +68,7 @@
 			</xsd:appinfo>
 		</xsd:annotation>
 		<xsd:complexType>
-			<xsd:attribute name="id" type="xsd:string" use="optional" default="schemaExportManager">
+			<xsd:attribute name="id" type="xsd:string" use="optional" default="cratePersistentEntitySchemaManager">
 				<xsd:annotation>
 					<xsd:documentation>
 						<![CDATA[The name of the schema export manager definition (by default "schemaExportManager").]]>
@@ -99,6 +99,13 @@
 				<xsd:annotation>
 					<xsd:documentation>
 						Should failed SQL statements be ignored during schema export ? Defaults to 'false'
+					</xsd:documentation>
+				</xsd:annotation>
+			</xsd:attribute>
+			<xsd:attribute name="enabled" type="xsd:string" use="optional" default="true">
+				<xsd:annotation>
+					<xsd:documentation>
+						Should schema export manager export the schema ? Defaults to 'true'
 					</xsd:documentation>
 				</xsd:annotation>
 			</xsd:attribute>
