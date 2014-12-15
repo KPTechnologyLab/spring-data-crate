@@ -16,10 +16,14 @@
 
 package org.springframework.data.crate.client;
 
+import static org.springframework.util.Assert.hasText;
 import io.crate.client.CrateClient;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.DisposableBean;
 import org.springframework.beans.factory.FactoryBean;
 import org.springframework.beans.factory.InitializingBean;
-import org.springframework.util.Assert;
 
 /**
  * CrateDataSourceFactoryBean
@@ -27,8 +31,10 @@ import org.springframework.util.Assert;
  * @author Hasnain Javed
  * @author Rizwan Idrees
  */
-public class CrateClientFactoryBean implements FactoryBean<CrateClient>, InitializingBean {
+public class CrateClientFactoryBean implements FactoryBean<CrateClient>, InitializingBean, DisposableBean {
 
+	private final Logger logger = LoggerFactory.getLogger(getClass());
+	
     private CrateClient client;
 	private String servers ="localhost:4300";
 
@@ -49,10 +55,16 @@ public class CrateClientFactoryBean implements FactoryBean<CrateClient>, Initial
 
     @Override
 	public void afterPropertiesSet()  {
-        Assert.hasText(servers, "[Assertion failed] servers settings missing.");
+        hasText(servers, "[Assertion failed] servers settings missing.");
         client = new CrateClient(servers);
 	}
-
+    
+    @Override
+	public void destroy() throws Exception {
+    	logger.info("closing crate client");
+		client.close();
+	}
+    
     public void setServers(String servers) {
         this.servers = servers;
     }
