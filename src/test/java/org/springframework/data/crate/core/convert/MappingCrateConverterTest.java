@@ -51,9 +51,11 @@ import org.mockito.runners.MockitoJUnitRunner;
 import org.springframework.context.ApplicationContext;
 import org.springframework.data.annotation.Id;
 import org.springframework.data.annotation.PersistenceConstructor;
+import org.springframework.data.annotation.Version;
 import org.springframework.data.crate.core.mapping.CrateArray;
 import org.springframework.data.crate.core.mapping.CrateDocument;
 import org.springframework.data.crate.core.mapping.CrateMappingContext;
+import static org.springframework.data.crate.core.mapping.CratePersistentProperty.RESERVED_VESRION_FIELD_NAME;
 import org.springframework.data.mapping.model.MappingException;
 
 /**
@@ -188,6 +190,37 @@ public class MappingCrateConverterTest {
 		entity.map = map;
 		
 		converter.write(entity, new CrateDocument());
+	}
+	
+	@Test
+	public void shouldNotWriteVersionProperty() {
+		
+		VersionedEntity entity = new VersionedEntity();
+		entity.version = 1L;
+		
+		Map<String, Object> expected = new HashMap<String, Object>();
+	    expected.put(DEFAULT_TYPE_KEY, entity.getClass().getName());
+	    
+		CrateDocument document = new CrateDocument();
+		
+		converter.write(entity, document);
+		
+		for(Entry<String, Object> entry : expected.entrySet()) {
+			assertThat(document, hasEntry(entry.getKey(), entry.getValue()));
+		}
+	}
+	
+	@Test
+	public void shouldReadVersionProperty() {
+		
+		CrateDocument document = new CrateDocument();
+		document.put(DEFAULT_TYPE_KEY, VersionedEntity.class.getName());
+		document.put(RESERVED_VESRION_FIELD_NAME, 1L);
+		
+		VersionedEntity entity = converter.read(VersionedEntity.class, document);
+		
+		assertThat(entity, is(notNullValue()));
+		assertThat(entity.version, is(1L));
 	}
 	
 	@Test
@@ -1160,6 +1193,11 @@ public class MappingCrateConverterTest {
 	
 	static class MapWithComplexKey {
 		Map<NestedArrays, String> map;
+	}
+	
+	static class VersionedEntity {
+		@Version
+		Long version;
 	}
 	
 	static class SimpleTypesEntity {

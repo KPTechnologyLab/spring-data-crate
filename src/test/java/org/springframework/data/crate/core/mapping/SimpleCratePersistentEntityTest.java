@@ -27,8 +27,10 @@ import java.util.Set;
 
 import org.junit.Test;
 import org.springframework.data.annotation.Id;
+import org.springframework.data.annotation.Version;
 import org.springframework.data.crate.InvalidCrateApiUsageException;
 import org.springframework.data.crate.core.mapping.annotations.Table;
+import org.springframework.data.mapping.model.MappingException;
 import org.springframework.data.sample.entities.Book;
 import org.springframework.data.sample.entities.PropertiesContainer;
 import org.springframework.data.sample.entities.SampleEntity;
@@ -40,14 +42,34 @@ import org.springframework.data.sample.entities.SampleEntity;
  */
 public class SimpleCratePersistentEntityTest {
 	
-	@Test(expected=InvalidCrateApiUsageException.class)
+	@Test(expected=MappingException.class)
 	public void shouldNotCreatePersistentEntity() {
 		prepareMappingContext(EntityWithInvalidColumnName.class);
 	}
 	
-	@Test(expected=InvalidCrateApiUsageException.class)
+	@Test(expected=MappingException.class)
 	public void shouldNotCreatePersistentEntityWithReservedIdName() {
 		prepareMappingContext(EntityWithReservedIdName.class);
+	}
+	
+	@Test(expected=MappingException.class)
+	public void shouldNotCreatePersistentEntityWithReservedVersionName() {
+		prepareMappingContext(EntityWithReservedVersionName.class);
+	}
+	
+	@Test(expected=MappingException.class)
+	public void shouldNotCreatePersistentEntityWithWrongVersionType() {
+		prepareMappingContext(EntityWithWrongVersionType.class);
+	}
+	
+	@Test
+	public void shouldNotCreatePersistentEntityWithPrimitveVersionType() {
+		prepareMappingContext(EntityWithPrimitveVersionType.class);
+	}
+	
+	@Test
+	public void shouldNotCreatePersistentEntityWithPrimitveWrapperVersionType() {
+		prepareMappingContext(EntityWithPrimitveWrapperVersionType.class);
 	}
 	
 	@Test
@@ -186,5 +208,29 @@ public class SimpleCratePersistentEntityTest {
 	static class EntityWithReservedIdName {
 		@Id		
 		long _id;
+	}
+	
+	@Table
+	static class EntityWithReservedVersionName {
+		@Version		
+		long _version;
+	}
+	
+	@Table
+	static class EntityWithWrongVersionType {
+		@Version		
+		String version;
+	}
+	
+	@Table
+	static class EntityWithPrimitveVersionType {
+		@Version		
+		long version;
+	}
+	
+	@Table
+	static class EntityWithPrimitveWrapperVersionType {
+		@Version		
+		Long version;
 	}
 }

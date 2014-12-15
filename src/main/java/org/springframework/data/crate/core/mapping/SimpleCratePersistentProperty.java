@@ -25,7 +25,6 @@ import java.lang.reflect.Field;
 import java.util.HashSet;
 import java.util.Set;
 
-import org.springframework.data.crate.InvalidCrateApiUsageException;
 import org.springframework.data.mapping.Association;
 import org.springframework.data.mapping.PersistentEntity;
 import org.springframework.data.mapping.model.AnnotationBasedPersistentProperty;
@@ -46,6 +45,7 @@ public class SimpleCratePersistentProperty extends AnnotationBasedPersistentProp
 	private final FieldNamingStrategy fieldNamingStrategy;
 	
 	private final static String RESERVED_ID = "'_id' is reserved in crate db and cannot be used as user-defined column name for '%s' in class '%s'";
+	private final static String RESERVED_VERSION = "'_version' is reserved in crate db and cannot be used as user-defined column name for '%s' in class '%s'";
 	private final static String STARTS_WITH_UNDERSCORE = "Column identity '%s' must not start with '_' in class '%s'";
 	
 	static {
@@ -61,11 +61,15 @@ public class SimpleCratePersistentProperty extends AnnotationBasedPersistentProp
 		String fieldName = getFieldName();
 		
 		if(RESERVED_ID_FIELD_NAME.equals(fieldName)) {				
-			throw new InvalidCrateApiUsageException(format(RESERVED_ID, fieldName, owner.getType()));
+			throw new MappingException(format(RESERVED_ID, fieldName, owner.getType()));
+		}
+		
+		if(RESERVED_VESRION_FIELD_NAME.equals(fieldName)) {				
+			throw new MappingException(format(RESERVED_VERSION, fieldName, owner.getType()));
 		}
 		
 		if(startsWithIgnoreCase(fieldName, "_")) {
-			throw new InvalidCrateApiUsageException(format(STARTS_WITH_UNDERSCORE, fieldName, owner.getType()));
+			throw new MappingException(format(STARTS_WITH_UNDERSCORE, fieldName, owner.getType()));
 		}
 	}
 	

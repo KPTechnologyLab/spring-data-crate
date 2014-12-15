@@ -20,7 +20,6 @@ import static org.hamcrest.Matchers.is;
 import static org.hamcrest.Matchers.notNullValue;
 import static org.junit.Assert.assertThat;
 import static org.junit.Assert.assertTrue;
-import static org.junit.Assert.assertFalse;
 import static org.springframework.data.sample.entities.integration.EntityWithComplexId.entityWithComplexId;
 import static org.springframework.data.sample.entities.integration.ObjectCollectionTypes.objectCollectionTypes;
 import static org.springframework.data.sample.entities.integration.ObjectMapTypes.objectMapTypes;
@@ -59,19 +58,24 @@ public class CrateTemplateIntegrationTest {
     private CrateTemplate crateTemplate;
     
     @Test
-    public void shouldSaveWithoutId() {
+    public void shouldSaveWithoutIdAndInitialVersion() {
     	
     	SimpleEntity entity = simpleEntity();
     	crateTemplate.save(entity);
+    	assertThat(entity.version, is(notNullValue()));
+    	assertThat(entity.version, is(1L));
     }
     
     @Test
-    public void shouldSaveAndFindBySimpleId() {
+    public void shouldSaveWithInitialVersionAndFindBySimpleId() {
     	
     	SimpleEntityWithId entity = simpleEntityWithId();
     	crateTemplate.save(entity);
+    	assertThat(entity.version, is(1L));
     	SimpleEntityWithId dbEntity = crateTemplate.findById(entity.id, SimpleEntityWithId.class);
     	assertThat(dbEntity, is(notNullValue()));
+    	assertThat(dbEntity.version, is(notNullValue()));
+    	assertThat(dbEntity.version, is(1L));
     	assertThat(dbEntity, is(entity));
     }
     

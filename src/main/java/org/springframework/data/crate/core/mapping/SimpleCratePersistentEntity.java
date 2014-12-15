@@ -15,9 +15,12 @@
  */
 package org.springframework.data.crate.core.mapping;
 
+import static java.lang.String.format;
+import static java.util.Arrays.asList;
 import static org.springframework.util.StringUtils.hasText;
 import static org.springframework.util.StringUtils.replace;
 
+import java.util.HashSet;
 import java.util.LinkedHashSet;
 import java.util.Set;
 
@@ -29,6 +32,7 @@ import org.springframework.context.expression.BeanFactoryResolver;
 import org.springframework.data.crate.core.mapping.annotations.Table;
 import org.springframework.data.mapping.PropertyHandler;
 import org.springframework.data.mapping.model.BasicPersistentEntity;
+import org.springframework.data.mapping.model.MappingException;
 import org.springframework.data.util.TypeInformation;
 import org.springframework.expression.spel.support.StandardEvaluationContext;
 
@@ -43,6 +47,7 @@ import org.springframework.expression.spel.support.StandardEvaluationContext;
 public class SimpleCratePersistentEntity<T> extends BasicPersistentEntity<T, CratePersistentProperty>
 		implements CratePersistentEntity<T>, ApplicationContextAware {
 
+	private final static String VERSION_TYPE = "Version property '%s' must be of type java.lang.Long";
 	
 	private final StandardEvaluationContext context;
 	
@@ -60,21 +65,35 @@ public class SimpleCratePersistentEntity<T> extends BasicPersistentEntity<T, Cra
 		context.setBeanResolver(new BeanFactoryResolver(applicationContext));
 		context.setRootObject(applicationContext);
 	}
-
+	
+	@Override
+	public void addPersistentProperty(CratePersistentProperty property) {
+		
+		super.addPersistentProperty(property);
+		
+		if(property.isVersionProperty() && !isLongType(property.getType())) {
+			throw new MappingException(format(VERSION_TYPE, property.getFieldName()));
+		}
+	}
+	
 	@Override
 	public String getTableName() {
 		return tableName;
 	}
-	
+
 	@Override
-	public Set<String> getPropertyNames() {
+	public Set<String> getPropertyNames(String... exclude) {
 		
 		Set<CratePersistentProperty> properties = getPersistentProperties();
+		
+		Set<String> excluded = new HashSet<String>(asList(exclude));
 		
 		Set<String> propertyNames = new LinkedHashSet<String>(properties.size());
 		
 		for(CratePersistentProperty property : properties) {
-			propertyNames.add(property.getFieldName());
+			if(!excluded.contains(property.getFieldName())) {
+				propertyNames.add(property.getFieldName());
+			}
 		}
 		
 		return propertyNames;
@@ -220,4 +239,8 @@ public class SimpleCratePersistentEntity<T> extends BasicPersistentEntity<T, Cra
 		
 		return tableName;
  	}
+	
+	private boolean isLongType(Class<?> clazz) {
+		return Long.class.equals(clazz) || Long.TYPE.equals(clazz);
+	}
 }

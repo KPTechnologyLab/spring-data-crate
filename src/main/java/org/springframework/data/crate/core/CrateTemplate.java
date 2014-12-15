@@ -20,7 +20,9 @@ import static java.lang.String.format;
 import static java.util.Arrays.asList;
 import static java.util.Collections.unmodifiableCollection;
 import static org.slf4j.LoggerFactory.getLogger;
+import static org.springframework.data.crate.core.mapping.CratePersistentProperty.INITIAL_VERSION_VALUE;
 import static org.springframework.data.crate.core.mapping.CratePersistentProperty.RESERVED_ID_FIELD_NAME;
+import static org.springframework.data.crate.core.mapping.CratePersistentProperty.RESERVED_VESRION_FIELD_NAME;
 import static org.springframework.data.mapping.model.BeanWrapper.create;
 import static org.springframework.util.Assert.hasText;
 import static org.springframework.util.Assert.notEmpty;
@@ -69,6 +71,7 @@ public class CrateTemplate implements CrateOperations {
     
     private static final Collection<String> ITERABLE_CLASSES;
     
+    private static final String SQL_STATEMENT = "executing statement '{}' with args '{}'";
     private static final String NO_ID_WARNING = "Persitent Entity '{}' has no id property defined. Saving the same instance will result in a duplicate row";
     
     static {
@@ -112,13 +115,10 @@ public class CrateTemplate implements CrateOperations {
     	
     	try {
     		SQLRequest request = action.getSQLRequest();
-    		logger.debug("executing query '{}' with args '{}'", request.stmt(), Arrays.toString(request.args()));
+    		logger.debug(SQL_STATEMENT, request.stmt(), Arrays.toString(request.args()));
     		return (T)handler.handle(client.sql(request).actionGet());
     	}catch(SQLActionException e) {
     		throw tryConvertingRuntimeException(e);
-		}catch (Exception e) {
-			logger.error(e.getMessage(), e);
-			throw new RuntimeException(e);
 		}
     }
     
@@ -137,7 +137,7 @@ public class CrateTemplate implements CrateOperations {
 		ensureNotCollectionType(objectToSave);
 		
 		boolean hasId = isIdPropertyDefined(objectToSave.getClass());
-		
+
 		if(!hasId) {
 			logger.warn(NO_ID_WARNING, objectToSave.getClass().getName());
 		}else {
@@ -148,7 +148,14 @@ public class CrateTemplate implements CrateOperations {
 		
 		crateConverter.write(objectToSave, document);
 		
+		CratePersistentProperty versionProperty = getPersistentEntityFor(objectToSave.getClass()).getVersionProperty();
+		
 		this.execute(new InsertAction(tableName, document));
+		
+		if(isVersionPropertyDefined(objectToSave.getClass())) {
+			BeanWrapper<Object> wrapper = create(objectToSave, crateConverter.getConversionService());
+			wrapper.setProperty(versionProperty, INITIAL_VERSION_VALUE);
+		}
 	}
 	
 	@Override
@@ -164,8 +171,8 @@ public class CrateTemplate implements CrateOperations {
 		
 		CratePersistentEntity<?> persistentEntity = getPersistentEntityFor(entityClass);
 		
-		String idColumn = null; 
-				
+		String idColumn = null;
+		
 		if(persistentEntity.hasIdProperty()) {
 			idColumn = persistentEntity.getIdProperty().getFieldName();
 		}else {
@@ -174,7 +181,12 @@ public class CrateTemplate implements CrateOperations {
 			logger.info("Using fallback crate system column '{}' as primary key column name", idColumn);
 		}
 		
-		return execute(new SelectByIdAction(tableName, idColumn, persistentEntity.getPropertyNames(), id),
+		boolean isVersioned = isVersionPropertyDefined(entityClass);
+		
+		Set<String> columns = isVersioned ? persistentEntity.getPropertyNames(persistentEntity.getVersionProperty().getFieldName()) :
+										    persistentEntity.getPropertyNames();
+		
+		return execute(new SelectByIdAction(tableName, idColumn, columns, id),
 					   new DefaultSQLResponseHandler<T>(entityClass));
 	}
 	
@@ -256,6 +268,10 @@ public class CrateTemplate implements CrateOperations {
 		return getPersistentEntityFor(clazz).hasIdProperty();
 	}
 	
+	private boolean isVersionPropertyDefined(Class<?> clazz) {
+		return getPersistentEntityFor(clazz).hasVersionProperty();
+	}
+	
 	private CratePersistentProperty getIdPropertyFor(Class<?> type) {
 		return getPersistentEntityFor(type).getIdProperty();
 	}
@@ -334,7 +350,8 @@ public class CrateTemplate implements CrateOperations {
 				Iterator<String> iterator = columns.iterator();
 				
 				while(iterator.hasNext()) {
-					cols.append(doubleQuote(iterator.next()));
+					String column = iterator.next();
+					cols.append(doubleQuote(column));
 					if(iterator.hasNext()) {
 						cols.append(", ");
 					}
@@ -342,7 +359,8 @@ public class CrateTemplate implements CrateOperations {
 				
 				String colNames = StringUtils.hasText(cols.toString()) ? cols.toString() : "*";
 				
-				statement = format("SELECT %s FROM %s WHERE %s = ?", colNames, tableName, doubleQuote(idColumn));
+				statement = format("SELECT %s, %s FROM %s WHERE %s = ?", colNames, doubleQuote(RESERVED_VESRION_FIELD_NAME), 
+																		 tableName, doubleQuote(idColumn));
 				
 				return statement;
 			}

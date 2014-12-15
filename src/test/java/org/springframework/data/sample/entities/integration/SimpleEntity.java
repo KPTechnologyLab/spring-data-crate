@@ -5,11 +5,14 @@ import java.util.Locale;
 
 import org.apache.commons.lang.builder.EqualsBuilder;
 import org.apache.commons.lang.builder.HashCodeBuilder;
+import org.springframework.data.annotation.Version;
 import org.springframework.data.crate.core.mapping.annotations.Table;
 
 @Table
 public class SimpleEntity {
 	
+	@Version
+	public Long version;
 	public String stringField;
 	public int integerField;
 	public Date dateField;

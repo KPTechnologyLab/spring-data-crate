@@ -47,6 +47,7 @@ import org.springframework.data.crate.core.mapping.CrateArray;
 import org.springframework.data.crate.core.mapping.CrateDocument;
 import org.springframework.data.crate.core.mapping.CratePersistentEntity;
 import org.springframework.data.crate.core.mapping.CratePersistentProperty;
+import static org.springframework.data.crate.core.mapping.CratePersistentProperty.RESERVED_VESRION_FIELD_NAME;
 import org.springframework.data.mapping.Association;
 import org.springframework.data.mapping.AssociationHandler;
 import org.springframework.data.mapping.PreferredConstructor.Parameter;
@@ -239,22 +240,28 @@ public class MappingCrateConverter extends AbstractCrateConverter implements App
 	    final BeanWrapper<R> wrapper = create(instance, conversionService);
 	    final R result = wrapper.getBean();
 	    final CratePersistentProperty idProperty = entity.getIdProperty();
+	    final CratePersistentProperty versionProperty = entity.getVersionProperty();
 	    
-	    if(idProperty != null) {
+	    if(entity.hasIdProperty()) {
 	    	Object idValue = getValueInternal(idProperty, source, result);
 	    	wrapper.setProperty(idProperty, idValue);
 	    }
 	    
+	    if(entity.hasVersionProperty()) {
+	    	Object versionValue = getValueInternal(versionProperty, source, result);
+	    	wrapper.setProperty(versionProperty, versionValue);
+	    }
+	    
 	    for(CratePersistentProperty property : entity.getPersistentProperties()) {
-	    	// skip id property as it may have potentially be set above.  
-			if(idProperty != null && idProperty.equals(property)) {
+	    	// skip id and version properties as they may have potentially been set above.  
+			if((idProperty != null && idProperty.equals(property)) || (versionProperty != null && versionProperty.equals(property))) {
 				continue;
 			}
-
+			
 			if(!source.containsKey(property.getFieldName()) || entity.isConstructorArgument(property)) {
 				continue;
 			}
-
+			
 			wrapper.setProperty(property, getValueInternal(property, source, result));
 	    }
 	    
@@ -856,7 +863,13 @@ public class MappingCrateConverter extends AbstractCrateConverter implements App
 	    	
 	      String expression = property.getSpelExpression();
 	      
-	      Object value = expression != null ? evaluator.evaluate(expression) : source.get(property.getFieldName());
+	      Object value = null; 
+	    		  
+	      if(expression != null) {
+	    	  value = evaluator.evaluate(expression);
+	      }else {
+	    	  value = property.isVersionProperty() ? source.get(RESERVED_VESRION_FIELD_NAME) : source.get(property.getFieldName());
+	      }
 	      
 	      if(value == null) {
 	        return null;
