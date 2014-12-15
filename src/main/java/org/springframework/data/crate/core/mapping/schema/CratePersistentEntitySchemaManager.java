@@ -172,8 +172,8 @@ public class CratePersistentEntitySchemaManager implements InitializingBean, Dis
 		try {
 			crateOperations.execute(new DropTableAction(entity.getTableName()));
 			logger.info("dropped table '{}' for '{}'", entity.getTableName(), entity.getType());
-		}catch(InvalidDataAccessResourceUsageException e) {
-			logger.warn(e.getMessage());
+		}catch(NoSuchTableException e) {
+			logger.warn("table '{}' does not exist for '{}'", entity.getTableName(), entity.getType());
 		}
 	}
 	
