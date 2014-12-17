@@ -576,7 +576,7 @@ public class MappingCrateConverter extends AbstractCrateConverter implements App
 	 * Writes the given simple value to the given {@link CrateDocument}. Will store enum names for enum values.
 	 * 
 	 * @param value
-	 * @param dbObject must not be {@literal null}.
+	 * @param CrateDocument must not be {@literal null}.
 	 * @param key must not be {@literal null}.
 	 */
 	private void writeSimpleInternal(final Object source, final CrateDocument sink, final String key) {
