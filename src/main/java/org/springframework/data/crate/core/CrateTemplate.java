@@ -19,7 +19,9 @@ package org.springframework.data.crate.core;
 import static java.lang.String.format;
 import static java.util.Arrays.asList;
 import static java.util.Collections.unmodifiableCollection;
+import static org.apache.commons.lang.ArrayUtils.add;
 import static org.slf4j.LoggerFactory.getLogger;
+import static org.springframework.data.crate.core.convert.CrateTypeMapper.DEFAULT_TYPE_KEY;
 import static org.springframework.data.crate.core.mapping.CratePersistentProperty.INITIAL_VERSION_VALUE;
 import static org.springframework.data.crate.core.mapping.CratePersistentProperty.RESERVED_ID_FIELD_NAME;
 import static org.springframework.data.crate.core.mapping.CratePersistentProperty.RESERVED_VESRION_FIELD_NAME;
@@ -71,6 +73,7 @@ public class CrateTemplate implements CrateOperations {
     
     private static final Collection<String> ITERABLE_CLASSES;
     
+    private static final String PRIMARY_KEY = "Primary Key must not be null";
     private static final String SQL_STATEMENT = "executing statement '{}' with args '{}'";
     private static final String NO_ID_WARNING = "Persitent Entity '{}' has no id property defined. Saving the same instance will result in a duplicate row";
     
@@ -123,38 +126,101 @@ public class CrateTemplate implements CrateOperations {
     }
     
     @Override
-	public void save(Object objectToSave) {
-    	notNull(objectToSave);
-    	save(objectToSave, getTableName(objectToSave.getClass()));
+	public void insert(Object entity) {
+    	notNull(entity);
+    	insert(entity, getTableName(entity.getClass()));
 	}
 
 	@Override
-	public void save(Object objectToSave, String tableName) {
+	public void insert(Object entity, String tableName) {
 		
-		notNull(objectToSave);
+		notNull(entity);
 		hasText(tableName);
 		
-		ensureNotCollectionType(objectToSave);
+		ensureNotCollectionType(entity);
 		
-		boolean hasId = isIdPropertyDefined(objectToSave.getClass());
+		boolean hasId = isIdPropertyDefined(entity.getClass());
 
 		if(!hasId) {
-			logger.warn(NO_ID_WARNING, objectToSave.getClass().getName());
+			logger.warn(NO_ID_WARNING, entity.getClass().getName());
 		}else {
-			validateIdValue(objectToSave);
+			validateIdValue(entity);
 		}
 		
 		CrateDocument document = new CrateDocument();
 		
-		crateConverter.write(objectToSave, document);
+		crateConverter.write(entity, document);
 		
-		CratePersistentProperty versionProperty = getPersistentEntityFor(objectToSave.getClass()).getVersionProperty();
+		CratePersistentProperty versionProperty = getPersistentEntityFor(entity.getClass()).getVersionProperty();
 		
 		this.execute(new InsertAction(tableName, document));
 		
-		if(isVersionPropertyDefined(objectToSave.getClass())) {
-			BeanWrapper<Object> wrapper = create(objectToSave, crateConverter.getConversionService());
+		if(isVersionPropertyDefined(entity.getClass())) {
+			BeanWrapper<Object> wrapper = create(entity, crateConverter.getConversionService());
 			wrapper.setProperty(versionProperty, INITIAL_VERSION_VALUE);
+		}
+	}
+	
+	@Override
+	public void update(Object entity) {
+		
+		notNull(entity);
+		update(entity, getTableName(entity.getClass()));
+	}
+	
+	@Override
+	public void update(Object entity, String tableName) {
+		
+		notNull(entity);
+		hasText(tableName);
+		
+		ensureNotCollectionType(entity);
+		
+		CratePersistentEntity<?> persistentEntity = getPersistentEntityFor(entity.getClass());
+		
+		String idColumn = null;
+		Object idValue = null;
+		
+		if(!persistentEntity.hasIdProperty()) {
+			throw new MappingException("Persistent Entity '{}' must define an id column");
+		}else {
+			idColumn = persistentEntity.getIdProperty().getFieldName();
+		}
+		
+		validateIdValue(entity);
+
+		idValue = getIdPropertyValue(entity);
+		
+		CrateDocument document = new CrateDocument();
+		
+		crateConverter.write(entity, document);
+		
+		document.remove(idColumn);
+		document.remove(DEFAULT_TYPE_KEY);
+		
+		if(persistentEntity.hasVersionProperty()) {
+			document.remove(persistentEntity.getVersionProperty().getFieldName());
+		}
+		
+		SQLResponse response = this.execute(new WholesaleUpdateByIdAction(tableName, idColumn, document, idValue));
+		
+		if(response.rowCount() < 0) {
+			logger.info("No row updated with id '{}'", idValue);
+		}else {
+			logger.info("Updated row with id '{}'", idValue);
+			if(persistentEntity.hasVersionProperty()) {
+				
+				Object updated = findById(idValue, entity.getClass());
+				
+				if(updated != null) {
+					Object updatedVersion = getVersionPropertyValue(updated);
+					
+					BeanWrapper<Object> wrapper = create(entity, crateConverter.getConversionService());
+					wrapper.setProperty(persistentEntity.getVersionProperty(), updatedVersion);
+				}else {
+					logger.info("No row found with id '{}'", idValue);
+				}
+			}
 		}
 	}
 	
@@ -186,24 +252,30 @@ public class CrateTemplate implements CrateOperations {
 		Set<String> columns = isVersioned ? persistentEntity.getPropertyNames(persistentEntity.getVersionProperty().getFieldName()) :
 										    persistentEntity.getPropertyNames();
 		
-		return execute(new SelectByIdAction(tableName, idColumn, columns, id),
-					   new DefaultSQLResponseHandler<T>(entityClass));
+		T dbEntity = execute(new SelectByIdAction(tableName, idColumn, columns, id),
+	   						 new DefaultSQLResponseHandler<T>(entityClass));
+		
+		if(dbEntity == null) {
+			logger.info("No row found with id '{}'", id);
+		}
+		
+		return dbEntity;
 	}
 	
 	@Override
-	public <T> boolean removeById(Object object, Class<T> entityClass) {
+	public <T> boolean remove(Object id, Class<T> entityClass) {
 		
 		notNull(entityClass);
-		return removeById(object, entityClass, getTableName(entityClass));
+		return remove(id, entityClass, getTableName(entityClass));
 	}
 
 	@Override
-	public <T> boolean removeById(Object object, Class<T> entityClass, String tableName) {
+	public <T> boolean remove(Object id, Class<T> entityClass, String tableName) {
 		
 		notNull(entityClass);
 		hasText(tableName);
 		
-		if(object == null) {
+		if(id == null) {
 			return false;
 		}
 		
@@ -213,14 +285,14 @@ public class CrateTemplate implements CrateOperations {
 			throw new MappingException("No id property found for object of type " + entityClass);
 		}
 		
-		SQLResponse response = execute(new DeleteByIdAction(tableName, idProperty.getFieldName(), object));
+		SQLResponse response = execute(new DeleteByIdAction(tableName, idProperty.getFieldName(), id));
 		
 		boolean removed = response.rowCount() == 1L;
 		
 		if(removed) {
-			logger.debug("Removed row from crate with id '{}'", object);
+			logger.info("Removed row with id '{}'", id);
 		}else {
-			logger.debug("No row removed from crate with id '{}'", object);
+			logger.info("No row removed with id '{}'", id);
 		}
 		
 		return removed;
@@ -241,7 +313,7 @@ public class CrateTemplate implements CrateOperations {
 	 * exception is returned if the conversion fails.
 	 * 
 	 * @param ex
-	 * @return
+	 * @return the translated exception or the thrown exception
 	 */
 	private RuntimeException tryConvertingRuntimeException(RuntimeException ex) {
 		RuntimeException resolved = exceptionTranslator.translateExceptionIfPossible(ex);
@@ -249,13 +321,13 @@ public class CrateTemplate implements CrateOperations {
 	}
 	
 	/**
-	 * * Make sure the given object is not a iterable.
-	   *
-	   * @param objectToSave the object to verify.
+	 * Make sure the given object is not a iterable.
+	 *
+	 * @param entity the object to verify.
 	 */
-	private void ensureNotCollectionType(Object objectToSave) {
+	private void ensureNotCollectionType(Object entity) {
 		
-		Class<?> clazz = objectToSave.getClass();
+		Class<?> clazz = entity.getClass();
 		
 		if(clazz.isArray() || ITERABLE_CLASSES.contains(clazz.getName()) ||
 		   Collection.class.isAssignableFrom(clazz) || Iterable.class.isAssignableFrom(clazz) || 
@@ -276,18 +348,56 @@ public class CrateTemplate implements CrateOperations {
 		return getPersistentEntityFor(type).getIdProperty();
 	}
 	
-	private void validateIdValue(Object objectToSave) {
+	private CratePersistentProperty getVersionPropertyFor(Class<?> type) {
+		return getPersistentEntityFor(type).getVersionProperty();
+	}
+	
+	private Object getIdPropertyValue(Object object) {
 		
-		CratePersistentProperty idProperty = getIdPropertyFor(objectToSave.getClass());
+		CratePersistentProperty idProperty = getIdPropertyFor(object.getClass());
+		
+		if(idProperty == null) {
+			return null;
+		}else {
+			return getPropertyValue(object, idProperty);
+		}
+	}
+
+	private Object getVersionPropertyValue(Object object) {
+		
+		CratePersistentProperty versionProperty = getVersionPropertyFor(object.getClass());
+		
+		if(versionProperty == null) {
+			return null;
+		}else {
+			return getPropertyValue(object, versionProperty);
+		}
+	}
+	
+	private Object getPropertyValue(Object source, CratePersistentProperty property) {
+		
+		notNull(source);
+		
+		if(property == null) {
+			return null;
+		}else {
+			BeanWrapper<Object> wrapper = create(source, crateConverter.getConversionService());
+			return wrapper.getProperty(property);
+		}
+	}
+	
+	private void validateIdValue(Object entity) {
+		
+		CratePersistentProperty idProperty = getIdPropertyFor(entity.getClass());
 		
 		if(idProperty != null) {
 			
-			BeanWrapper<Object> wrapper = create(objectToSave, crateConverter.getConversionService());
+			BeanWrapper<Object> wrapper = create(entity, crateConverter.getConversionService());
 			
 			Object idValue = wrapper.getProperty(idProperty);
 			
 			if(idValue == null) {
-				throw new MappingException("Primary Key can not be null");
+				throw new MappingException(PRIMARY_KEY);
 			}
 		}
 	}
@@ -320,12 +430,11 @@ public class CrateTemplate implements CrateOperations {
 			return select.createStatement();
 		}
 		
-		// TODO: create a generic select statement in sql package
+		// TODO: create a generic select statement in sql package when Criteria API is in place
 		private class Select extends AbstractStatement {
 			
 			private String idColumn;
 			private String tableName;
-			
 			private Set<String> columns;
 			
 			public Select(String idColumn, String tableName, Set<String> columns) {
@@ -361,6 +470,80 @@ public class CrateTemplate implements CrateOperations {
 				
 				statement = format("SELECT %s, %s FROM %s WHERE %s = ?", colNames, doubleQuote(RESERVED_VESRION_FIELD_NAME), 
 																		 tableName, doubleQuote(idColumn));
+				
+				return statement;
+			}
+		}
+	}
+	
+	/**
+	 * @author Hasnain Javed
+	 * @since 1.0.0 
+	 */
+	private class WholesaleUpdateByIdAction implements CrateSQLAction {
+		
+		private CrateSQLStatement update;
+		private CrateDocument document;
+		private Object idValue;
+
+		public WholesaleUpdateByIdAction(String tableName, String idColumn, CrateDocument document, Object idValue) {
+			notEmpty(document);
+			this.document = document;
+			this.idValue = crateConverter.convertToCrateType(idValue, null);
+			this.update = new Update(idColumn, tableName, document.keySet());
+		}
+		
+		@Override
+		public SQLRequest getSQLRequest() {
+			SQLRequest request = new SQLRequest(getSQLStatement(), add(document.values().toArray(), idValue));
+			request.includeTypesOnResponse(true);
+			return request;
+		}
+
+		@Override
+		public String getSQLStatement() {
+			return update.createStatement();
+		}
+		
+		// TODO: create a generic update statement in sql package when Criteria API is in place
+		private class Update extends AbstractStatement {
+
+			private String tableName;
+			private String idColumn;
+			private Set<String> columns;
+			
+			public Update(String idColumn, String tableName, Set<String> columns) {
+				
+				hasText(tableName);
+				hasText(idColumn);
+				notEmpty(columns);
+				
+				this.idColumn = idColumn;
+				this.tableName = tableName;
+				this.columns = columns;
+			}
+			
+			@Override
+			public String createStatement() {
+				
+				if(StringUtils.hasText(statement)) {
+					return statement;
+				}
+				
+				StringBuilder cols = new StringBuilder();
+				
+				Iterator<String> iterator = columns.iterator();
+				
+				while(iterator.hasNext()) {
+					String column = iterator.next();
+					cols.append(doubleQuote(column))
+						.append(" = ?");
+					if(iterator.hasNext()) {
+						cols.append(", ");
+					}
+				}
+				
+				statement = format("UPDATE %s set %s WHERE %s = ?", tableName, cols.toString(), doubleQuote(idColumn));
 				
 				return statement;
 			}
@@ -423,7 +606,7 @@ public class CrateTemplate implements CrateOperations {
 			return delete.createStatement();
 		}
 		
-		// TODO: create a generic delete statement in sql package
+		// TODO: create a generic delete statement in sql package when Criteria API is in place
 		private class Delete extends AbstractStatement {
 
 			private String table;

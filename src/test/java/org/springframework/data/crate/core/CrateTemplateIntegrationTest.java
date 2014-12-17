@@ -17,10 +17,13 @@
 package org.springframework.data.crate.core;
 
 import static org.hamcrest.Matchers.is;
+import static org.hamcrest.Matchers.not;
 import static org.hamcrest.Matchers.notNullValue;
+import static org.hamcrest.Matchers.nullValue;
 import static org.junit.Assert.assertThat;
 import static org.junit.Assert.assertTrue;
 import static org.springframework.data.sample.entities.integration.EntityWithComplexId.entityWithComplexId;
+import static org.springframework.data.sample.entities.integration.EntityWithNesting.entityWithNestingAndSimpleId;
 import static org.springframework.data.sample.entities.integration.ObjectCollectionTypes.objectCollectionTypes;
 import static org.springframework.data.sample.entities.integration.ObjectMapTypes.objectMapTypes;
 import static org.springframework.data.sample.entities.integration.Person.person;
@@ -35,6 +38,8 @@ import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.crate.config.TestCrateConfiguration;
 import org.springframework.data.sample.entities.integration.EntityWithComplexId;
+import org.springframework.data.sample.entities.integration.EntityWithNesting;
+import org.springframework.data.sample.entities.integration.Language;
 import org.springframework.data.sample.entities.integration.ObjectCollectionTypes;
 import org.springframework.data.sample.entities.integration.ObjectMapTypes;
 import org.springframework.data.sample.entities.integration.Person;
@@ -61,7 +66,7 @@ public class CrateTemplateIntegrationTest {
     public void shouldSaveWithoutIdAndInitialVersion() {
     	
     	SimpleEntity entity = simpleEntity();
-    	crateTemplate.save(entity);
+    	crateTemplate.insert(entity);
     	assertThat(entity.version, is(notNullValue()));
     	assertThat(entity.version, is(1L));
     }
@@ -70,7 +75,7 @@ public class CrateTemplateIntegrationTest {
     public void shouldSaveWithInitialVersionAndFindBySimpleId() {
     	
     	SimpleEntityWithId entity = simpleEntityWithId();
-    	crateTemplate.save(entity);
+    	crateTemplate.insert(entity);
     	assertThat(entity.version, is(1L));
     	SimpleEntityWithId dbEntity = crateTemplate.findById(entity.id, SimpleEntityWithId.class);
     	assertThat(dbEntity, is(notNullValue()));
@@ -83,7 +88,7 @@ public class CrateTemplateIntegrationTest {
     public void shouldSaveSimpleCollectionTypesAndFindById() {
     	
     	SimpleCollectionTypes entity = simpleCollectionTypes();
-    	crateTemplate.save(entity);
+    	crateTemplate.insert(entity);
     	SimpleCollectionTypes dbEntity = crateTemplate.findById(entity.id, SimpleCollectionTypes.class);
     	assertThat(dbEntity, is(notNullValue()));
     	assertThat(dbEntity, is(entity));
@@ -93,7 +98,7 @@ public class CrateTemplateIntegrationTest {
     public void shouldSaveObjectCollectionTypesAndFindById() {
     	
     	ObjectCollectionTypes entity = objectCollectionTypes();
-    	crateTemplate.save(entity);
+    	crateTemplate.insert(entity);
     	ObjectCollectionTypes dbEntity = crateTemplate.findById(entity.id, ObjectCollectionTypes.class);
     	assertThat(dbEntity, is(notNullValue()));
     	assertThat(dbEntity, is(entity));
@@ -103,7 +108,7 @@ public class CrateTemplateIntegrationTest {
     public void shouldSaveSimpleMapTypesAndFindById() {
     	
     	SimpleMapTypes entity = simpleMapTypes();
-    	crateTemplate.save(entity);
+    	crateTemplate.insert(entity);
     	SimpleMapTypes dbEntity = crateTemplate.findById(entity.id, SimpleMapTypes.class);
     	assertThat(dbEntity, is(notNullValue()));
     	assertThat(dbEntity, is(entity));
@@ -116,7 +121,7 @@ public class CrateTemplateIntegrationTest {
     public void shouldSaveObjectMapTypesAndFindById() {
     	
     	ObjectMapTypes entity = objectMapTypes();
-    	crateTemplate.save(entity);
+    	crateTemplate.insert(entity);
     	ObjectMapTypes dbEntity = crateTemplate.findById(entity.id, ObjectMapTypes.class);
     	assertThat(dbEntity, is(notNullValue()));
     	assertThat(dbEntity, is(entity));
@@ -127,7 +132,7 @@ public class CrateTemplateIntegrationTest {
     public void shouldSaveComplexModelAndFindById() {
     	
     	Person entity = person();
-    	crateTemplate.save(entity);
+    	crateTemplate.insert(entity);
     	Person dbEntity = crateTemplate.findById(entity.id, Person.class);
     	assertThat(dbEntity, is(notNullValue()));
     	assertThat(dbEntity, is(entity));
@@ -137,7 +142,7 @@ public class CrateTemplateIntegrationTest {
     public void shouldSaveAndFindByComplexId() {
     	
     	EntityWithComplexId entity = entityWithComplexId();
-    	crateTemplate.save(entity);
+    	crateTemplate.insert(entity);
     	EntityWithComplexId dbEntity = crateTemplate.findById(entity.complexId, EntityWithComplexId.class);
     	assertThat(dbEntity, is(notNullValue()));
     	assertThat(dbEntity, is(entity));
@@ -148,8 +153,8 @@ public class CrateTemplateIntegrationTest {
     	
     	SimpleEntityWithId entity = simpleEntityWithId();
     	entity.id = 2L;
-    	crateTemplate.save(entity);
-    	assertTrue(crateTemplate.removeById(entity.id, SimpleEntityWithId.class));
+    	crateTemplate.insert(entity);
+    	assertTrue(crateTemplate.remove(entity.id, SimpleEntityWithId.class));
     }
     
     @Test
@@ -157,7 +162,55 @@ public class CrateTemplateIntegrationTest {
     	
     	EntityWithComplexId entity = entityWithComplexId();
     	entity.complexId.booleanField = false;
-    	crateTemplate.save(entity);
-    	assertTrue(crateTemplate.removeById(entity.complexId, EntityWithComplexId.class));
+    	crateTemplate.insert(entity);
+    	assertTrue(crateTemplate.remove(entity.complexId, EntityWithComplexId.class));
+    }
+    
+    @Test
+    public void shouldSaveAndUpdateEntityAndBumpUpVersion() {
+    	
+    	Language language = new Language();
+    	language.name = "Groovy";
+    	
+    	EntityWithNesting entity = entityWithNestingAndSimpleId();
+    	crateTemplate.insert(entity);
+
+    	entity.name = "CrateDB";
+    	entity.country.languages.add(language);
+    	entity.country.name = "Canada";
+    	entity.map.put("Key_2", "Value_2");
+    	entity.integers.add(3);
+    	
+    	crateTemplate.update(entity);
+    	
+    	EntityWithNesting dbEntity = crateTemplate.findById(entity.id, EntityWithNesting.class);
+    	
+    	assertThat(dbEntity, is(entity));
+    	assertThat(dbEntity.version, is(2L));
+    }
+    
+    @Test
+    public void shouldNotUpdateWhenIdIsChanged() {
+    	
+    	Language language = new Language();
+    	language.name = "Groovy";
+    	
+    	EntityWithNesting entity = entityWithNestingAndSimpleId();
+    	entity.id = 2L;
+    	crateTemplate.insert(entity);
+
+    	entity.id = 3L;
+    	entity.name = "CrateDB";
+    	entity.country.languages.add(language);
+    	entity.country.name = "Canada";
+    	entity.map.put("Key_2", "Value_2");
+    	entity.integers.add(3);
+    	
+    	crateTemplate.update(entity);
+    	
+    	EntityWithNesting dbEntity = crateTemplate.findById(entity.id, EntityWithNesting.class);
+    	
+    	assertThat(dbEntity, is(not(entity)));
+    	assertThat(dbEntity.version, is(nullValue()));
     }
 }

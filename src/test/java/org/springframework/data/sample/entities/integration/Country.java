@@ -2,6 +2,8 @@ package org.springframework.data.sample.entities.integration;
 
 import static org.springframework.data.sample.entities.integration.Language.language;
 import static java.util.Arrays.asList;
+
+import java.util.ArrayList;
 import java.util.List;
 
 import org.apache.commons.lang.builder.EqualsBuilder;
@@ -16,7 +18,7 @@ public class Country {
 		
 		Country country = new Country();
 		country.name = "Australia";
-		country.languages = asList(language());
+		country.languages = new ArrayList<Language>(asList(language()));
 		
 		return country;
 	}

@@ -52,20 +52,47 @@ public interface CrateOperations {
     <T> T execute(CrateSQLAction action, CrateSQLResponseHandler<T> handler) throws DataAccessException;
     
     /**
-     * Save the given object. The object must define an id (primary key). 
-     * The Table name will be determined by the backing {@link SimpleCratePersistentEntity} instance
+     * Insert the given object. If the object defines an id (primary key), it must not be null.
+     * The Table name will be determined by the backing {@link SimpleCratePersistentEntity} instance.
      *
-     * @param objectToSave the object to store in the table.
+     * @param entity the object to store in the table.
      */
-    void save(Object objectToSave);
+    void insert(Object entity);
     
     /**
-     * Save the given object in the given table name. The object must define an id (primary key) 
+     * Insert the given object. If the object defines an id (primary key), it must not be null. 
      *
-     * @param objectToSave the object to store in the table.
+     * @param entity the object to store in the table.
      * @param tableName name of the table to store the object in
      */
-    void save(Object objectToSave, String tableName);
+    void insert(Object entity, String tableName);
+    
+    /**
+     * Update the given object. The object must define an id (primary key) and the value must not be null. 
+     * The Table name will be determined by the backing {@link SimpleCratePersistentEntity} instance.
+     * The columns being updated must not have been used to partition the table using the PARTITIONED BY clause
+     * and will result in an exception. 
+     * By default, the primary key is used as the routing column if defined, otherwise the internal _id column
+     * is used as the routing column. The primary key and the version properties if defined will be excluded from
+     * the update query even if they are changed by the calling code and will not be reflected in the database. 
+     * @param entity the object to store in the table.
+     * @throws {@link InvalidDataAccessResourceUsageException}
+     */
+    void update(Object entity);
+    
+    /**
+     * Update the given object. The object must define an id (primary key). 
+     * The Table name will be determined by the backing {@link SimpleCratePersistentEntity} instance.
+     * The columns being updated must not have been used to partition the table using the PARTITIONED BY clause
+     * and will result in an exception. 
+     * By default, the primary key is used as the routing column if defined, otherwise the internal _id column
+     * is used as the routing column. The primary key and the version properties if defined will be excluded from
+     * the update query even if they are changed by the calling code and will not be reflected in the database.
+     * @param entity the object to store in the table.
+     * @param tableName name of the table to store the object in
+     * @throws {@link InvalidDataAccessResourceUsageException}
+     */
+    void update(Object entity, String tableName);
     
     /**
 	 * Returns a document with the given id mapped onto the given target class. The table the query is ran against will be
@@ -92,17 +119,17 @@ public interface CrateOperations {
 	/**
 	 * Remove the given object from the table by id.
 	 * 
-	 * @param object the id to be used
+	 * @param id the id to be used
 	 * @param entityClass the type of entity
 	 */
-	<T> boolean removeById(Object object, Class<T> entityClass);
+	<T> boolean remove(Object id, Class<T> entityClass);
 
 	/**
 	 * Removes the given object from the given table by id.
 	 * 
-	 * @param object the id to be used
+	 * @param id the id to be used
 	 * @param entityClass the type of entity
 	 * @param table must not be {@literal null} or empty.
 	 */
-	<T> boolean removeById(Object object, Class<T> entityClass, String tableName);
+	<T> boolean remove(Object id, Class<T> entityClass, String tableName);
 }
