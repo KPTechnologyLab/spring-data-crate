@@ -58,7 +58,7 @@ public class CrateRepositoryFactory extends RepositoryFactorySupport {
 	@Override
 	@SuppressWarnings({"rawtypes", "unchecked"})
 	protected Object getTargetRepository(RepositoryMetadata metadata) {
-        return new SimpleCrateRepository(crateOperations,getEntityInformation(metadata.getDomainType()), metadata.getDomainType());
+        return new SimpleCrateRepository(getEntityInformation(metadata.getDomainType()),crateOperations);
 	}
 
 	@Override

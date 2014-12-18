@@ -208,7 +208,6 @@ public class CrateTemplateIntegrationTest {
     	
     	EntityWithNesting dbEntity = crateTemplate.findById(entity.id, EntityWithNesting.class);
     	
-    	assertThat(dbEntity, is(not(entity)));
-    	assertThat(dbEntity.version, is(nullValue()));
+    	assertThat(dbEntity, is(nullValue()));
     }
 }
