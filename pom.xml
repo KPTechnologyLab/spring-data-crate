@@ -8,10 +8,10 @@
 	<version>1.0.0.BUILD-SNAPSHOT</version>
 
 	<parent>
-        <groupId>org.springframework.data.build</groupId>
-        <artifactId>spring-data-parent</artifactId>
-		<version>1.5.0.BUILD-SNAPSHOT</version>
-        <relativePath>../spring-data-build/parent/pom.xml</relativePath>
+		<groupId>org.springframework.data.build</groupId>
+		<artifactId>spring-data-parent</artifactId>
+		<version>1.6.0.BUILD-SNAPSHOT</version>
+		<relativePath>../spring-data-build/parent/pom.xml</relativePath>
 	</parent>
 
 	<name>Spring Data Crate</name>
@@ -24,8 +24,10 @@
 
 		<commonscollections>3.2.1</commonscollections>
 		<commonslang>2.6</commonslang>
-		<crate>0.45.5</crate>
-		<springdata.commons>1.9.0.BUILD-SNAPSHOT</springdata.commons>
+		<crate>0.45.6</crate>
+		<springdata.commons>1.10.0.BUILD-SNAPSHOT</springdata.commons>
+		<validation>1.0.0.GA</validation>
+		<hibernate-validator>4.2.0.Final</hibernate-validator>
 		<mockito>1.9.5</mockito>
 		<junit>4.11</junit>
 	</properties>
@@ -36,7 +38,6 @@
 		<dependency>
 			<groupId>org.springframework</groupId>
 			<artifactId>spring-context</artifactId>
-			<version>${spring}</version>
 			<exclusions>
 				<exclusion>
 					<groupId>commons-logging</groupId>
@@ -49,14 +50,22 @@
 		<dependency>
 			<groupId>org.springframework</groupId>
 			<artifactId>spring-tx</artifactId>
-			<version>${spring}</version>
 		</dependency>
+
 
 		<!-- SPRING DATA -->
 		<dependency>
 			<groupId>org.springframework.data</groupId>
 			<artifactId>spring-data-commons</artifactId>
 			<version>${springdata.commons}</version>
+		</dependency>
+
+		<!-- JSR 303 Validation -->
+		<dependency>
+			<groupId>javax.validation</groupId>
+			<artifactId>validation-api</artifactId>
+			<version>${validation}</version>
+			<optional>true</optional>
 		</dependency>
 
 		<!-- APACHE -->
@@ -110,7 +119,6 @@
 		<dependency>
 			<groupId>org.springframework</groupId>
 			<artifactId>spring-test</artifactId>
-			<version>${spring}</version>
 			<scope>test</scope>
 		</dependency>
 
@@ -147,6 +155,27 @@
 			<scope>test</scope>
 		</dependency>
 
+		<dependency>
+			<groupId>org.hibernate</groupId>
+			<artifactId>hibernate-validator</artifactId>
+			<version>${hibernate-validator}</version>
+			<scope>test</scope>
+		</dependency>
+
+		<dependency>
+			<groupId>javax.el</groupId>
+			<artifactId>el-api</artifactId>
+			<version>${cdi}</version>
+			<scope>test</scope>
+		</dependency>
+
+		<dependency>
+			<groupId>org.apache.openwebbeans.test</groupId>
+			<artifactId>cditest-owb</artifactId>
+			<version>${webbeans}</version>
+			<scope>test</scope>
+		</dependency>
+
 	</dependencies>
 
 	<build>
@@ -167,11 +196,17 @@
 			<id>hasnain</id>
 			<name>Hasnain Javed (KP Technology Lab)</name>
 			<timezone>+4</timezone>
+			<roles>
+				<role>Project Lead</role>
+			</roles>
 		</developer>
 		<developer>
 			<id>rizwan</id>
 			<name>Rizwan Idrees (Springer)</name>
 			<timezone>+0</timezone>
+			<roles>
+				<role>Project Lead</role>
+			</roles>
 		</developer>
 	</developers>
 

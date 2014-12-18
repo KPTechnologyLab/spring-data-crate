@@ -32,7 +32,6 @@ import static org.springframework.data.sample.entities.integration.SimpleEntity.
 import static org.springframework.data.sample.entities.integration.SimpleEntityWithId.simpleEntityWithId;
 import static org.springframework.data.sample.entities.integration.SimpleMapTypes.simpleMapTypes;
 
-import org.junit.Ignore;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;

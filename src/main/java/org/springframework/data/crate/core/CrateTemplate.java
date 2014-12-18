@@ -42,6 +42,10 @@ import java.util.List;
 import java.util.Set;
 
 import org.slf4j.Logger;
+import org.springframework.beans.BeansException;
+import org.springframework.context.ApplicationContext;
+import org.springframework.context.ApplicationContextAware;
+import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.dao.DataAccessException;
 import org.springframework.dao.support.PersistenceExceptionTranslator;
 import org.springframework.data.crate.core.convert.CrateConverter;
@@ -51,6 +55,14 @@ import org.springframework.data.crate.core.mapping.CrateDocument;
 import org.springframework.data.crate.core.mapping.CrateMappingContext;
 import org.springframework.data.crate.core.mapping.CratePersistentEntity;
 import org.springframework.data.crate.core.mapping.CratePersistentProperty;
+import org.springframework.data.crate.core.mapping.event.AfterConvertEvent;
+import org.springframework.data.crate.core.mapping.event.AfterDeleteEvent;
+import org.springframework.data.crate.core.mapping.event.AfterLoadEvent;
+import org.springframework.data.crate.core.mapping.event.AfterSaveEvent;
+import org.springframework.data.crate.core.mapping.event.BeforeConvertEvent;
+import org.springframework.data.crate.core.mapping.event.BeforeDeleteEvent;
+import org.springframework.data.crate.core.mapping.event.BeforeSaveEvent;
+import org.springframework.data.crate.core.mapping.event.CrateMappingEvent;
 import org.springframework.data.crate.core.sql.AbstractStatement;
 import org.springframework.data.crate.core.sql.CrateSQLStatement;
 import org.springframework.data.crate.core.sql.Insert;
@@ -63,13 +75,14 @@ import org.springframework.util.StringUtils;
  * @author Rizwan Idrees
  * @since 1.0.0
  */
-public class CrateTemplate implements CrateOperations {
+public class CrateTemplate implements CrateOperations, ApplicationContextAware {
 
     private final Logger logger = getLogger(CrateTemplate.class);
     
 	private final CrateClient client;
 	private final PersistenceExceptionTranslator exceptionTranslator;
     private CrateConverter crateConverter;
+    private ApplicationEventPublisher eventPublisher;
     
     private static final Collection<String> ITERABLE_CLASSES;
     
@@ -94,6 +107,11 @@ public class CrateTemplate implements CrateOperations {
         											 : crateConverter;
         this.exceptionTranslator = new CrateExceptionTranslator();
     }
+    
+    @Override
+	public void setApplicationContext(ApplicationContext applicationContext) throws BeansException {
+    	this.eventPublisher = applicationContext;
+	}
 
     @Override
     public CrateConverter getConverter() {
@@ -147,11 +165,15 @@ public class CrateTemplate implements CrateOperations {
 			validateIdValue(entity);
 		}
 		
+		maybeEmitEvent(new BeforeConvertEvent<Object>(entity));
+		
 		CrateDocument document = new CrateDocument();
 		
 		crateConverter.write(entity, document);
 		
 		CratePersistentProperty versionProperty = getPersistentEntityFor(entity.getClass()).getVersionProperty();
+		
+		maybeEmitEvent(new BeforeSaveEvent<Object>(entity, document));
 		
 		this.execute(new InsertAction(tableName, document));
 		
@@ -159,6 +181,8 @@ public class CrateTemplate implements CrateOperations {
 			BeanWrapper<Object> wrapper = create(entity, crateConverter.getConversionService());
 			wrapper.setProperty(versionProperty, INITIAL_VERSION_VALUE);
 		}
+		
+		maybeEmitEvent(new AfterSaveEvent<Object>(entity, document));
 	}
 	
 	@Override
@@ -191,9 +215,13 @@ public class CrateTemplate implements CrateOperations {
 
 		idValue = getIdPropertyValue(entity);
 		
+		maybeEmitEvent(new BeforeConvertEvent<Object>(entity));
+		
 		CrateDocument document = new CrateDocument();
 		
 		crateConverter.write(entity, document);
+		
+		maybeEmitEvent(new BeforeSaveEvent<Object>(entity, document));
 		
 		document.remove(idColumn);
 		document.remove(DEFAULT_TYPE_KEY);
@@ -217,9 +245,9 @@ public class CrateTemplate implements CrateOperations {
 					
 					BeanWrapper<Object> wrapper = create(entity, crateConverter.getConversionService());
 					wrapper.setProperty(persistentEntity.getVersionProperty(), updatedVersion);
-				}else {
-					logger.info("No row found with id '{}'", idValue);
 				}
+				
+				maybeEmitEvent(new AfterSaveEvent<Object>(entity, document));
 			}
 		}
 	}
@@ -285,17 +313,26 @@ public class CrateTemplate implements CrateOperations {
 			throw new MappingException("No id property found for object of type " + entityClass);
 		}
 		
+		maybeEmitEvent(new BeforeDeleteEvent<Object>(id));
+		
 		SQLResponse response = execute(new DeleteByIdAction(tableName, idProperty.getFieldName(), id));
 		
 		boolean removed = response.rowCount() == 1L;
 		
 		if(removed) {
 			logger.info("Removed row with id '{}'", id);
+			maybeEmitEvent(new AfterDeleteEvent<Object>(id));
 		}else {
 			logger.info("No row removed with id '{}'", id);
 		}
 		
 		return removed;
+	}
+	
+	protected <T> void maybeEmitEvent(CrateMappingEvent<T> event) {
+		if (null != eventPublisher) {
+			eventPublisher.publishEvent(event);
+		}
 	}
 	
 	private String getTableName(Class<?> clazz) {
@@ -655,7 +692,15 @@ public class CrateTemplate implements CrateOperations {
 			
 			CrateDocument source = new CrateDocumentConverter(response).toDocument();
 			
-			return (T)crateConverter.read(type, source);
+			maybeEmitEvent(new AfterLoadEvent<T>(source, type));
+			
+			T entity = crateConverter.read(type, source);
+			
+			if (entity != null) {
+				maybeEmitEvent(new AfterConvertEvent<T>(source, entity));
+			}
+			
+			return entity;
 		}
 	}
 }
