@@ -128,7 +128,6 @@ public class CrateTemplateIntegrationTest {
     }
     
     @Test
-    @Ignore("crate has a bug with object array nested inside another nested object")
     public void shouldSaveComplexModelAndFindById() {
     	
     	Person entity = person();
