@@ -15,7 +15,7 @@
  */
 package org.springframework.data.crate.core.mapping;
 
-import java.util.LinkedHashMap;
+import java.util.TreeMap;
 
 /**
  * {@link CrateDocument} represents document to be stored in Crate DB.
@@ -23,16 +23,12 @@ import java.util.LinkedHashMap;
  * @author Hasnain Javed
  * @since 1.0.0
  */
-public class CrateDocument extends LinkedHashMap<String, Object> implements CrateDBObject {
+public class CrateDocument extends TreeMap<String, Object> implements CrateDBObject {
 	
 	private static final long serialVersionUID = 3037469346219206410L;
 
 	public CrateDocument() {
 		super();
-	}
-	
-	public CrateDocument(int size) {
-		super(size);
 	}
 	
 	public CrateDocument(String fieldName, Object value){
