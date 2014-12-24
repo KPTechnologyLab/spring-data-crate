@@ -18,7 +18,10 @@ package org.springframework.data.crate.core;
 
 import io.crate.action.sql.SQLResponse;
 
+import java.util.List;
+
 import org.springframework.dao.DataAccessException;
+import org.springframework.data.crate.CrateSQLActionException;
 import org.springframework.data.crate.core.convert.CrateConverter;
 import org.springframework.data.crate.core.mapping.SimpleCratePersistentEntity;
 
@@ -42,14 +45,22 @@ public interface CrateOperations {
      * @param action must not be {@literal null}.
      * @return response returned by crate as a result of executing the specified action
      */
-    SQLResponse execute(CrateSQLAction action) throws DataAccessException;
+    SQLResponse execute(CrateAction action) throws DataAccessException;
     
     /**
      * execute the given action (insert | update | delete | alter | select)
      * @param action must not be {@literal null}.
      * @param handler must not be {@literal null}. 
      */
-    <T> T execute(CrateSQLAction action, CrateSQLResponseHandler<T> handler) throws DataAccessException;
+    <T> T execute(CrateAction action, CrateActionResponseHandler<T> handler) throws DataAccessException;
+    
+    /**
+     * Execute the given bulk operation (insert | update | delete)
+     * All operations are executed whatsoever. It does not matter whether one single operation failed or all succeeded
+     * @param action must not be {@literal null}.
+     * @param handler must not be {@literal null}. 
+     */
+    <T> BulkActionResult<T> execute(CrateBulkAction action, CrateBulkActionResponseHandler<T> handler) throws DataAccessException, CrateSQLActionException;
     
     /**
      * Insert the given object. If the object defines an id (primary key), it must not be null.
@@ -66,6 +77,27 @@ public interface CrateOperations {
      * @param tableName name of the table to store the object in
      */
     void insert(Object entity, String tableName);
+    
+    /**
+     * Insert the given list of objects. If the object defines an id (primary key), it must not be null.
+     * All life cycle callback methods will be invoked for entities succeeding the insert operation.
+     *
+     * @param entities the list of objects to store in the table.
+     * @param entityClass the parameterized type of the object.
+     * @return Results containing the details of the bulk operation
+     */
+    <T> BulkActionResult<T> bulkInsert(List<T> entities, Class<T> entityClass);
+    
+    /**
+     * Insert the given list of objects in the given table. If the object defines an id (primary key), it must not be null.
+     * All life cycle callback methods will be invoked for entities succeeding the insert operation.
+     * 
+     * @param entities the list of objects to store in the table.
+     * @param entityClass the parameterized type of the object.
+     * @param tableName name of the table to store the object in.
+     * @return Results containing the details of the bulk operation
+     */
+    <T> BulkActionResult<T> bulkInsert(List<T> entities, Class<T> entityClass, String tableName);
     
     /**
      * Update the given object. The object must define an id (primary key) and the value must not be null. 
@@ -95,6 +127,52 @@ public interface CrateOperations {
     void update(Object entity, String tableName);
     
     /**
+     * Update the given list of objects. The object must define an id (primary key).
+     * All life cycle callback methods will be invoked for entities succeeding the update operation.
+     *
+     * @param entities the list of objects to store in the table.
+     * @param entityClass the parameterized type of the object.
+     * @return Results containing the details of the bulk operation
+     */
+    <T> BulkActionResult<T> bulkUpdate(List<T> entities, Class<T> entityClass);
+    
+    /**
+     * Update the given list of objects in the given table. The object must define an id (primary key).
+     * All life cycle callback methods will be invoked for entities succeeding the update operation.
+     * 
+     * @param entities the list of objects to store in the table.
+     * @param entityClass the parameterized type of the object.
+     * @param tableName name of the table to store the object in.
+     * @return Results containing the details of the bulk operation
+     */
+    <T> BulkActionResult<T> bulkUpdate(List<T> entities, Class<T> entityClass, String tableName);
+    
+    /**
+	 * Query for a list of objects of type T from the table used by the entity class.
+	 * <p/>
+	 * The object is converted from the Crate native representation using an instance of {@see CrateDocumentConverter}
+	 * and {@see CrateConverter}. Unless configured otherwise, an instance of MappingCrateConverter will be used.
+	 * <p/>
+	 * 
+	 * @param entityClass the parameterized type of the returned list
+	 * @return the converted collection
+	 */
+	<T> List<T> findAll(Class<T> entityClass);
+
+	/**
+	 * Query for a list of objects of type T from the table used by the entity class.
+	 * <p/>
+	 * The object is converted from the Crate native representation using an instance of {@see CrateDocumentConverter}
+	 * and {@see CrateConverter}. Unless configured otherwise, an instance of MappingCrateConverter will be used.
+	 * <p/>
+	 * 
+	 * @param entityClass the parameterized type of the returned list.
+	 * @param tableName name of the table to retrieve the objects from
+	 * @return the converted collection
+	 */
+	<T> List<T> findAll(Class<T> entityClass, String tableName);
+    
+    /**
 	 * Returns a document with the given id mapped onto the given target class. The table the query is ran against will be
 	 * derived from the given target class as well.
 	 * 
@@ -117,12 +195,26 @@ public interface CrateOperations {
 	<T> T findById(Object id, Class<T> entityClass, String tableName);
 	
 	/**
+	 * Remove all rows from the table used by the entity class.
+	 * 
+	 * @param entityClass the type of entity
+	 */
+	<T> void deleteAll(Class<T> entityClass);
+	
+	/**
+	 * Remove all rows from the table.
+	 * 
+	 * @param tableName name of the table to remove from
+	 */
+	void deleteAll(String tableName);
+	
+	/**
 	 * Remove the given object from the table by id.
 	 * 
 	 * @param id the id to be used
 	 * @param entityClass the type of entity
 	 */
-	<T> boolean remove(Object id, Class<T> entityClass);
+	<T> boolean delete(Object id, Class<T> entityClass);
 
 	/**
 	 * Removes the given object from the given table by id.
@@ -131,5 +223,26 @@ public interface CrateOperations {
 	 * @param entityClass the type of entity
 	 * @param table must not be {@literal null} or empty.
 	 */
-	<T> boolean remove(Object id, Class<T> entityClass, String tableName);
+	<T> boolean delete(Object id, Class<T> entityClass, String tableName);
+	
+	/**
+     * Delete the given list of objects. The object must define an id (primary key).
+     * All life cycle callback methods will be invoked for entities succeeding the delete operation.
+     *
+     * @param ids the list of objects to store in the table.
+     * @param entityClass the parameterized type of the object.
+     * @return Results containing the details of the bulk operation
+     */
+	<T> BulkActionResult<Object> bulkDelete(List<Object> ids, Class<T> entityClass);
+    
+    /**
+     * Delete the given list of objects from the given table. The object must define an id (primary key).
+     * All life cycle callback methods will be invoked for entities succeeding the delete operation.
+     * 
+     * @param ids the list of objects to store in the table.
+     * @param entityClass the parameterized type of the object.
+     * @param tableName name of the table to delete the object from.
+     * @return Results containing the details of the bulk operation
+     */
+    <T> BulkActionResult<Object> bulkDelete(List<Object> ids, Class<T> entityClass, String tableName);
 }

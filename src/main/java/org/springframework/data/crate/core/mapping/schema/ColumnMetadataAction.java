@@ -17,6 +17,7 @@ package org.springframework.data.crate.core.mapping.schema;
 
 import static java.lang.String.format;
 import static java.lang.String.valueOf;
+import static org.springframework.data.crate.core.CrateSQLAction.ActionType.SELECT;
 import static org.springframework.util.Assert.hasText;
 import io.crate.action.sql.SQLRequest;
 import io.crate.action.sql.SQLResponse;
@@ -25,15 +26,15 @@ import java.util.LinkedList;
 import java.util.List;
 
 import org.springframework.data.crate.NoSuchTableException;
-import org.springframework.data.crate.core.CrateSQLAction;
-import org.springframework.data.crate.core.CrateSQLResponseHandler;
+import org.springframework.data.crate.core.CrateAction;
+import org.springframework.data.crate.core.CrateActionResponseHandler;
 
 /**
  * 
  * @author Hasnain Javed
  * @since 1.0.0
  */
-class ColumnMetadataAction implements CrateSQLAction, CrateSQLResponseHandler<List<ColumnMetadata>> {
+class ColumnMetadataAction implements CrateAction, CrateActionResponseHandler<List<ColumnMetadata>> {
 
     private static final String SELECT_TEMPLATE = "select table_name, column_name, data_type from information_schema.columns where table_name = '%s'";
     
@@ -78,5 +79,10 @@ class ColumnMetadataAction implements CrateSQLAction, CrateSQLResponseHandler<Li
 		}
 		
 		throw new NoSuchTableException(format("Table '%s' has no metadata in 'information_schema.columns'. Table does not exist", tableName), null);
+	}
+
+	@Override
+	public ActionType getActionType() {
+		return SELECT;
 	}
 }

@@ -34,7 +34,7 @@ import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
  * @since 1.0.0
  */
 @RunWith(SpringJUnit4ClassRunner.class)
-@ContextConfiguration(classes={EventContextConfiguration.class})
+@ContextConfiguration(classes={LifecycleEventConfiguration.class})
 public class ValidatingCrateEventListenerTest {
 
 	@Autowired

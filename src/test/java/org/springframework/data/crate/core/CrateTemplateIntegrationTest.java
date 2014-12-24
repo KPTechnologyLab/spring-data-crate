@@ -17,7 +17,6 @@
 package org.springframework.data.crate.core;
 
 import static org.hamcrest.Matchers.is;
-import static org.hamcrest.Matchers.not;
 import static org.hamcrest.Matchers.notNullValue;
 import static org.hamcrest.Matchers.nullValue;
 import static org.junit.Assert.assertThat;
@@ -31,7 +30,13 @@ import static org.springframework.data.sample.entities.integration.SimpleCollect
 import static org.springframework.data.sample.entities.integration.SimpleEntity.simpleEntity;
 import static org.springframework.data.sample.entities.integration.SimpleEntityWithId.simpleEntityWithId;
 import static org.springframework.data.sample.entities.integration.SimpleMapTypes.simpleMapTypes;
+import static java.util.Arrays.asList;
 
+import java.util.ArrayList;
+import java.util.List;
+
+import org.junit.After;
+import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -46,6 +51,7 @@ import org.springframework.data.sample.entities.integration.SimpleCollectionType
 import org.springframework.data.sample.entities.integration.SimpleEntity;
 import org.springframework.data.sample.entities.integration.SimpleEntityWithId;
 import org.springframework.data.sample.entities.integration.SimpleMapTypes;
+import org.springframework.data.sample.entities.integration.User;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 
@@ -60,6 +66,36 @@ public class CrateTemplateIntegrationTest {
 
     @Autowired
     private CrateTemplate crateTemplate;
+    
+    @Before
+    public void setup() {
+    	
+    	crateTemplate.deleteAll(SimpleEntity.class);
+    	crateTemplate.deleteAll(SimpleEntityWithId.class);
+    	crateTemplate.deleteAll(SimpleCollectionTypes.class);
+    	crateTemplate.deleteAll(ObjectCollectionTypes.class);
+    	crateTemplate.deleteAll(SimpleMapTypes.class);
+    	crateTemplate.deleteAll(ObjectMapTypes.class);
+    	crateTemplate.deleteAll(Person.class);
+    	crateTemplate.deleteAll(EntityWithComplexId.class);
+    	crateTemplate.deleteAll(EntityWithNesting.class);
+    	crateTemplate.deleteAll(User.class);
+    }
+    
+    @After
+    public void teardown() {
+    	
+    	crateTemplate.deleteAll(SimpleEntity.class);
+    	crateTemplate.deleteAll(SimpleEntityWithId.class);
+    	crateTemplate.deleteAll(SimpleCollectionTypes.class);
+    	crateTemplate.deleteAll(ObjectCollectionTypes.class);
+    	crateTemplate.deleteAll(SimpleMapTypes.class);
+    	crateTemplate.deleteAll(ObjectMapTypes.class);
+    	crateTemplate.deleteAll(Person.class);
+    	crateTemplate.deleteAll(EntityWithComplexId.class);
+    	crateTemplate.deleteAll(EntityWithNesting.class);
+    	crateTemplate.deleteAll(User.class);
+    }
     
     @Test
     public void shouldSaveWithoutIdAndInitialVersion() {
@@ -152,7 +188,7 @@ public class CrateTemplateIntegrationTest {
     	SimpleEntityWithId entity = simpleEntityWithId();
     	entity.id = 2L;
     	crateTemplate.insert(entity);
-    	assertTrue(crateTemplate.remove(entity.id, SimpleEntityWithId.class));
+    	assertTrue(crateTemplate.delete(entity.id, SimpleEntityWithId.class));
     }
     
     @Test
@@ -161,7 +197,7 @@ public class CrateTemplateIntegrationTest {
     	EntityWithComplexId entity = entityWithComplexId();
     	entity.complexId.booleanField = false;
     	crateTemplate.insert(entity);
-    	assertTrue(crateTemplate.remove(entity.complexId, EntityWithComplexId.class));
+    	assertTrue(crateTemplate.delete(entity.complexId, EntityWithComplexId.class));
     }
     
     @Test
@@ -194,10 +230,9 @@ public class CrateTemplateIntegrationTest {
     	language.name = "Groovy";
     	
     	EntityWithNesting entity = entityWithNestingAndSimpleId();
-    	entity.id = 2L;
     	crateTemplate.insert(entity);
 
-    	entity.id = 3L;
+    	entity.id = 2L;
     	entity.name = "CrateDB";
     	entity.country.languages.add(language);
     	entity.country.name = "Canada";
@@ -209,5 +244,50 @@ public class CrateTemplateIntegrationTest {
     	EntityWithNesting dbEntity = crateTemplate.findById(entity.id, EntityWithNesting.class);
     	
     	assertThat(dbEntity, is(nullValue()));
+    }
+    
+    @Test
+    public void shouldBulkInsert() {
+    	
+    	User hasnain = new User("hasnain@test.com", "Hasnain Javed", 34);
+    	User rizwan = new User("rizwan@test.com", "Rizwan Idrees", 33);
+    	
+    	BulkActionResult<User> results = crateTemplate.bulkInsert(asList(hasnain, rizwan), User.class);
+    	
+    	assertThat(results.getAllSuccesses().size(), is(2));
+    	assertThat(results.getAllFailures().isEmpty(), is(true));
+    }
+    
+    @Test
+    public void shouldBulkUpdate() {
+    	
+    	User hasnain = new User("hasnain@test.com", "Hasnain Javed", 34);
+    	User rizwan = new User("rizwan@test.com", "Rizwan Idrees", 33);
+    	
+    	crateTemplate.bulkInsert(asList(hasnain, rizwan), User.class);
+    	
+    	hasnain.setName("Hasnain");
+    	rizwan.setName("Rizwan");
+    	
+    	BulkActionResult<User> results = crateTemplate.bulkUpdate(asList(hasnain, rizwan), User.class);
+    	
+    	assertThat(results.getAllSuccesses().size(), is(2));
+    	assertThat(results.getAllFailures().isEmpty(), is(true));
+    }
+    
+    @Test
+    public void shouldBulkDelete() {
+    	
+    	User hasnain = new User("hasnain@test.com", "Hasnain Javed", 34);
+    	User rizwan = new User("rizwan@test.com", "Rizwan Idrees", 33);
+    	
+    	crateTemplate.bulkInsert(asList(hasnain, rizwan), User.class);
+    	
+    	List<Object> ids = new ArrayList<Object>(asList(hasnain.getId(), rizwan.getId()));
+    	
+    	BulkActionResult<Object> results = crateTemplate.bulkDelete(ids, User.class);
+    	
+    	assertThat(results.getAllSuccesses().size(), is(2));
+    	assertThat(results.getAllFailures().isEmpty(), is(true));
     }
 }

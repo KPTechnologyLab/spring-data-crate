@@ -13,20 +13,15 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.springframework.data.crate.core.mapping.event;
+package org.springframework.data.crate.core;
 
-import org.springframework.data.crate.core.mapping.CrateDocument;
+import io.crate.action.sql.SQLResponse;
 
 /**
- * @author Jon Brisbin <jbrisbin@vmware.com>
  * @author Hasnain Javed
- * @since 1.0.0 
+ *
+ * @since 1.0.0
  */
-public class AfterConvertEvent<E> extends CrateMappingEvent<E> {
-
-	private static final long serialVersionUID = -8068074117593506006L;
-
-	public AfterConvertEvent(CrateDocument document, E source) {
-		super(source, document);
-	}
+public interface CrateActionResponseHandler<T> {
+	public T handle(SQLResponse response);
 }

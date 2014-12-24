@@ -15,13 +15,14 @@
  */
 package org.springframework.data.crate.core;
 
-import io.crate.action.sql.SQLResponse;
+import io.crate.action.sql.SQLBulkRequest;
 
 /**
+ * 
  * @author Hasnain Javed
- *
  * @since 1.0.0
  */
-public interface CrateSQLResponseHandler<T> {
-	public T handle(SQLResponse response);
+public interface CrateBulkAction extends CrateSQLAction {
+	 
+	SQLBulkRequest getSQLRequest();
 }

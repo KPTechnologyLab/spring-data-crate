@@ -12,7 +12,7 @@ import org.springframework.validation.beanvalidation.LocalValidatorFactoryBean;
  * @since 1.0.0
  */
 @Configuration
-public class EventContextConfiguration extends TestCrateConfiguration {
+public class LifecycleEventConfiguration extends TestCrateConfiguration {
 
 	@Bean
 	public LocalValidatorFactoryBean validator() {

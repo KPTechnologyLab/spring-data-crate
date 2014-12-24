@@ -15,110 +15,217 @@
  */
 package org.springframework.data.crate.repository.support;
 
-import org.springframework.data.crate.core.CrateOperations;
-import org.springframework.data.crate.repository.CrateRepository;
-import org.springframework.data.domain.Page;
-import org.springframework.data.domain.Pageable;
-import org.springframework.data.domain.Sort;
-import org.springframework.util.Assert;
+import static java.lang.String.format;
+import static org.springframework.data.crate.core.CrateSQLAction.ActionType.SELECT;
+import static org.springframework.util.Assert.notNull;
+import io.crate.action.sql.SQLRequest;
+import io.crate.action.sql.SQLResponse;
 
 import java.io.Serializable;
+import java.util.ArrayList;
+import java.util.Iterator;
+import java.util.LinkedHashSet;
+import java.util.LinkedList;
+import java.util.List;
+import java.util.Set;
+
+import org.springframework.data.crate.core.BulkActionResult;
+import org.springframework.data.crate.core.CrateAction;
+import org.springframework.data.crate.core.CrateOperations;
+import org.springframework.data.crate.repository.CrateRepository;
+
 
 /**
  * Crate specific repository implementation. Likely to be used as target within
  * {@link org.springframework.data.crate.repository.support.CrateRepositoryFactory}
  *
  * @author Rizwan Idrees
+ * @author Hasnain Javed
+ * @since 1.0.0
  */
 public class SimpleCrateRepository<T, ID extends Serializable> implements CrateRepository<T,ID> {
 
     private CrateOperations crateOperations;
-    private Class<T> entityClass;
     private CrateEntityInformation<T, ID> entityInformation;
+    
+    private Class<T> entityClass;
+    
+    private String tableName;
 
-
-
-    public SimpleCrateRepository(CrateOperations crateOperations,
-                                 CrateEntityInformation<T, ID> entityInformation,
-                                 Class<T> entityClass){
-        Assert.notNull(crateOperations, "CrateOperations must be configured!");
-        Assert.notNull(entityInformation, "entityInformation is missing");
-        Assert.notNull(entityClass, "entityClass is missing");
+    public SimpleCrateRepository(CrateEntityInformation<T, ID> entityInformation, CrateOperations crateOperations) {
+    	
+        notNull(crateOperations, "CrateOperations must be configured!");
+        notNull(entityInformation, "EntityInformation is missing");
+        
         this.crateOperations = crateOperations;
         this.entityInformation = entityInformation;
+        this.entityClass = entityInformation.getJavaType();
+        this.tableName = entityInformation.getTableName();
     }
 
     @Override
-    public Iterable<T> findAll(Sort orders) {
-        //TODO:implement me
-        return null;
+    public <S extends T> S save(S entity) {
+    	
+    	notNull(entity, "Entity must not be null");
+    	crateOperations.insert(entity, tableName);
+    	
+        return entity;
     }
-
+    
     @Override
-    public Page<T> findAll(Pageable pageable) {
-        //TODO:implement me
-        return null;
+    public <S extends T> List<S> save(Iterable<S> ses) {
+    	
+    	notNull(ses, "The given Iterable of entities must not be null");
+    	
+    	List<S> entities = new LinkedList<S>();
+    	
+    	for(S entity : ses) {
+    		save(entity);
+    		entities.add(entity);
+    	}
+    	
+        return entities;
     }
-
-    @Override
-    public <S extends T> S save(S s) {
-        //TODO:implement me
-        return null;
-    }
-
-    @Override
-    public <S extends T> Iterable<S> save(Iterable<S> ses) {
-        //TODO:implement me
-        return null;
-    }
-
+    
     @Override
     public T findOne(ID id) {
-        //TODO:implement me
-        return null;
+    	
+    	notNull(id, "The given id must not be null");
+        return crateOperations.findById(id, entityClass, tableName);
     }
 
     @Override
     public boolean exists(ID id) {
-        //TODO:implement me
-        return false;
+    	
+    	return findOne(id) == null ? false : true;
     }
-
+    
+    // TODO: re factor when the Criteria API is in place
     @Override
     public Iterable<T> findAll() {
-        //TODO:implement me
-        return null;
+    	
+        return crateOperations.findAll(entityClass, tableName);
     }
-
+    
+    // TODO: re factor when the Criteria API is in place and use the IN clause for ids
     @Override
     public Iterable<T> findAll(Iterable<ID> ids) {
-        //TODO:implement me
-        return null;
+        
+    	Iterator<ID> iterator = ids.iterator();
+    	
+    	Set<ID> pks = new LinkedHashSet<ID>();
+    	
+    	while(iterator.hasNext()) {
+    		pks.add(iterator.next());
+    	}
+    	
+    	List<T> entities = new ArrayList<T>(pks.size());
+    	
+    	for(ID pk : pks) {
+    		T entity = findOne(pk);
+    		if(entity != null) {
+    			entities.add(entity);
+    		}
+    	}
+    	
+    	return entities;
     }
-
+    
+    // TODO: re factor when the Criteria API is in place
     @Override
     public long count() {
-        //TODO:implement me
-        return 0;
-    }
+        
+    	SQLResponse response = crateOperations.execute(new CrateAction() {
+			
+			@Override
+			public String getSQLStatement() {
+				return format("SELECT count(*) from %s", tableName);
+			}
+			
+			@Override
+			public SQLRequest getSQLRequest() {
+				return new SQLRequest(getSQLStatement());
+			}
 
+			@Override
+			public ActionType getActionType() {
+				return SELECT;
+			}
+		});
+    	
+    	return response.rowCount();
+    }
+    
     @Override
     public void delete(ID id) {
-        //TODO:implement me
+    	
+    	notNull(id, "The given id must not be null");
+    	crateOperations.delete(id, entityClass, tableName);
     }
 
     @Override
-    public void delete(T t) {
-        //TODO:implement me
+    public void delete(T entity) {
+    	
+    	notNull(entity, "Entity must not be null");
+    	delete(entityInformation.getId(entity));
     }
 
+    // TODO: re factor when the Criteria API is in place and use the IN clause for entity ids
     @Override
     public void delete(Iterable<? extends T> ts) {
-        //TODO:implement me
+        
+    	Iterator<? extends T> iterator = ts.iterator();
+    	
+    	while(iterator.hasNext()) {
+    		delete(entityInformation.getId(iterator.next()));
+    	}
     }
 
     @Override
-    public void deleteAll() {
-        //TODO:implement me
+    public void deleteAll() {    	
+    	crateOperations.deleteAll(tableName);
     }
+    
+    @Override
+	public BulkActionResult<T> bulkInsert(List<T> entities) {
+		
+    	notNull(entityClass, "Entity class must not be null");
+    	notNull(entities, "The given List of entities must not be null");
+    	
+		return crateOperations.bulkInsert(entities, entityClass, tableName);
+	}
+
+	@Override
+	public BulkActionResult<T> bulkUpdate(List<T> entities) {
+		
+		notNull(entityClass, "Entity class must not be null");
+    	notNull(entities, "The given List of entities must not be null");
+    	
+		return null;
+	}
+
+	@Override
+	public BulkActionResult<T> bulkDelete(List<T> entities) {
+		
+		notNull(entityClass, "Entity class must not be null");
+    	notNull(entities, "The given List of entities must not be null");
+    	
+		return null;
+	}
+    
+    /**
+	 * Returns the underlying {@link CrateOperations} instance.
+	 * 
+	 * @return
+	 */
+	protected CrateOperations getCrateOperations() {
+		return this.crateOperations;
+	}
+
+	/**
+	 * @return the entityInformation
+	 */
+	protected CrateEntityInformation<T, ID> getEntityInformation() {
+		return entityInformation;
+	}
 }

@@ -16,7 +16,6 @@
 
 package org.springframework.data.crate.core;
 
-import io.crate.action.sql.SQLRequest;
 
 /**
  * @author Hasnain Javed
@@ -25,17 +24,16 @@ import io.crate.action.sql.SQLRequest;
  */
 public interface CrateSQLAction {
 	
-	String SPACE = " ";
-	String COMMA = ",";
-	String OPEN_BRACE = "(";
-	String CLOSE_BRACE = ")";
-	String AS = "as";
-	String PRIMARY_KEY = "primary key";
-	String CREATE_TABLE = "create table";
-	String DROP_TABLE = "drop table";
-	String ALTER_TABLE = "alter table";
-	String ADD_COLUMN = "add column";
+	enum ActionType {
+		SELECT,
+		INSERT,
+		UPDATE,
+		DELETE,
+		ALTER_TABLE,
+		CREATE_TABLE,
+		DROP_TABLE;
+	}
 	
-	public SQLRequest getSQLRequest();
+	ActionType getActionType();
 	public String getSQLStatement();
 }

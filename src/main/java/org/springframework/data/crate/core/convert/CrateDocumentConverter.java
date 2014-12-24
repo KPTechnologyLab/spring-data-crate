@@ -1,5 +1,5 @@
 /*
- * Copyright 2002-2014 the original author or authozrs.
+ * Copyright 2002-2014 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -26,7 +26,6 @@ import static org.springframework.data.util.ClassTypeInformation.from;
 import static org.springframework.util.Assert.hasText;
 import static org.springframework.util.Assert.notEmpty;
 import static org.springframework.util.Assert.notNull;
-import io.crate.action.sql.SQLResponse;
 import io.crate.types.DataType;
 
 import java.util.ArrayList;
@@ -43,7 +42,7 @@ import org.springframework.data.util.TypeInformation;
 
 
 /**
- * {@link CrateDocumentConverter} translates sql response payload (rows) for a single entity type to {@link CrateDocument}
+ * {@link CrateDocumentConverter} translates sql response payload (row) for a single entity type to {@link CrateDocument}
  * 
  * @author Hasnain Javed
  * @since 1.0.0
@@ -54,15 +53,11 @@ public class CrateDocumentConverter {
 	
 	private List<Row> rows;
 	
-	public CrateDocumentConverter(SQLResponse response) {
-		this(response.cols(), response.columnTypes(), response.rows());
-	}
-	
-	public CrateDocumentConverter(String[] columns, DataType<?>[] types, Object[][] rows) {
+	public CrateDocumentConverter(String[] columns, DataType<?>[] types, Object[] row) {
 		notEmpty(columns);
 		notEmpty(types);
 		
-		this.rows = isNotEmpty(rows) ? initRows(columns, types, rows) : Collections.<Row>emptyList();
+		this.rows = isNotEmpty(row) ? initRows(columns, types, row) : Collections.<Row>emptyList();
 	}
 	
 	public CrateDocument toDocument() {
@@ -147,14 +142,12 @@ public class CrateDocumentConverter {
 		}
 	}
 	
-	private List<Row> initRows(String[] columns, DataType<?>[] types, Object[][] rows) {
+	private List<Row> initRows(String[] columns, DataType<?>[] types, Object[] row) {
 		
 		List<Row> payload = new ArrayList<CrateDocumentConverter.Row>(getLength(rows));
 
-		for (int i = 0; i < rows.length; i++) {
-			for (int j = 0; j < rows[i].length; j++) {
-				payload.add(new Row(columns[j], types[j], rows[i][j]));
-			}
+		for (int index = 0; index < row.length; index++) {
+			payload.add(new Row(columns[index], types[index], row[index]));
 		}
 		
 		return payload;
@@ -171,6 +164,7 @@ public class CrateDocumentConverter {
 		private Object payload;
 		
 		public Row(String column, DataType<?> type, Object payload) {
+			
 			hasText(column);
 			notNull(type);
 			

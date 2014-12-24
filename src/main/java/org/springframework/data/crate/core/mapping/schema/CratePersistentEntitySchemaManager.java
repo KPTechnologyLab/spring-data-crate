@@ -19,6 +19,9 @@ package org.springframework.data.crate.core.mapping.schema;
 import static java.lang.Boolean.TRUE;
 import static java.lang.String.format;
 import static org.slf4j.LoggerFactory.getLogger;
+import static org.springframework.data.crate.core.CrateSQLAction.ActionType.ALTER_TABLE;
+import static org.springframework.data.crate.core.CrateSQLAction.ActionType.CREATE_TABLE;
+import static org.springframework.data.crate.core.CrateSQLAction.ActionType.DROP_TABLE;
 import static org.springframework.data.crate.core.mapping.schema.SchemaExportOption.CREATE_DROP;
 import static org.springframework.data.crate.core.mapping.schema.SchemaExportOption.values;
 import static org.springframework.util.Assert.notNull;
@@ -33,8 +36,8 @@ import org.slf4j.Logger;
 import org.springframework.beans.factory.DisposableBean;
 import org.springframework.beans.factory.InitializingBean;
 import org.springframework.dao.DataAccessException;
-import org.springframework.dao.InvalidDataAccessResourceUsageException;
 import org.springframework.data.crate.NoSuchTableException;
+import org.springframework.data.crate.core.CrateAction;
 import org.springframework.data.crate.core.CrateOperations;
 import org.springframework.data.crate.core.CrateSQLAction;
 import org.springframework.data.crate.core.mapping.CrateMappingContext;
@@ -219,7 +222,7 @@ public class CratePersistentEntitySchemaManager implements InitializingBean, Dis
 	 * @author Hasnain Javed
 	 * @since 1.0.0
 	 */
-	private class CreateTableAction implements CrateSQLAction {
+	private class CreateTableAction implements CrateAction {
 		
 		private CrateSQLStatement createTable;
 		
@@ -237,6 +240,11 @@ public class CratePersistentEntitySchemaManager implements InitializingBean, Dis
 		public String getSQLStatement() {
 			return createTable.createStatement();
 		}
+
+		@Override
+		public ActionType getActionType() {
+			return CREATE_TABLE;
+		}
 	}
 	
 	/**
@@ -245,7 +253,7 @@ public class CratePersistentEntitySchemaManager implements InitializingBean, Dis
 	 * @author Hasnain Javed
 	 * @since 1.0.0
 	 */
-	private class AlterTableAction implements CrateSQLAction {
+	private class AlterTableAction implements CrateAction {
 		
 		private CrateSQLStatement alterTable;
 		
@@ -262,6 +270,11 @@ public class CratePersistentEntitySchemaManager implements InitializingBean, Dis
 		public String getSQLStatement() {
 			return alterTable.createStatement();
 		}
+
+		@Override
+		public ActionType getActionType() {
+			return ALTER_TABLE;
+		}
 	}
 	
 	/**
@@ -269,7 +282,7 @@ public class CratePersistentEntitySchemaManager implements InitializingBean, Dis
 	 * @author Hasnain Javed 
 	 * @since 1.0.0
 	 */
-	class DropTableAction implements CrateSQLAction {
+	class DropTableAction implements CrateAction {
 		
 		private CrateSQLStatement dropTable;
 		
@@ -286,6 +299,11 @@ public class CratePersistentEntitySchemaManager implements InitializingBean, Dis
 		@Override
 		public String getSQLStatement() {
 			return dropTable.createStatement();
+		}
+
+		@Override
+		public ActionType getActionType() {
+			return DROP_TABLE;
 		}
 	}
 }

@@ -53,9 +53,9 @@ public class CrateDocumentConverterTest {
 		
 		DataType<?>[] types = { StringType.INSTANCE };
 		
-		Object[][] rows = new Object[0][0];
+		Object[] row = new Object[0];
 		
-		converter = new CrateDocumentConverter(columns, types, rows);
+		converter = new CrateDocumentConverter(columns, types, row);
 		
 		CrateDocument document = converter.toDocument();
 		
@@ -78,7 +78,7 @@ public class CrateDocumentConverterTest {
 		DataType<?>[] types = { StringType.INSTANCE, IntegerType.INSTANCE, 
 							    BooleanType.INSTANCE, StringType.INSTANCE };
 		
-		Object[][] rows = new Object[][]{new Object[]{"DOCUMENT", 1, true, CANADA}};
+		Object[] row = new Object[]{"DOCUMENT", 1, true, CANADA};
 		
 		Map<String, Object> expected = new HashMap<String, Object>();
 		expected.put("string", "DOCUMENT");
@@ -86,7 +86,7 @@ public class CrateDocumentConverterTest {
 		expected.put("bool", true);
 		expected.put("locale", CANADA);
 		
-		converter = new CrateDocumentConverter(columns, types, rows);
+		converter = new CrateDocumentConverter(columns, types, row);
 		
 		CrateDocument document = converter.toDocument();
 		
@@ -105,7 +105,7 @@ public class CrateDocumentConverterTest {
 		DataType<?>[] types = { new ArrayType(StringType.INSTANCE), 
 								new ArrayType(IntegerType.INSTANCE) };
 		
-		Object[][] rows = new Object[][]{new Object[]{strings, integers}};
+		Object[] row = new Object[]{strings, integers};
 		
 		CrateArray stringsArray = new CrateArray();
 		stringsArray.addAll(strings);
@@ -117,7 +117,7 @@ public class CrateDocumentConverterTest {
 		expected.put("strings", stringsArray);
 		expected.put("integers", integersArray);
 		
-		converter = new CrateDocumentConverter(columns, types, rows);
+		converter = new CrateDocumentConverter(columns, types, row);
 		
 		CrateDocument document = converter.toDocument();
 		
@@ -134,14 +134,14 @@ public class CrateDocumentConverterTest {
 		
 		DataType<?>[] types = { new ArrayType(StringType.INSTANCE) };
 		
-		Object[][] rows = new Object[][]{new Object[]{strings}};
+		Object[] row = new Object[]{strings};
 		
 		CrateArray stringsArray = new CrateArray();
 		stringsArray.addAll(asList(strings));
 		Map<String, Object> expected = new HashMap<String, Object>();
 		expected.put("strings", stringsArray);
 		
-		converter = new CrateDocumentConverter(columns, types, rows);
+		converter = new CrateDocumentConverter(columns, types, row);
 		
 		CrateDocument document = converter.toDocument();
 		
@@ -163,9 +163,9 @@ public class CrateDocumentConverterTest {
 		
 		DataType<?>[] types = { ObjectType.INSTANCE };
 		
-		Object[][] rows = new Object[][]{new Object[]{nested}};
+		Object[] row = new Object[]{nested};
 		
-		converter = new CrateDocumentConverter(columns, types, rows);
+		converter = new CrateDocumentConverter(columns, types, row);
 		
 		CrateDocument document = converter.toDocument();
 		
@@ -195,9 +195,9 @@ public class CrateDocumentConverterTest {
 		
 		DataType<?>[] types = { new ArrayType(ObjectType.INSTANCE) };
 		
-		Object[][] rows = new Object[][]{new Object[]{objects}};
+		Object[] row = new Object[]{objects};
 		
-		converter = new CrateDocumentConverter(columns, types, rows);
+		converter = new CrateDocumentConverter(columns, types, row);
 		
 		CrateDocument document = converter.toDocument();
 		
@@ -238,9 +238,9 @@ public class CrateDocumentConverterTest {
 		
 		DataType<?>[] types = { StringType.INSTANCE, ObjectType.INSTANCE, new ArrayType(ObjectType.INSTANCE) };
 		
-		Object[][] rows = new Object[][]{new Object[]{"aName", addressDocument, emailsArray}};
+		Object[] row = new Object[]{"aName", addressDocument, emailsArray};
 		
-		converter = new CrateDocumentConverter(columns, types, rows);
+		converter = new CrateDocumentConverter(columns, types, row);
 		
 		CrateDocument document = converter.toDocument();
 		

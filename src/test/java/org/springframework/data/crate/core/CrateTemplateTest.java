@@ -102,17 +102,22 @@ public class CrateTemplateTest {
 	
 	@Test(expected=MappingException.class)
 	public void shouldNotRemoveWhenEntityHasNoId() {
-		assertFalse(crateOperations.remove("id", CollectionSubType.class, "test"));
+		assertFalse(crateOperations.delete("id", CollectionSubType.class, "test"));
 	}
 	
 	@Test
 	public void shouldNotRemoveWhenObjectIsNull() {
-		assertFalse(crateOperations.remove(null, Object.class, "test"));
+		assertFalse(crateOperations.delete(null, Object.class, "test"));
 	}
 	
 	@Test(expected=IllegalArgumentException.class)
 	public void shouldNotFindByIdWhenEntityClassIsNull() {
 		crateOperations.findById(1, null);
+	}
+	
+	@Test(expected=MappingException.class)
+	public void shouldNotFindByIdEntityHasNoId() {
+		crateOperations.findById(1, ClassWithNoId.class);
 	}
 	
 	@Test(expected=MappingException.class)

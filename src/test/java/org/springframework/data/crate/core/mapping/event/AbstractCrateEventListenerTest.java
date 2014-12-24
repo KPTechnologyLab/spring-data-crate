@@ -18,6 +18,7 @@ package org.springframework.data.crate.core.mapping.event;
 import static org.junit.Assert.assertEquals;
 
 import org.junit.After;
+import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -33,7 +34,7 @@ import org.springframework.test.context.support.DependencyInjectionTestExecution
  * @since 1.0.0
  */
 @RunWith(SpringJUnit4ClassRunner.class)
-@ContextConfiguration(classes={EventContextConfiguration.class})
+@ContextConfiguration(classes={LifecycleEventConfiguration.class})
 @TestExecutionListeners({DependencyInjectionTestExecutionListener.class})
 public class AbstractCrateEventListenerTest {
 
@@ -43,40 +44,46 @@ public class AbstractCrateEventListenerTest {
 	@Autowired
 	private SimpleMappingEventListener eventListener;
 	
+	@Before
+	public void setup() {
+		crateOperations.deleteAll(User.class);
+	}
+	
 	@After
 	public void teardown() {
 		eventListener.clearEvents();
+		crateOperations.deleteAll(User.class);
 	}
 	
 	@Test
 	public void shouldEmitEventsOnInsert() {
 		
-		insertUser("1@test.com", "hasnain javed", 34);
+		insertUser();
 		
+		assertEquals(1, eventListener.onBeforeConvertEvents.size());
 		assertEquals(1, eventListener.onBeforeSaveEvents.size());
 		assertEquals(1, eventListener.onAfterSaveEvents.size());
-		assertEquals(1, eventListener.onBeforeConvertEvents.size());
 	}
 	
 	@Test
 	public void shouldEmitEventsOnUpdate() {
 		
-		User user = insertUser("2@test.com", "hasnain javed", 34);
+		User user = insertUser();
 		user.setAge(35);
 		
 		crateOperations.update(user);
 		
+		assertEquals(2, eventListener.onBeforeConvertEvents.size()); // once for insert and once for update
 		assertEquals(2, eventListener.onBeforeSaveEvents.size()); // once for insert and once for update
 		assertEquals(1, eventListener.onAfterSaveEvents.size());
-		assertEquals(2, eventListener.onBeforeConvertEvents.size()); // once for insert and once for update
 	}
 	
 	@Test
 	public void shouldEmitEventsOnRemove() {
 		
-		User user = insertUser("3@test.com", "hasnain javed", 34);
+		User user = insertUser();;
 
-		crateOperations.remove(user.getId(), User.class);
+		crateOperations.delete(user.getId(), User.class);
 		
 		assertEquals(1, eventListener.onBeforeDeleteEvents.size());
 		assertEquals(1, eventListener.onAfterDeleteEvents.size());
@@ -85,7 +92,7 @@ public class AbstractCrateEventListenerTest {
 	@Test
 	public void shouldEmitEventsOnFindById() {
 		
-		User user = insertUser("4@test.com", "hasnain javed", 34);
+		User user = insertUser();
 		
 		crateOperations.findById(user.getId(), User.class);
 
@@ -93,8 +100,8 @@ public class AbstractCrateEventListenerTest {
 		assertEquals(1, eventListener.onAfterConvertEvents.size());
 	}
 	
-	private User insertUser(String id, String name, int age) {
-		User user = new User(id, name, age);
+	private User insertUser() {
+		User user = new User("1@test.com", "hasnain javed", 34);
 		crateOperations.insert(user);
 		return user;
 	}
