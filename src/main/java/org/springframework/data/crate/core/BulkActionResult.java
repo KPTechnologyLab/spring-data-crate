@@ -28,7 +28,7 @@ import java.util.List;
  * @since 1.0.0
  * @param <T>
  */
-public class BulkActionResult<T> implements ActionableResult<T> {
+public class BulkActionResult<T> implements BulkOperartionResult<T> {
 	
 	private List<ActionResult<T>> results;
 	

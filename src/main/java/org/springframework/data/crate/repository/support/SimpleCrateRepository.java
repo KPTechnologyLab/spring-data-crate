@@ -28,7 +28,7 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Set;
 
-import org.springframework.data.crate.core.ActionableResult;
+import org.springframework.data.crate.core.BulkOperartionResult;
 import org.springframework.data.crate.core.CrateAction;
 import org.springframework.data.crate.core.CrateOperations;
 import org.springframework.data.crate.repository.CrateRepository;
@@ -187,21 +187,21 @@ public class SimpleCrateRepository<T, ID extends Serializable> implements CrateR
     }
     
     @Override
-	public ActionableResult<T> bulkInsert(List<T> entities) {
+	public BulkOperartionResult<T> bulkInsert(List<T> entities) {
 		
     	notNull(entities, "The given List of entities must not be null");
 		return crateOperations.bulkInsert(entities, entityClass, tableName);
 	}
     
 	@Override
-	public ActionableResult<T> bulkUpdate(List<T> entities) {
+	public BulkOperartionResult<T> bulkUpdate(List<T> entities) {
 		
     	notNull(entities, "The given List of entities must not be null");
 		return crateOperations.bulkUpdate(entities, entityClass, tableName);
 	}
 	
 	@Override
-	public ActionableResult<Object> bulkDelete(List<Object> ids) {
+	public BulkOperartionResult<Object> bulkDelete(List<Object> ids) {
 		
     	notNull(ids, "The given List of Ids must not be null");
 		return crateOperations.bulkDelete(ids, entityClass, tableName);

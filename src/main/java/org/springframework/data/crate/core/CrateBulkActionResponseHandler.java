@@ -24,5 +24,5 @@ import io.crate.action.sql.SQLBulkResponse;
  */
 public interface CrateBulkActionResponseHandler<T> {
 	
-	public ActionableResult<T> handle(SQLBulkResponse response);
+	public BulkOperartionResult<T> handle(SQLBulkResponse response);
 }

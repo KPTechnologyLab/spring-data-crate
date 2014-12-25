@@ -18,7 +18,7 @@ package org.springframework.data.crate.repository;
 import java.io.Serializable;
 import java.util.List;
 
-import org.springframework.data.crate.core.ActionableResult;
+import org.springframework.data.crate.core.BulkOperartionResult;
 import org.springframework.data.repository.CrudRepository;
 import org.springframework.data.repository.NoRepositoryBean;
 
@@ -59,7 +59,7 @@ public interface CrateRepository<T, ID extends Serializable> extends CrudReposit
      * @param entities the list of objects to store in the table.
      * @return Results containing the details of the bulk operation
      */
-    ActionableResult<T> bulkInsert(List<T> entities);
+    BulkOperartionResult<T> bulkInsert(List<T> entities);
     
     /**
      * Update the given list of objects. The object must define an id (primary key).
@@ -68,7 +68,7 @@ public interface CrateRepository<T, ID extends Serializable> extends CrudReposit
      * @param entities the list of objects to store in the table.
      * @return Results containing the details of the bulk operation
      */
-    ActionableResult<T> bulkUpdate(List<T> entities);
+    BulkOperartionResult<T> bulkUpdate(List<T> entities);
     
     /**
      * Delete the given list of objects. The object must define an id (primary key).
@@ -77,5 +77,5 @@ public interface CrateRepository<T, ID extends Serializable> extends CrudReposit
      * @param ids the list of object ids.
      * @return Results containing the details of the bulk operation
      */
-    ActionableResult<Object> bulkDelete(List<Object> ids);
+    BulkOperartionResult<Object> bulkDelete(List<Object> ids);
 }

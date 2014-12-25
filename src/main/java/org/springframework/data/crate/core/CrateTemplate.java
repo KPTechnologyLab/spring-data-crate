@@ -161,7 +161,7 @@ public class CrateTemplate implements CrateOperations, ApplicationContextAware {
     }
     
 	@Override
-	public <T> ActionableResult<T> execute(CrateBulkAction action, CrateBulkActionResponseHandler<T> handler) throws DataAccessException {
+	public <T> BulkOperartionResult<T> execute(CrateBulkAction action, CrateBulkActionResponseHandler<T> handler) throws DataAccessException {
 		
 		notNull(action, "An implementation of CrateBulkAction is required");
 		notNull(action.getActionType(), "Action Type is required");
@@ -210,14 +210,14 @@ public class CrateTemplate implements CrateOperations, ApplicationContextAware {
 	}
 	
 	@Override
-	public <T> ActionableResult<T> bulkInsert(List<T> entities, Class<T> entityClass) {
+	public <T> BulkOperartionResult<T> bulkInsert(List<T> entities, Class<T> entityClass) {
 		
 		notNull(entityClass);
 		return bulkInsert(entities, entityClass, getTableName(entityClass));
 	}
 
 	@Override
-	public <T> ActionableResult<T> bulkInsert(List<T> entities, Class<T> entityClass, String tableName) {
+	public <T> BulkOperartionResult<T> bulkInsert(List<T> entities, Class<T> entityClass, String tableName) {
 		
 		boolean hasId = isIdPropertyDefined(entityClass);
 
@@ -253,14 +253,14 @@ public class CrateTemplate implements CrateOperations, ApplicationContextAware {
 	}
 	
 	@Override
-	public <T> ActionableResult<T> bulkUpdate(List<T> entities, Class<T> entityClass) {
+	public <T> BulkOperartionResult<T> bulkUpdate(List<T> entities, Class<T> entityClass) {
 		
 		notNull(entityClass);
 		return bulkUpdate(entities, entityClass, getTableName(entityClass));
 	}
 
 	@Override
-	public <T> ActionableResult<T> bulkUpdate(List<T> entities, Class<T> entityClass, String tableName) {
+	public <T> BulkOperartionResult<T> bulkUpdate(List<T> entities, Class<T> entityClass, String tableName) {
 		
 		notNull(entityClass);
 		notEmpty(entities);
@@ -371,7 +371,7 @@ public class CrateTemplate implements CrateOperations, ApplicationContextAware {
 	}
 	
 	@Override
-	public <T> ActionableResult<Object> bulkDelete(List<Object> ids, Class<T> entityClass) {
+	public <T> BulkOperartionResult<Object> bulkDelete(List<Object> ids, Class<T> entityClass) {
 		
 		notEmpty(ids);
 		notNull(entityClass);
@@ -379,7 +379,7 @@ public class CrateTemplate implements CrateOperations, ApplicationContextAware {
 	}
 	
 	@Override
-	public <T> ActionableResult<Object> bulkDelete(List<Object> ids, Class<T> entityClass, String tableName) {
+	public <T> BulkOperartionResult<Object> bulkDelete(List<Object> ids, Class<T> entityClass, String tableName) {
 		
 		notEmpty(ids);
 		notNull(entityClass);
@@ -1093,7 +1093,7 @@ public class CrateTemplate implements CrateOperations, ApplicationContextAware {
 		}
 		
 		@Override
-		public ActionableResult<T> handle(SQLBulkResponse response) {
+		public BulkOperartionResult<T> handle(SQLBulkResponse response) {
 			
 			Result[] results = response.results();
 			
@@ -1286,7 +1286,7 @@ public class CrateTemplate implements CrateOperations, ApplicationContextAware {
 		}
 
 		@Override
-		public ActionableResult<Object> handle(SQLBulkResponse response) {
+		public BulkOperartionResult<Object> handle(SQLBulkResponse response) {
 			
 			Result[] results = response.results();
 			

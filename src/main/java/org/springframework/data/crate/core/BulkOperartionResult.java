@@ -25,7 +25,7 @@ import org.springframework.data.crate.core.BulkActionResult.ActionResult;
  * @since 1.0.0
  * @param T
  */
-public interface ActionableResult<T> {
+public interface BulkOperartionResult<T> {
 	
 	public List<ActionResult<T>> getResults();
 	public List<ActionResult<T>> getSuccesses();
