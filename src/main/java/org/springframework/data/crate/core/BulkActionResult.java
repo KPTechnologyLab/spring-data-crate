@@ -28,7 +28,7 @@ import java.util.List;
  * @since 1.0.0
  * @param <T>
  */
-public class BulkActionResult<T> {
+public class BulkActionResult<T> implements ActionableResult<T> {
 	
 	private List<ActionResult<T>> results;
 	
@@ -42,11 +42,13 @@ public class BulkActionResult<T> {
 		return actionResult;
 	}
 	
+	@Override
 	public List<ActionResult<T>> getResults() {
 		return results;
 	}
 	
-	public List<ActionResult<T>> getAllFailures() {
+	@Override
+	public List<ActionResult<T>> getFailures() {
 		
 		List<ActionResult<T>> failures = new LinkedList<ActionResult<T>>();
 		
@@ -59,7 +61,8 @@ public class BulkActionResult<T> {
 		return failures;
 	}
 	
-	public List<ActionResult<T>> getAllSuccesses() {
+	@Override
+	public List<ActionResult<T>> getSuccesses() {
 		
 		List<ActionResult<T>> successes = new LinkedList<ActionResult<T>>();
 		
@@ -72,6 +75,12 @@ public class BulkActionResult<T> {
 		return successes;
 	}
 
+	/**
+	 * 
+	 * @author Hasnain Javed
+	 * @since 1.0.0
+	 * @param <T>
+	 */
 	public static class ActionResult<T> {
 		
 		private Result result;
