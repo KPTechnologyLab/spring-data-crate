@@ -23,11 +23,29 @@ import java.io.Serializable;
  * @param <T>
  * @param <ID>
  * @author Rizwan Idrees
+ * @author Hasnain Javed
+ * @since 1.0.0
  */
 public interface CrateEntityInformation<T, ID extends Serializable> extends EntityInformation<T, ID> {
 
+	/**
+	 * Returns the name of the table the entity will be persisted to.
+	 * 
+	 * @return
+	 */
+	String getTableName();
+	
+	/**
+	 * Returns the attribute that the id will be persisted to.
+	 * 
+	 * @return
+	 */
 	String getIdAttribute();
 
+	/**
+	 * Returns the version value from the given entity.
+	 * 
+	 * @return
+	 */
 	Long getVersion(T entity);
-
 }

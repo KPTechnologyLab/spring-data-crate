@@ -29,7 +29,7 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Set;
 
-import org.springframework.data.crate.core.BulkActionResult;
+import org.springframework.data.crate.core.ActionableResult;
 import org.springframework.data.crate.core.CrateAction;
 import org.springframework.data.crate.core.CrateOperations;
 import org.springframework.data.crate.repository.CrateRepository;
@@ -102,14 +102,14 @@ public class SimpleCrateRepository<T, ID extends Serializable> implements CrateR
     
     // TODO: re factor when the Criteria API is in place
     @Override
-    public Iterable<T> findAll() {
+    public List<T> findAll() {
     	
         return crateOperations.findAll(entityClass, tableName);
     }
     
     // TODO: re factor when the Criteria API is in place and use the IN clause for ids
     @Override
-    public Iterable<T> findAll(Iterable<ID> ids) {
+    public List<T> findAll(Iterable<ID> ids) {
         
     	Iterator<ID> iterator = ids.iterator();
     	
@@ -153,7 +153,13 @@ public class SimpleCrateRepository<T, ID extends Serializable> implements CrateR
 			}
 		});
     	
-    	return response.rowCount();
+    	Long total = 0L;
+    	
+    	if(response.hasRowCount()) {
+    		total = (Long)response.rows()[0][0];
+    	}
+    	
+    	return total;
     }
     
     @Override
@@ -187,32 +193,26 @@ public class SimpleCrateRepository<T, ID extends Serializable> implements CrateR
     }
     
     @Override
-	public BulkActionResult<T> bulkInsert(List<T> entities) {
+	public ActionableResult<T> bulkInsert(List<T> entities) {
 		
-    	notNull(entityClass, "Entity class must not be null");
     	notNull(entities, "The given List of entities must not be null");
-    	
 		return crateOperations.bulkInsert(entities, entityClass, tableName);
 	}
-
-	@Override
-	public BulkActionResult<T> bulkUpdate(List<T> entities) {
-		
-		notNull(entityClass, "Entity class must not be null");
-    	notNull(entities, "The given List of entities must not be null");
-    	
-		return null;
-	}
-
-	@Override
-	public BulkActionResult<T> bulkDelete(List<T> entities) {
-		
-		notNull(entityClass, "Entity class must not be null");
-    	notNull(entities, "The given List of entities must not be null");
-    	
-		return null;
-	}
     
+	@Override
+	public ActionableResult<T> bulkUpdate(List<T> entities) {
+		
+    	notNull(entities, "The given List of entities must not be null");
+		return crateOperations.bulkUpdate(entities, entityClass, tableName);
+	}
+	
+	@Override
+	public ActionableResult<Object> bulkDelete(List<Object> ids) {
+		
+    	notNull(ids, "The given List of Ids must not be null");
+		return crateOperations.bulkDelete(ids, entityClass, tableName);
+	}
+	
     /**
 	 * Returns the underlying {@link CrateOperations} instance.
 	 * 

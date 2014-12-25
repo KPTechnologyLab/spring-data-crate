@@ -252,10 +252,10 @@ public class CrateTemplateIntegrationTest {
     	User hasnain = new User("hasnain@test.com", "Hasnain Javed", 34);
     	User rizwan = new User("rizwan@test.com", "Rizwan Idrees", 33);
     	
-    	BulkActionResult<User> results = crateTemplate.bulkInsert(asList(hasnain, rizwan), User.class);
+    	ActionableResult<User> results = crateTemplate.bulkInsert(asList(hasnain, rizwan), User.class);
     	
-    	assertThat(results.getAllSuccesses().size(), is(2));
-    	assertThat(results.getAllFailures().isEmpty(), is(true));
+    	assertThat(results.getSuccesses().size(), is(2));
+    	assertThat(results.getFailures().isEmpty(), is(true));
     }
     
     @Test
@@ -269,10 +269,10 @@ public class CrateTemplateIntegrationTest {
     	hasnain.setName("Hasnain");
     	rizwan.setName("Rizwan");
     	
-    	BulkActionResult<User> results = crateTemplate.bulkUpdate(asList(hasnain, rizwan), User.class);
+    	ActionableResult<User> results = crateTemplate.bulkUpdate(asList(hasnain, rizwan), User.class);
     	
-    	assertThat(results.getAllSuccesses().size(), is(2));
-    	assertThat(results.getAllFailures().isEmpty(), is(true));
+    	assertThat(results.getSuccesses().size(), is(2));
+    	assertThat(results.getFailures().isEmpty(), is(true));
     }
     
     @Test
@@ -285,9 +285,9 @@ public class CrateTemplateIntegrationTest {
     	
     	List<Object> ids = new ArrayList<Object>(asList(hasnain.getId(), rizwan.getId()));
     	
-    	BulkActionResult<Object> results = crateTemplate.bulkDelete(ids, User.class);
+    	ActionableResult<Object> results = crateTemplate.bulkDelete(ids, User.class);
     	
-    	assertThat(results.getAllSuccesses().size(), is(2));
-    	assertThat(results.getAllFailures().isEmpty(), is(true));
+    	assertThat(results.getSuccesses().size(), is(2));
+    	assertThat(results.getFailures().isEmpty(), is(true));
     }
 }

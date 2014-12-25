@@ -15,15 +15,13 @@
  */
 package org.springframework.data.crate.repository.support;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-import org.springframework.data.crate.core.mapping.CratePersistentEntity;
-import org.springframework.data.crate.core.mapping.CratePersistentProperty;
-import org.springframework.data.mapping.model.BeanWrapper;
-import org.springframework.data.repository.core.support.AbstractEntityInformation;
-import org.springframework.util.Assert;
+import static java.lang.String.format;
+import static org.springframework.util.Assert.notNull;
 
 import java.io.Serializable;
+
+import org.springframework.data.crate.core.mapping.CratePersistentEntity;
+import org.springframework.data.repository.core.support.AbstractEntityInformation;
 
 /**
  * Crate specific implementation of
@@ -32,16 +30,19 @@ import java.io.Serializable;
  * @param <T>
  * @param <ID>
  * @author Rizwan Idrees
+ * @author Hasnain Javed
  */
-public class MappingCrateEntityInformation<T, ID extends Serializable> extends AbstractEntityInformation<T, ID>
-		implements CrateEntityInformation<T, ID> {
+public class MappingCrateEntityInformation<T, ID extends Serializable> extends AbstractEntityInformation<T, ID> 
+												 implements CrateEntityInformation<T, ID> {
 
-	private static final Logger logger = LoggerFactory.getLogger(MappingCrateEntityInformation.class);
+	private static final String ID_MSG = "Unable to identify 'id' property in class '%s'."
+										 .concat("Make sure the 'id' property is annotated with @Id or named as 'id'");
+	
 	private final CratePersistentEntity<T> entityMetadata;
 	private Class<?> idClass;
-
-
+	
 	public MappingCrateEntityInformation(CratePersistentEntity<T> entity) {
+		
 		super(entity.getType());
 		this.entityMetadata = entity;
 		this.idClass = entity.getIdProperty().getType();
@@ -50,12 +51,13 @@ public class MappingCrateEntityInformation<T, ID extends Serializable> extends A
 	@SuppressWarnings("unchecked")
 	@Override
 	public ID getId(T entity) {
-		CratePersistentProperty id = entityMetadata.getIdProperty();
-		try {
-			return (ID) BeanWrapper.create(entity, null).getProperty(id);
-		} catch (Exception e) {
-			throw new IllegalStateException("ID could not be resolved", e);
+		
+		if(entityMetadata.hasIdProperty()) {
+			return (ID) entityMetadata.getPropertyAccessor(entity)
+					  				  .getProperty(entityMetadata.getIdProperty());
 		}
+		
+		return null;
 	}
 
 	@SuppressWarnings("unchecked")
@@ -63,26 +65,27 @@ public class MappingCrateEntityInformation<T, ID extends Serializable> extends A
 	public Class<ID> getIdType() {
 		return (Class<ID>) idClass;
 	}
+	
+	@Override
+	public String getTableName() {
+		return entityMetadata.getTableName();
+	}
 
 	@Override
 	public String getIdAttribute() {
-		Assert.notNull(entityMetadata.getIdProperty(), "Unable to identify 'id' property in class "
-				+ entityMetadata.getType().getSimpleName()
-				+ ". Make sure the 'id' property is annotated with @Id or named as 'id' or 'documentId' ");
+		
+		notNull(entityMetadata.getIdProperty(), format(ID_MSG, entityMetadata.getType().getSimpleName()));
 		return entityMetadata.getIdProperty().getFieldName();
 	}
 
 	@Override
 	public Long getVersion(T entity) {
-		CratePersistentProperty versionProperty = entityMetadata.getVersionProperty();
-		try {
-			if (versionProperty != null) {
-				return (Long) BeanWrapper.create(entity, null).getProperty(versionProperty);
-			}
-		} catch (Exception e) {
-			throw new IllegalStateException("failed to load version field", e);
+		
+		if(entityMetadata.hasVersionProperty()) {
+			return (Long) entityMetadata.getPropertyAccessor(entity)
+										.getProperty(entityMetadata.getVersionProperty());
 		}
+		
 		return null;
 	}
-
 }

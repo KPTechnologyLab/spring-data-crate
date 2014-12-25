@@ -54,9 +54,6 @@ import java.util.List;
 import java.util.Set;
 import java.util.concurrent.ExecutionException;
 
-
-
-//import org.apache.commons.lang.ArrayUtils;
 import org.slf4j.Logger;
 import org.springframework.beans.BeansException;
 import org.springframework.context.ApplicationContext;
@@ -166,7 +163,7 @@ public class CrateTemplate implements CrateOperations, ApplicationContextAware {
     }
     
 	@Override
-	public <T> BulkActionResult<T> execute(CrateBulkAction action, CrateBulkActionResponseHandler<T> handler) throws DataAccessException {
+	public <T> ActionableResult<T> execute(CrateBulkAction action, CrateBulkActionResponseHandler<T> handler) throws DataAccessException {
 		
 		notNull(action, "An implementation of CrateBulkAction is required");
 		notNull(action.getActionType(), "Action Type is required");
@@ -215,14 +212,14 @@ public class CrateTemplate implements CrateOperations, ApplicationContextAware {
 	}
 	
 	@Override
-	public <T> BulkActionResult<T> bulkInsert(List<T> entities, Class<T> entityClass) {
+	public <T> ActionableResult<T> bulkInsert(List<T> entities, Class<T> entityClass) {
 		
 		notNull(entityClass);
 		return bulkInsert(entities, entityClass, getTableName(entityClass));
 	}
 
 	@Override
-	public <T> BulkActionResult<T> bulkInsert(List<T> entities, Class<T> entityClass, String tableName) {
+	public <T> ActionableResult<T> bulkInsert(List<T> entities, Class<T> entityClass, String tableName) {
 		
 		boolean hasId = isIdPropertyDefined(entityClass);
 
@@ -258,14 +255,14 @@ public class CrateTemplate implements CrateOperations, ApplicationContextAware {
 	}
 	
 	@Override
-	public <T> BulkActionResult<T> bulkUpdate(List<T> entities, Class<T> entityClass) {
+	public <T> ActionableResult<T> bulkUpdate(List<T> entities, Class<T> entityClass) {
 		
 		notNull(entityClass);
 		return bulkUpdate(entities, entityClass, getTableName(entityClass));
 	}
 
 	@Override
-	public <T> BulkActionResult<T> bulkUpdate(List<T> entities, Class<T> entityClass, String tableName) {
+	public <T> ActionableResult<T> bulkUpdate(List<T> entities, Class<T> entityClass, String tableName) {
 		
 		notNull(entityClass);
 		notEmpty(entities);
@@ -376,7 +373,7 @@ public class CrateTemplate implements CrateOperations, ApplicationContextAware {
 	}
 	
 	@Override
-	public <T> BulkActionResult<Object> bulkDelete(List<Object> ids, Class<T> entityClass) {
+	public <T> ActionableResult<Object> bulkDelete(List<Object> ids, Class<T> entityClass) {
 		
 		notEmpty(ids);
 		notNull(entityClass);
@@ -384,7 +381,7 @@ public class CrateTemplate implements CrateOperations, ApplicationContextAware {
 	}
 	
 	@Override
-	public <T> BulkActionResult<Object> bulkDelete(List<Object> ids, Class<T> entityClass, String tableName) {
+	public <T> ActionableResult<Object> bulkDelete(List<Object> ids, Class<T> entityClass, String tableName) {
 		
 		notEmpty(ids);
 		notNull(entityClass);
@@ -674,10 +671,10 @@ public class CrateTemplate implements CrateOperations, ApplicationContextAware {
 		public SelectAction(Class<?> entityClass, String tableName, Object id) {
 			
 			notNull(entityClass);
-			notNull(id);
+//			notNull(id);
 			
-			this.select = initSelectStatement(entityClass, tableName);
 			this.id = crateConverter.convertToCrateType(id, null);
+			this.select = initSelectStatement(entityClass, tableName);
 		}
 		
 		@Override
@@ -712,7 +709,7 @@ public class CrateTemplate implements CrateOperations, ApplicationContextAware {
 			Set<String> columns = isVersioned ? entity.getPropertyNames(entity.getVersionProperty().getFieldName()) :
 												entity.getPropertyNames();
 			
-			String idColumn = entity.hasIdProperty() ? entity.getIdProperty().getFieldName() : null;
+			String idColumn = id != null ? entity.getIdProperty().getFieldName() : null;
 			
 			return new Select(idColumn, tableName, columns);
 		}
@@ -1099,7 +1096,7 @@ public class CrateTemplate implements CrateOperations, ApplicationContextAware {
 		}
 		
 		@Override
-		public BulkActionResult<T> handle(SQLBulkResponse response) {
+		public ActionableResult<T> handle(SQLBulkResponse response) {
 			
 			Result[] results = response.results();
 			
@@ -1292,7 +1289,7 @@ public class CrateTemplate implements CrateOperations, ApplicationContextAware {
 		}
 
 		@Override
-		public BulkActionResult<Object> handle(SQLBulkResponse response) {
+		public ActionableResult<Object> handle(SQLBulkResponse response) {
 			
 			Result[] results = response.results();
 			
