@@ -24,11 +24,10 @@ import static org.apache.commons.lang.ArrayUtils.add;
 import static org.apache.commons.lang.ArrayUtils.addAll;
 import static org.apache.commons.lang.ArrayUtils.isEmpty;
 import static org.slf4j.LoggerFactory.getLogger;
-import static org.springframework.data.crate.core.CrateSQLAction.ActionType.DELETE;
-import static org.springframework.data.crate.core.CrateSQLAction.ActionType.INSERT;
-import static org.springframework.data.crate.core.CrateSQLAction.ActionType.SELECT;
-import static org.springframework.data.crate.core.CrateSQLAction.ActionType.UPDATE;
-import static org.springframework.data.crate.core.CrateSQLAction.ActionType.values;
+import static org.springframework.data.crate.core.ActionType.DELETE;
+import static org.springframework.data.crate.core.ActionType.INSERT;
+import static org.springframework.data.crate.core.ActionType.UPDATE;
+import static org.springframework.data.crate.core.ActionType.values;
 import static org.springframework.data.crate.core.convert.CrateTypeMapper.DEFAULT_TYPE_KEY;
 import static org.springframework.data.crate.core.mapping.CratePersistentProperty.INITIAL_VERSION_VALUE;
 import static org.springframework.data.crate.core.mapping.CratePersistentProperty.RESERVED_VESRION_FIELD_NAME;
@@ -63,7 +62,6 @@ import org.springframework.dao.DataAccessException;
 import org.springframework.dao.support.PersistenceExceptionTranslator;
 import org.springframework.data.crate.CrateSQLActionException;
 import org.springframework.data.crate.core.BulkActionResult.ActionResult;
-import org.springframework.data.crate.core.CrateSQLAction.ActionType;
 import org.springframework.data.crate.core.convert.CrateConverter;
 import org.springframework.data.crate.core.convert.CrateDocumentConverter;
 import org.springframework.data.crate.core.convert.MappingCrateConverter;
@@ -343,10 +341,10 @@ public class CrateTemplate implements CrateOperations, ApplicationContextAware {
 				return new SQLRequest(getSQLStatement());
 			}
 
-			@Override
+			/*@Override
 			public ActionType getActionType() {
 				return DELETE;
-			}
+			}*/
 		});
 	}
 	
@@ -671,7 +669,6 @@ public class CrateTemplate implements CrateOperations, ApplicationContextAware {
 		public SelectAction(Class<?> entityClass, String tableName, Object id) {
 			
 			notNull(entityClass);
-//			notNull(id);
 			
 			this.id = crateConverter.convertToCrateType(id, null);
 			this.select = initSelectStatement(entityClass, tableName);
@@ -695,10 +692,10 @@ public class CrateTemplate implements CrateOperations, ApplicationContextAware {
 			return select.createStatement();
 		}
 		
-		@Override
+		/*@Override
 		public ActionType getActionType() {
 			return SELECT;
-		}
+		}*/
 		
 		private CrateSQLStatement initSelectStatement(Class<?> entityClass, String tableName) {
 			
@@ -896,10 +893,10 @@ public class CrateTemplate implements CrateOperations, ApplicationContextAware {
 			return delete.createStatement();
 		}
 		
-		@Override
+		/*@Override
 		public ActionType getActionType() {
 			return DELETE;
-		}
+		}*/
 		
 		@Override
 		public Boolean handle(SQLResponse response) {
@@ -1340,6 +1337,7 @@ public class CrateTemplate implements CrateOperations, ApplicationContextAware {
 	 */
 	private interface LifecycleEventCallback extends CrateAction {
 		
+		ActionType getActionType();
 		Object getEntity();
 		CrateDocument getDocument();
 	}

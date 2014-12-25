@@ -16,6 +16,7 @@
 
 package org.springframework.data.crate.core;
 
+import static java.util.Arrays.asList;
 import static org.hamcrest.Matchers.is;
 import static org.hamcrest.Matchers.notNullValue;
 import static org.hamcrest.Matchers.nullValue;
@@ -30,7 +31,6 @@ import static org.springframework.data.sample.entities.integration.SimpleCollect
 import static org.springframework.data.sample.entities.integration.SimpleEntity.simpleEntity;
 import static org.springframework.data.sample.entities.integration.SimpleEntityWithId.simpleEntityWithId;
 import static org.springframework.data.sample.entities.integration.SimpleMapTypes.simpleMapTypes;
-import static java.util.Arrays.asList;
 
 import java.util.ArrayList;
 import java.util.List;

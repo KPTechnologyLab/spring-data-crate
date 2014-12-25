@@ -15,6 +15,11 @@
  */
 package org.springframework.data.crate.repository.support;
 
+import static org.springframework.data.querydsl.QueryDslUtils.QUERY_DSL_PRESENT;
+
+import java.io.Serializable;
+import java.lang.reflect.Method;
+
 import org.springframework.data.crate.core.CrateOperations;
 import org.springframework.data.querydsl.QueryDslPredicateExecutor;
 import org.springframework.data.repository.core.NamedQueries;
@@ -24,11 +29,6 @@ import org.springframework.data.repository.query.EvaluationContextProvider;
 import org.springframework.data.repository.query.QueryLookupStrategy;
 import org.springframework.data.repository.query.RepositoryQuery;
 import org.springframework.util.Assert;
-
-import java.io.Serializable;
-import java.lang.reflect.Method;
-
-import static org.springframework.data.querydsl.QueryDslUtils.QUERY_DSL_PRESENT;
 
 /**
  * Factory to create {@link org.springframework.data.crate.repository.CrateRepository}

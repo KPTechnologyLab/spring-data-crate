@@ -49,7 +49,6 @@ import org.springframework.data.crate.core.mapping.schema.EntityColumnMapperTest
 import org.springframework.data.crate.core.mapping.schema.EntityColumnMapperTest.EntityTypeColumnMappingTest;
 import org.springframework.data.crate.core.mapping.schema.EntityColumnMapperTest.MapTypeColumnMappingTest;
 import org.springframework.data.crate.core.mapping.schema.EntityColumnMapperTest.PrimitivesColumnMappingTest;
-import org.springframework.util.ClassUtils;
 
 /**
  * @author Hasnain Javed

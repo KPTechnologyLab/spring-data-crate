@@ -19,9 +19,6 @@ package org.springframework.data.crate.core.mapping.schema;
 import static java.lang.Boolean.TRUE;
 import static java.lang.String.format;
 import static org.slf4j.LoggerFactory.getLogger;
-import static org.springframework.data.crate.core.CrateSQLAction.ActionType.ALTER_TABLE;
-import static org.springframework.data.crate.core.CrateSQLAction.ActionType.CREATE_TABLE;
-import static org.springframework.data.crate.core.CrateSQLAction.ActionType.DROP_TABLE;
 import static org.springframework.data.crate.core.mapping.schema.SchemaExportOption.CREATE_DROP;
 import static org.springframework.data.crate.core.mapping.schema.SchemaExportOption.values;
 import static org.springframework.util.Assert.notNull;
@@ -240,11 +237,6 @@ public class CratePersistentEntitySchemaManager implements InitializingBean, Dis
 		public String getSQLStatement() {
 			return createTable.createStatement();
 		}
-
-		@Override
-		public ActionType getActionType() {
-			return CREATE_TABLE;
-		}
 	}
 	
 	/**
@@ -270,11 +262,6 @@ public class CratePersistentEntitySchemaManager implements InitializingBean, Dis
 		public String getSQLStatement() {
 			return alterTable.createStatement();
 		}
-
-		@Override
-		public ActionType getActionType() {
-			return ALTER_TABLE;
-		}
 	}
 	
 	/**
@@ -299,11 +286,6 @@ public class CratePersistentEntitySchemaManager implements InitializingBean, Dis
 		@Override
 		public String getSQLStatement() {
 			return dropTable.createStatement();
-		}
-
-		@Override
-		public ActionType getActionType() {
-			return DROP_TABLE;
 		}
 	}
 }

@@ -15,8 +15,6 @@
  */
 package org.springframework.data.crate.core.mapping;
 
-import static org.springframework.data.crate.core.mapping.CrateSimpleTypes.HOLDER;
-
 import java.beans.PropertyDescriptor;
 import java.lang.reflect.Field;
 

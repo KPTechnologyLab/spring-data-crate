@@ -15,7 +15,6 @@
  */
 package org.springframework.data.crate.core.mapping.event;
 
-import org.springframework.data.crate.core.mapping.CrateDocument;
 
 /**
  * Base class for delete events.

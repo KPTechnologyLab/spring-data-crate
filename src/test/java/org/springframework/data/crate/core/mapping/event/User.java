@@ -15,11 +15,11 @@
  */
 package org.springframework.data.crate.core.mapping.event;
 
-import org.springframework.data.annotation.Id;
-import org.springframework.data.crate.core.mapping.annotations.Table;
-
 import javax.validation.constraints.Min;
 import javax.validation.constraints.Size;
+
+import org.springframework.data.annotation.Id;
+import org.springframework.data.crate.core.mapping.annotations.Table;
 
 /**
  * 

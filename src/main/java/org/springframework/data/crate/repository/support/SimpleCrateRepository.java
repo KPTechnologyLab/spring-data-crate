@@ -16,7 +16,6 @@
 package org.springframework.data.crate.repository.support;
 
 import static java.lang.String.format;
-import static org.springframework.data.crate.core.CrateSQLAction.ActionType.SELECT;
 import static org.springframework.util.Assert.notNull;
 import io.crate.action.sql.SQLRequest;
 import io.crate.action.sql.SQLResponse;
@@ -146,12 +145,7 @@ public class SimpleCrateRepository<T, ID extends Serializable> implements CrateR
 			public SQLRequest getSQLRequest() {
 				return new SQLRequest(getSQLStatement());
 			}
-
-			@Override
-			public ActionType getActionType() {
-				return SELECT;
-			}
-		});
+    	});
     	
     	Long total = 0L;
     	

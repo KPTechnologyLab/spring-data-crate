@@ -23,6 +23,7 @@ import io.crate.action.sql.SQLBulkRequest;
  * @since 1.0.0
  */
 public interface CrateBulkAction extends CrateSQLAction {
-	 
+	
+	ActionType getActionType();
 	SQLBulkRequest getSQLRequest();
 }

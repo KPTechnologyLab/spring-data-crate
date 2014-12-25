@@ -19,15 +19,12 @@ package org.springframework.data.crate.core;
 import static java.util.Collections.singleton;
 import static org.springframework.data.crate.core.CyclicReferenceBarrier.cyclicReferenceBarrier;
 
-import java.util.LinkedHashSet;
 import java.util.List;
-import java.util.Set;
 
 import org.junit.Test;
 import org.springframework.data.crate.core.mapping.CrateMappingContext;
 import org.springframework.data.crate.core.mapping.CratePersistentEntity;
 import org.springframework.data.crate.core.mapping.CratePersistentProperty;
-import org.springframework.data.crate.core.mapping.annotations.Table;
 
 /**
  * 

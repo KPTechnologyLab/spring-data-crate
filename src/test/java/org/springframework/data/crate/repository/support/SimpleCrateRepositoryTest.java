@@ -85,7 +85,7 @@ public class SimpleCrateRepositoryTest {
 		
 		repository.save(people);
 		
-		currentThread().sleep(500);
+		currentThread().sleep(1000);
 	}
 
 	@After

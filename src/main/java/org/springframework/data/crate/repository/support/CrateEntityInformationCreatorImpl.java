@@ -15,12 +15,12 @@
  */
 package org.springframework.data.crate.repository.support;
 
+import java.io.Serializable;
+
 import org.springframework.data.crate.core.mapping.CratePersistentEntity;
 import org.springframework.data.crate.core.mapping.CratePersistentProperty;
 import org.springframework.data.mapping.context.MappingContext;
 import org.springframework.util.Assert;
-
-import java.io.Serializable;
 
 /**
  * CrateEntityInformationCreatorImpl

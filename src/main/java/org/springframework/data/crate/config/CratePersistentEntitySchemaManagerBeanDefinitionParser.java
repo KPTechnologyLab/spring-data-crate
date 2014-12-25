@@ -17,6 +17,7 @@ package org.springframework.data.crate.config;
 
 import static org.springframework.data.config.ParsingUtils.setPropertyValue;
 import static org.springframework.data.crate.config.BeanNames.SCHEMA_EXPORT_MANAGER;
+import static org.springframework.data.crate.core.mapping.schema.SchemaExportOption.valueOf;
 
 import org.springframework.beans.factory.support.AbstractBeanDefinition;
 import org.springframework.beans.factory.support.BeanDefinitionBuilder;
@@ -24,7 +25,6 @@ import org.springframework.beans.factory.xml.AbstractBeanDefinitionParser;
 import org.springframework.beans.factory.xml.ParserContext;
 import org.springframework.data.config.BeanComponentDefinitionBuilder;
 import org.springframework.data.crate.core.mapping.schema.CratePersistentEntitySchemaManager;
-import static org.springframework.data.crate.core.mapping.schema.SchemaExportOption.*;
 import org.w3c.dom.Element;
 
 /**

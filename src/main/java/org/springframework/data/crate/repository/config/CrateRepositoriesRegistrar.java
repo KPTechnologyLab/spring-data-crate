@@ -15,10 +15,10 @@
  */
 package org.springframework.data.crate.repository.config;
 
+import java.lang.annotation.Annotation;
+
 import org.springframework.data.repository.config.RepositoryBeanDefinitionRegistrarSupport;
 import org.springframework.data.repository.config.RepositoryConfigurationExtension;
-
-import java.lang.annotation.Annotation;
 
 /**
  * {@link org.springframework.context.annotation.ImportBeanDefinitionRegistrar} implementation to trigger configuration

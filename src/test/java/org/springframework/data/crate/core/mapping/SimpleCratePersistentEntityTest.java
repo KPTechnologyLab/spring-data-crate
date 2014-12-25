@@ -28,7 +28,6 @@ import java.util.Set;
 import org.junit.Test;
 import org.springframework.data.annotation.Id;
 import org.springframework.data.annotation.Version;
-import org.springframework.data.crate.InvalidCrateApiUsageException;
 import org.springframework.data.crate.core.mapping.annotations.Table;
 import org.springframework.data.mapping.model.MappingException;
 import org.springframework.data.sample.entities.Book;

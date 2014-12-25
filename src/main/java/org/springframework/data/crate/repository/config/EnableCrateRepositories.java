@@ -15,13 +15,18 @@
  */
 package org.springframework.data.crate.repository.config;
 
+import java.lang.annotation.Documented;
+import java.lang.annotation.ElementType;
+import java.lang.annotation.Inherited;
+import java.lang.annotation.Retention;
+import java.lang.annotation.RetentionPolicy;
+import java.lang.annotation.Target;
+
 import org.springframework.context.annotation.ComponentScan.Filter;
 import org.springframework.context.annotation.Import;
-import org.springframework.data.crate.repository.support.CrateRepositoryFactoryBean;
 import org.springframework.data.crate.core.CrateTemplate;
+import org.springframework.data.crate.repository.support.CrateRepositoryFactoryBean;
 import org.springframework.data.repository.query.QueryLookupStrategy.Key;
-
-import java.lang.annotation.*;
 
 /**
  * Annotation to enable Crate repositories. Will scan the package of the annotated configuration class for

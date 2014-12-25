@@ -15,13 +15,13 @@
  */
 package org.springframework.data.crate.repository.support;
 
+import java.io.Serializable;
+
 import org.springframework.data.crate.core.CrateOperations;
 import org.springframework.data.repository.Repository;
 import org.springframework.data.repository.core.support.RepositoryFactoryBeanSupport;
 import org.springframework.data.repository.core.support.RepositoryFactorySupport;
 import org.springframework.util.Assert;
-
-import java.io.Serializable;
 
 /**
  * Spring {@link org.springframework.beans.factory.FactoryBean} implementation to ease container based configuration for

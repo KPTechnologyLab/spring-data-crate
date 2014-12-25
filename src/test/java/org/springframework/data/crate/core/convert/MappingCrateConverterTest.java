@@ -32,6 +32,7 @@ import static org.hamcrest.Matchers.notNullValue;
 import static org.hamcrest.Matchers.nullValue;
 import static org.junit.Assert.assertThat;
 import static org.springframework.data.crate.core.convert.CrateTypeMapper.DEFAULT_TYPE_KEY;
+import static org.springframework.data.crate.core.mapping.CratePersistentProperty.RESERVED_VESRION_FIELD_NAME;
 
 import java.util.Collection;
 import java.util.Date;
@@ -55,7 +56,6 @@ import org.springframework.data.annotation.Version;
 import org.springframework.data.crate.core.mapping.CrateArray;
 import org.springframework.data.crate.core.mapping.CrateDocument;
 import org.springframework.data.crate.core.mapping.CrateMappingContext;
-import static org.springframework.data.crate.core.mapping.CratePersistentProperty.RESERVED_VESRION_FIELD_NAME;
 import org.springframework.data.mapping.model.MappingException;
 
 /**

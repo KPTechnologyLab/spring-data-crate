@@ -17,7 +17,6 @@ package org.springframework.data.crate.core.mapping.schema;
 
 import static java.lang.String.format;
 import static java.lang.String.valueOf;
-import static org.springframework.data.crate.core.CrateSQLAction.ActionType.SELECT;
 import static org.springframework.util.Assert.hasText;
 import io.crate.action.sql.SQLRequest;
 import io.crate.action.sql.SQLResponse;
@@ -79,10 +78,5 @@ class ColumnMetadataAction implements CrateAction, CrateActionResponseHandler<Li
 		}
 		
 		throw new NoSuchTableException(format("Table '%s' has no metadata in 'information_schema.columns'. Table does not exist", tableName), null);
-	}
-
-	@Override
-	public ActionType getActionType() {
-		return SELECT;
 	}
 }

@@ -15,11 +15,9 @@
  */
 package org.springframework.data.crate.core.sql;
 
-import static java.lang.String.format;
-import static org.apache.commons.lang.StringUtils.split;
+import static org.springframework.data.crate.core.sql.CrateSQLUtil.dotToSqlPath;
 import static org.springframework.util.Assert.hasText;
 import static org.springframework.util.Assert.notNull;
-import static org.springframework.data.crate.core.sql.CrateSQLUtil.*;
 
 import org.springframework.data.crate.core.mapping.schema.Column;
 

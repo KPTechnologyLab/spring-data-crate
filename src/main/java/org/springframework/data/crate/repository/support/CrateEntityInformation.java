@@ -15,9 +15,9 @@
  */
 package org.springframework.data.crate.repository.support;
 
-import org.springframework.data.repository.core.EntityInformation;
-
 import java.io.Serializable;
+
+import org.springframework.data.repository.core.EntityInformation;
 
 /**
  * @param <T>

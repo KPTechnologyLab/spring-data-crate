@@ -1,7 +1,7 @@
 package org.springframework.data.sample.entities.integration;
 
-import static org.springframework.data.sample.entities.integration.Language.language;
 import static java.util.Arrays.asList;
+import static org.springframework.data.sample.entities.integration.Language.language;
 
 import java.util.ArrayList;
 import java.util.List;
