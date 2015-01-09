@@ -97,7 +97,6 @@ public class CrateTemplate implements CrateOperations, ApplicationContextAware {
     private CrateConverter crateConverter;
     private ApplicationEventPublisher eventPublisher;
     
-    private static final Collection<String> ITERABLE_CLASSES;
     private static final Collection<ActionType> ALLOWED_BULK_OPERATIONS;
     
     private static final String PRIMARY_KEY = "Primary Key must not be null";
@@ -105,12 +104,8 @@ public class CrateTemplate implements CrateOperations, ApplicationContextAware {
     private static final String NO_ID_WARNING = "Persitent Entity '{}' has no id property defined. Saving the same instance will result in a duplicate row";
     private static final String BULK_ACTION = "Invalid bulk sql action type '%s'. Allowed types are '%s'";
     private static final String ID_COLUMN = "Persistent Entity '%s' must define an id column";
+    
     static {
-        ITERABLE_CLASSES = unmodifiableCollection(asList(Collection.class.getName(),
-        												 List.class.getName(),
-        												 Iterator.class.getName(),
-        												 Iterable.class.getName()));
-        
         ALLOWED_BULK_OPERATIONS = unmodifiableCollection(asList(INSERT, UPDATE, DELETE));
     }
     
@@ -137,8 +132,8 @@ public class CrateTemplate implements CrateOperations, ApplicationContextAware {
 
     @Override
 	public SQLResponse execute(CrateAction action) throws DataAccessException {
-    	return this.execute(action, new CrateActionResponseHandler<SQLResponse>() {
-			@Override
+    	return execute(action, new CrateActionResponseHandler<SQLResponse>() {
+    		@Override
 			public SQLResponse handle(SQLResponse response) {
 				return response;
 			}
@@ -200,13 +195,7 @@ public class CrateTemplate implements CrateOperations, ApplicationContextAware {
 		notNull(entity);
 		hasText(tableName);
 		
-		ensureNotCollectionType(entity);
-		
-		LifecycleEventCallback action = new InsertAction(entity, tableName);
-		
-		this.execute(action, new WriteDbCallback(action.getEntity(),
-											     action.getDocument(),
-											     action.getActionType()));
+		executeInternal(new InsertAction(entity, tableName));
 	}
 	
 	@Override
@@ -225,9 +214,7 @@ public class CrateTemplate implements CrateOperations, ApplicationContextAware {
 			logger.warn(NO_ID_WARNING, entityClass.getName());
 		}
 		
-		BulkInsertOperation<T> actionHandler = new BulkInsertOperation<T>(entityClass, tableName, entities);
-		
-		return execute(actionHandler, actionHandler);
+		return executeBulkInternal(new BulkInsertOperation<T>(entityClass, tableName, entities));
 	}
 	
 	@Override
@@ -243,13 +230,7 @@ public class CrateTemplate implements CrateOperations, ApplicationContextAware {
 		notNull(entity);
 		hasText(tableName);
 		
-		ensureNotCollectionType(entity);
-		
-		LifecycleEventCallback action = new WholesaleUpdateByIdAction(entity, tableName);
-		
-		this.execute(action, new WriteDbCallback(action.getEntity(),
-											   	 action.getDocument(),
-												 action.getActionType()));
+		executeInternal(new WholesaleUpdateByIdAction(entity, tableName));
 	}
 	
 	@Override
@@ -265,9 +246,7 @@ public class CrateTemplate implements CrateOperations, ApplicationContextAware {
 		notNull(entityClass);
 		notEmpty(entities);
 		
-		BulkUpdateOperation<T> actionHandler = new BulkUpdateOperation<T>(entityClass, tableName, entities);
-		
-		return execute(actionHandler, actionHandler);
+		return executeBulkInternal(new BulkUpdateOperation<T>(entityClass, tableName, entities));
 	}
 	
 	@Override
@@ -284,7 +263,7 @@ public class CrateTemplate implements CrateOperations, ApplicationContextAware {
 		hasText(tableName);
 		
 		return execute(new SelectAction(entityClass, tableName, null),
-					   new ActionResponseHandler<T>(entityClass));
+					   new ReadDbHandler<T>(entityClass));
 	}
 	
 	@Override
@@ -305,7 +284,7 @@ public class CrateTemplate implements CrateOperations, ApplicationContextAware {
 		}
 		
 		List<T> dbEntity = execute(new SelectAction(entityClass, tableName, id),
-	   						 	   new ActionResponseHandler<T>(entityClass));
+	   						 	   new ReadDbHandler<T>(entityClass));
 		if(dbEntity.isEmpty()) {
 			logger.info("No row found with id '{}'", id);
 			return null;
@@ -340,11 +319,6 @@ public class CrateTemplate implements CrateOperations, ApplicationContextAware {
 			public SQLRequest getSQLRequest() {
 				return new SQLRequest(getSQLStatement());
 			}
-
-			/*@Override
-			public ActionType getActionType() {
-				return DELETE;
-			}*/
 		});
 	}
 	
@@ -396,6 +370,16 @@ public class CrateTemplate implements CrateOperations, ApplicationContextAware {
 		}
 	}
 	
+	private void executeInternal(WriteDbAction action) {
+		action.beforeSave();
+		execute(action, action);
+	}
+	
+	private <T> BulkOperartionResult<T> executeBulkInternal(BaseSQLBulkOperation<T> op) {
+		op.beforeSave();
+		return execute(op, op);
+	}
+	
 	private String getTableName(Class<?> clazz) {
 		return getPersistentEntityFor(clazz).getTableName();
 	}
@@ -416,23 +400,7 @@ public class CrateTemplate implements CrateOperations, ApplicationContextAware {
 		RuntimeException resolved = exceptionTranslator.translateExceptionIfPossible(ex);
 		return resolved == null ? ex : resolved;
 	}
-	
-	/**
-	 * Make sure the given object is not a iterable.
-	 *
-	 * @param entity the object to verify.
-	 */
-	private void ensureNotCollectionType(Object entity) {
-		
-		Class<?> clazz = entity.getClass();
-		
-		if(clazz.isArray() || ITERABLE_CLASSES.contains(clazz.getName()) ||
-		   Collection.class.isAssignableFrom(clazz) || Iterable.class.isAssignableFrom(clazz) || 
-		   Iterator.class.isAssignableFrom(clazz)) {
-			throw new IllegalArgumentException("Cannot use a collection type for persisting entities.");
-		}
-	}
-	
+
 	private boolean isIdPropertyDefined(Class<?> clazz) {
 		return getPersistentEntityFor(clazz).hasIdProperty();
 	}
@@ -692,11 +660,6 @@ public class CrateTemplate implements CrateOperations, ApplicationContextAware {
 			return select.createStatement();
 		}
 		
-		/*@Override
-		public ActionType getActionType() {
-			return SELECT;
-		}*/
-		
 		private CrateSQLStatement initSelectStatement(Class<?> entityClass, String tableName) {
 			
 			CratePersistentEntity<?> entity = getPersistentEntityFor(entityClass);
@@ -716,58 +679,19 @@ public class CrateTemplate implements CrateOperations, ApplicationContextAware {
 	 * @author Hasnain Javed
 	 * @since 1.0.0 
 	 */
-	private class WholesaleUpdateByIdAction implements LifecycleEventCallback {
+	private class WholesaleUpdateByIdAction extends WriteDbAction {
 		
-		private CrateSQLStatement update;
-		private CrateDocument document;
-		private Object entity;
 		private Object idValue;
-		private CratePersistentEntity<?> persistentEntity;
 		
 		public WholesaleUpdateByIdAction(Object entity, String tableName) {
 			
-			notNull(entity);
-			validateEntity(entity);
+			super(entity, tableName, UPDATE);
+			validateEntity();
 			
-			this.entity = entity;
-			this.persistentEntity = getPersistentEntityFor(entity.getClass());
-			this.document = toDocument();
 			this.idValue = crateConverter.convertToCrateType(getIdPropertyValue(entity), null);
-			this.update = new Update(tableName,
-									 persistentEntity.getIdProperty().getFieldName(),
-									 document.keySet());
 		}
 		
-		@Override
-		public SQLRequest getSQLRequest() {
-			SQLRequest request = new SQLRequest(getSQLStatement(), add(document.values().toArray(), idValue));
-			request.includeTypesOnResponse(true);
-			return request;
-		}
-
-		@Override
-		public String getSQLStatement() {
-			return update.createStatement();
-		}
-		
-		@Override
-		public ActionType getActionType() {
-			return UPDATE;
-		}
-		
-		@Override
-		public Object getEntity() {
-			return entity;
-		}
-
-		@Override
-		public CrateDocument getDocument() {
-			return document;
-		}
-		
-		private void validateEntity(Object entity) {
-			
-			CratePersistentEntity<?> persistentEntity = getPersistentEntityFor(entity.getClass());
+		private void validateEntity() {
 			
 			if(!persistentEntity.hasIdProperty()) {
 				throw new MappingException(format(ID_COLUMN, entity.getClass().getName()));
@@ -776,20 +700,22 @@ public class CrateTemplate implements CrateOperations, ApplicationContextAware {
 			validateIdValue(entity);
 		}
 		
-		private CrateDocument toDocument() {
-			
-			CrateDocument document = new CrateDocument();
-			
-			doBeforeSave(entity, document);
-			
+		@Override
+		protected void processDocument(CrateDocument document) {
 			document.remove(persistentEntity.getIdProperty().getFieldName());
 			document.remove(DEFAULT_TYPE_KEY);
-			
-			if(persistentEntity.hasVersionProperty()) {
-				document.remove(persistentEntity.getVersionProperty().getFieldName());
-			}
-			
-			return document;
+		}
+
+		@Override
+		protected Object[] getArguments() {
+			return add(document.values().toArray(), idValue);
+		}
+		
+		@Override
+		public String getSQLStatement() {
+			return new Update(tableName,
+							  persistentEntity.getIdProperty().getFieldName(),
+					  		  document.keySet()).createStatement();
 		}
 	}
 	
@@ -798,35 +724,15 @@ public class CrateTemplate implements CrateOperations, ApplicationContextAware {
 	 * @author Hasnain Javed
 	 * @since 1.0.0
 	 */
-	private class InsertAction implements LifecycleEventCallback {
-		
-		private CrateSQLStatement insert;
-		private CrateDocument document;
-		private Object entity;
+	private class InsertAction extends WriteDbAction {
 		
 		public InsertAction(Object entity, String tableName) {
 			
-			notNull(entity);
-			validateEntity(entity);
-			
-			this.entity = entity;
-			this.document = toDocument();
-			this.insert = new Insert(tableName, document.keySet());
+			super(entity, tableName, INSERT);
+			validateEntity();
 		}
 		
-		@Override
-		public SQLRequest getSQLRequest() {
-			SQLRequest request = new SQLRequest(getSQLStatement(), document.values().toArray());
-			request.includeTypesOnResponse(true);
-			return request;
-		}
-		
-		@Override
-		public String getSQLStatement() {
-			return insert.createStatement();
-		}
-		
-		private void validateEntity(Object entity) {
+		private void validateEntity() {
 			
 			if(!isIdPropertyDefined(entity.getClass())) {
 				logger.warn(NO_ID_WARNING, entity.getClass().getName());
@@ -835,28 +741,19 @@ public class CrateTemplate implements CrateOperations, ApplicationContextAware {
 			}
 		}
 		
-		private CrateDocument toDocument() {
-			
-			CrateDocument document = new CrateDocument();
-			doBeforeSave(entity, document);
-			
+		@Override
+		protected void processDocument(CrateDocument document) {
 			document.remove(RESERVED_VESRION_FIELD_NAME);
-			return document;
 		}
 
 		@Override
-		public ActionType getActionType() {			
-			return INSERT;
+		protected Object[] getArguments() {
+			return document.values().toArray();
 		}
-
+		
 		@Override
-		public Object getEntity() {
-			return entity;
-		}
-
-		@Override
-		public CrateDocument getDocument() {
-			return document;
+		public String getSQLStatement() {
+			return new Insert(tableName, document.keySet()).createStatement();
 		}
 	}
 	
@@ -876,9 +773,10 @@ public class CrateTemplate implements CrateOperations, ApplicationContextAware {
 			notNull(id);
 			validateEntity(entityClass);
 
-			doBeforeDelete(id);
 			this.idValue = crateConverter.convertToCrateType(id, null);
 			this.delete = new Delete(table, getIdPropertyFor(entityClass).getFieldName());
+			
+			doBeforeDelete(id);
 		}
 		
 		@Override
@@ -892,11 +790,6 @@ public class CrateTemplate implements CrateOperations, ApplicationContextAware {
 		public String getSQLStatement() {
 			return delete.createStatement();
 		}
-		
-		/*@Override
-		public ActionType getActionType() {
-			return DELETE;
-		}*/
 		
 		@Override
 		public Boolean handle(SQLResponse response) {
@@ -929,11 +822,11 @@ public class CrateTemplate implements CrateOperations, ApplicationContextAware {
 	 * @since 1.0.0
 	 * @param <T>
 	 */
-	private class ActionResponseHandler<T> implements CrateActionResponseHandler<List<T>> {
+	private class ReadDbHandler<T> implements CrateActionResponseHandler<List<T>> {
 
 		private final Class<T> type;
 		
-		public ActionResponseHandler(Class<T> type) {
+		public ReadDbHandler(Class<T> type) {
 			notNull(type);
 			this.type = type;
 		}
@@ -976,33 +869,59 @@ public class CrateTemplate implements CrateOperations, ApplicationContextAware {
 	}
 
 	/**
-	 * 
 	 * @author Hasnain Javed
 	 * @since 1.0.0
 	 * @param <T>
 	 */
-	private class WriteDbCallback implements CrateActionResponseHandler<Void> {
-
-		private Set<ActionType> allowedTypes = new HashSet<ActionType>(asList(INSERT, UPDATE));
+	private abstract class WriteDbAction implements CrateAction, CrateActionResponseHandler<Void> {
+		
+		private final Set<ActionType> allowedTypes;
 		
 		private ActionType actionType;
-		private CrateDocument document;
-		private Object entity;
-
-		public WriteDbCallback(Object entity, CrateDocument document, ActionType actionType) {
+		
+		protected String tableName;
+		protected Object entity;
+		protected CratePersistentEntity<?> persistentEntity;
+		protected CrateDocument document;
+		
+		public WriteDbAction(Object entity, String tableName, ActionType actionType) {
 			
-			notNull(actionType);
+			hasText(tableName);
 			notNull(entity);
-			notNull(document);
+			notNull(actionType);
+			
+			allowedTypes = new HashSet<ActionType>(asList(INSERT, UPDATE));
 			
 			if(!allowedTypes.contains(actionType)) {
 	    		throw new CrateSQLActionException(format("Invalid sql action type '%s'. Allowed types are '%s'", actionType,
 	    																										 allowedTypes));
 			}
 			
-			this.actionType = actionType;
-			this.document = document;
+			this.tableName = tableName;
 			this.entity = entity;
+			this.persistentEntity = getPersistentEntityFor(entity.getClass());
+			this.document = new CrateDocument();
+			this.actionType = actionType;
+		}
+		
+		final void beforeSave() {
+			
+			doBeforeSave(entity, document);
+			
+			if(persistentEntity.hasVersionProperty()) {
+				document.remove(persistentEntity.getVersionProperty().getFieldName());
+			}
+			
+			processDocument(document);
+		}
+		
+		@Override
+		public SQLRequest getSQLRequest() {
+			
+			SQLRequest request = new SQLRequest(getSQLStatement(), getArguments());
+			request.includeTypesOnResponse(true);
+			
+			return request;
 		}
 		
 		@Override
@@ -1027,6 +946,9 @@ public class CrateTemplate implements CrateOperations, ApplicationContextAware {
 			
 			return null;
 		}
+		
+		protected abstract void processDocument(CrateDocument document);
+		protected abstract Object[] getArguments();
 	}
 	
 	/**
@@ -1037,26 +959,46 @@ public class CrateTemplate implements CrateOperations, ApplicationContextAware {
 	 */
 	private abstract class BaseSQLBulkOperation<T> implements CrateBulkAction, CrateBulkActionResponseHandler<T> {
 		
+		protected String tableName;
 		protected List<T> entities;		
 		protected List<CrateDocument> documents;		
 		protected CratePersistentEntity<?> persistentEntity;
 		
 		private ActionType actionType;
 
-		public BaseSQLBulkOperation(Class<T> entityClass, List<T> entities, ActionType actionType) {
+		public BaseSQLBulkOperation(String tableName, Class<T> entityClass, List<T> entities, ActionType actionType) {
 			
+			hasText(tableName);
 			notNull(entityClass);
 			notNull(actionType);			
 			notEmpty(entities);
 			
+			this.tableName = tableName;
 			this.persistentEntity = getPersistentEntityFor(entityClass);
 			this.actionType = actionType;
 			
 			// preserve order
 			this.entities = new ArrayList<T>(entities);
 			this.documents = new ArrayList<CrateDocument>(this.entities.size());
+		}
+		
+		/**
+		 * Converts entities to {@link CrateDocument}s and calls lifecycle callback method(s). 
+		 */
+		final void beforeSave() {
 			
-			toDocuments();
+			for(T entity : entities) {
+				
+				CrateDocument document = new CrateDocument();
+				
+				doBeforeSave(entity, document);
+				
+				processDocument(document);
+				
+				document.remove(RESERVED_VESRION_FIELD_NAME);
+				
+				documents.add(document);
+			}
 		}
 		
 		@Override
@@ -1125,31 +1067,7 @@ public class CrateTemplate implements CrateOperations, ApplicationContextAware {
 			
 			return actionResults;
 		}
-		
-		/**
-		 * Converts entities to {@link CrateDocument}s and calls lifecycle callback methods. 
-		 * Removes version field by default. If action type is UPDATE, the id field is removed 
-		 * from the converted document as crate will throw an exception if the id (primary key) 
-		 * is updated. 
-		 */
-		private void toDocuments() {
-			
-			for(T entity : entities) {
-				
-				CrateDocument document = new CrateDocument();
-				doBeforeSave(entity, document);
-				
-				if(actionType == UPDATE) {
-					document.remove(DEFAULT_TYPE_KEY);
-					document.remove(persistentEntity.getIdProperty().getFieldName());
-				}
-				
-				document.remove(RESERVED_VESRION_FIELD_NAME);
-				
-				documents.add(document);
-			}
- 		}
-		
+
 		/**
 		 * 
 		 * @param exclude the field(s) to be removed from the set. The version field if defined will be
@@ -1177,6 +1095,8 @@ public class CrateTemplate implements CrateOperations, ApplicationContextAware {
 		protected List<Object> appendArgs(Object entity) {
 			return emptyList();
 		}
+		
+		protected abstract void processDocument(CrateDocument document);
 	}
 	
 	/**
@@ -1187,20 +1107,18 @@ public class CrateTemplate implements CrateOperations, ApplicationContextAware {
 	 */
 	private class BulkInsertOperation<T> extends BaseSQLBulkOperation<T> {
 		
-		private final CrateSQLStatement insert;
-		
 		public BulkInsertOperation(Class<T> entityClass, String tableName, List<T> entities) {
-			
-			super(entityClass, entities, INSERT);
-			
-			hasText(tableName);
-			
-			this.insert = new Insert(tableName, getColumns());
+			super(tableName, entityClass, entities, INSERT);
 		}
 		
 		@Override
 		public String getSQLStatement() {
-			return insert.createStatement();
+			return new Insert(tableName, getColumns()).createStatement();
+		}
+
+		@Override
+		protected void processDocument(CrateDocument document) {
+			// no op
 		}
 	}
 	
@@ -1212,28 +1130,29 @@ public class CrateTemplate implements CrateOperations, ApplicationContextAware {
 	 */
 	private class BulkUpdateOperation<T> extends BaseSQLBulkOperation<T> {
 		
-		private final CrateSQLStatement update;
-		
 		public BulkUpdateOperation(Class<T> entityClass, String tableName, List<T> entities) {
 			
-			super(entityClass, entities, UPDATE);
+			super(tableName, entityClass, entities, UPDATE);
 			
-			hasText(tableName);	
 			validateEntity(entityClass);
-			
-			this.update = new Update(tableName,
-									 persistentEntity.getIdProperty().getFieldName(), 
-									 getColumns(persistentEntity.getIdProperty().getFieldName()));
 		}
 		
 		@Override
 		public String getSQLStatement() {
-			return update.createStatement();
+			return new Update(tableName,
+					 		  persistentEntity.getIdProperty().getFieldName(), 
+					 		  getColumns(persistentEntity.getIdProperty().getFieldName())).createStatement();
 		}
 		
 		@Override
 		protected List<Object> appendArgs(Object entity) {
 			return asList(getIdPropertyValue(entity));
+		}
+		
+		@Override
+		protected void processDocument(CrateDocument document) {
+			document.remove(DEFAULT_TYPE_KEY);
+			document.remove(persistentEntity.getIdProperty().getFieldName());
 		}
 		
 		private void validateEntity(Class<T> entityClass) {
@@ -1267,11 +1186,8 @@ public class CrateTemplate implements CrateOperations, ApplicationContextAware {
 			this.convertedIds = new ArrayList<Object>(ids.size());
 			
 			for(Object id : ids) {
-				
+				convertedIds.add(crateConverter.convertToCrateType(id, null));
 				doBeforeDelete(id);
-				
-				Object convertedId = crateConverter.convertToCrateType(id, null);
-				convertedIds.add(convertedId);
 			}
 		}
 		
@@ -1326,19 +1242,5 @@ public class CrateTemplate implements CrateOperations, ApplicationContextAware {
 				throw new MappingException(format(ID_COLUMN, entityClass.getName()));
 			}
 		}
-	}
-	
-	/**
-	 * Call back handler adds methods to return the current entity and document for 
-	 * life cycle event call backs
-	 * 
-	 * @author Hasnain Javed
-	 * @since 1.0.0
-	 */
-	private interface LifecycleEventCallback extends CrateAction {
-		
-		ActionType getActionType();
-		Object getEntity();
-		CrateDocument getDocument();
 	}
 }

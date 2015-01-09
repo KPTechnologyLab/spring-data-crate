@@ -23,8 +23,6 @@ import static org.mockito.Mockito.verify;
 import io.crate.action.sql.SQLRequest;
 import io.crate.client.CrateClient;
 
-import java.util.ArrayList;
-
 import org.elasticsearch.action.ActionListener;
 import org.junit.Before;
 import org.junit.Test;
@@ -68,27 +66,6 @@ public class CrateTemplateTest {
 	}
 	
 	@SuppressWarnings("unchecked")
-	@Test(expected=IllegalArgumentException.class)
-	public void shouldNotSaveCollectionSubType() {
-		crateOperations.insert(new CollectionSubType());
-		verify(client, never()).sql(any(SQLRequest.class), any(ActionListener.class));
-	}
-	
-	@SuppressWarnings("unchecked")
-	@Test(expected=IllegalArgumentException.class)
-	public void shouldNotSaveIterableType() {
-		crateOperations.insert(asList("CRATE").iterator());
-		verify(client, never()).sql(any(SQLRequest.class), any(ActionListener.class));
-	}
-	
-	@SuppressWarnings("unchecked")
-	@Test(expected=IllegalArgumentException.class)
-	public void shouldNotSaveArrayType() {
-		crateOperations.insert(asList("CRATE").toArray());
-		verify(client, never()).sql(any(SQLRequest.class), any(ActionListener.class));
-	}
-	
-	@SuppressWarnings("unchecked")
 	@Test(expected=MappingException.class)
 	public void shouldNotSaveWithNullId() {
 		crateOperations.insert(new ClassWithSimpleId());
@@ -102,7 +79,7 @@ public class CrateTemplateTest {
 	
 	@Test(expected=MappingException.class)
 	public void shouldNotRemoveWhenEntityHasNoId() {
-		assertFalse(crateOperations.delete("id", CollectionSubType.class, "test"));
+		assertFalse(crateOperations.delete("id", ClassWithNoId.class, "test"));
 	}
 	
 	@Test
@@ -139,9 +116,5 @@ public class CrateTemplateTest {
 	@Table(name="entity")
 	static class ClassWithNoId {
 		String field;
-	}
-	
-	@SuppressWarnings("serial")
-	static class CollectionSubType extends ArrayList<String> {
 	}
 }
