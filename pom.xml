@@ -225,8 +225,12 @@
 		</repository>
 	</repositories>
 
-	<!--pluginRepositories> <pluginRepository> <id>spring-plugins-release</id> 
-		<url>http://repo.spring.io/plugins-release</url> </pluginRepository> </pluginRepositories -->
+	<pluginRepositories>
+		<pluginRepository>
+			<id>spring-plugins-release</id>
+			<url>http://repo.spring.io/plugins-release</url>
+		</pluginRepository>
+	</pluginRepositories>
 
 	<scm>
 		<url>https://github.com/KPTechnologyLab/spring-data-crate</url>
