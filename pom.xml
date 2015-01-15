@@ -180,6 +180,16 @@
 
 	<build>
 		<plugins>
+			<!-- Crate Client requires Java 7 -->
+			<plugin>
+				<groupId>org.apache.maven.plugins</groupId>
+				<artifactId>maven-compiler-plugin</artifactId>
+				<version>3.1</version>
+				<configuration>
+					<source>1.7</source>
+					<target>1.7</target>
+				</configuration>
+			</plugin>
 			<plugin>
 				<groupId>org.apache.maven.plugins</groupId>
 				<artifactId>maven-assembly-plugin</artifactId>
@@ -193,7 +203,7 @@
 				<artifactId>maven-surefire-plugin</artifactId>
 				<version>2.12</version>
 				<configuration>
-				<useFile>false</useFile>
+					<useFile>false</useFile>
 					<includes>
 						<include>**/*Test.java</include>
 						<include>**/*Tests.java</include>
