@@ -22,7 +22,6 @@ import static org.springframework.core.CollectionFactory.createCollection;
 import static org.springframework.core.CollectionFactory.createMap;
 import static org.springframework.data.crate.core.convert.CrateDocumentPropertyAccessor.INSTANCE;
 import static org.springframework.data.crate.core.mapping.CratePersistentProperty.RESERVED_VESRION_FIELD_NAME;
-import static org.springframework.data.mapping.model.BeanWrapper.create;
 import static org.springframework.data.util.ClassTypeInformation.MAP;
 import static org.springframework.data.util.ClassTypeInformation.OBJECT;
 import static org.springframework.data.util.ClassTypeInformation.from;
@@ -50,9 +49,9 @@ import org.springframework.data.crate.core.mapping.CratePersistentEntity;
 import org.springframework.data.crate.core.mapping.CratePersistentProperty;
 import org.springframework.data.mapping.Association;
 import org.springframework.data.mapping.AssociationHandler;
+import org.springframework.data.mapping.PersistentPropertyAccessor;
 import org.springframework.data.mapping.PreferredConstructor.Parameter;
 import org.springframework.data.mapping.context.MappingContext;
-import org.springframework.data.mapping.model.BeanWrapper;
 import org.springframework.data.mapping.model.DefaultSpELExpressionEvaluator;
 import org.springframework.data.mapping.model.MappingException;
 import org.springframework.data.mapping.model.ParameterValueProvider;
@@ -228,6 +227,7 @@ public class MappingCrateConverter extends AbstractCrateConverter implements App
 	 * @param <R> the entity type.
 	 * @return the converted entity.
 	 */
+	@SuppressWarnings("unchecked")
 	protected <R> R read(final CratePersistentEntity<R> entity, final CrateDocument source, final Object parent) {
 		
 		final DefaultSpELExpressionEvaluator evaluator = new DefaultSpELExpressionEvaluator(source, spELContext);
@@ -237,19 +237,19 @@ public class MappingCrateConverter extends AbstractCrateConverter implements App
 	    EntityInstantiator instantiator = instantiators.getInstantiatorFor(entity);
 
 	    R instance = instantiator.createInstance(entity, provider);
-	    final BeanWrapper<R> wrapper = create(instance, conversionService);
-	    final R result = wrapper.getBean();
+	    final PersistentPropertyAccessor propertyAccessor = entity.getPropertyAccessor(instance);
+	    final R result = (R)propertyAccessor.getBean();
 	    final CratePersistentProperty idProperty = entity.getIdProperty();
 	    final CratePersistentProperty versionProperty = entity.getVersionProperty();
 	    
 	    if(entity.hasIdProperty()) {
 	    	Object idValue = getValueInternal(idProperty, source, result);
-	    	wrapper.setProperty(idProperty, idValue);
+	    	propertyAccessor.setProperty(idProperty, idValue);
 	    }
 	    
 	    if(entity.hasVersionProperty()) {
 	    	Object versionValue = getValueInternal(versionProperty, source, result);
-	    	wrapper.setProperty(versionProperty, versionValue);
+	    	propertyAccessor.setProperty(versionProperty, versionValue);
 	    }
 	    
 	    for(CratePersistentProperty property : entity.getPersistentProperties()) {
@@ -262,7 +262,7 @@ public class MappingCrateConverter extends AbstractCrateConverter implements App
 				continue;
 			}
 			
-			wrapper.setProperty(property, getValueInternal(property, source, result));
+			propertyAccessor.setProperty(property, getValueInternal(property, source, result));
 	    }
 	    
 	    entity.doWithAssociations(new AssociationHandler<CratePersistentProperty>() {
@@ -271,7 +271,7 @@ public class MappingCrateConverter extends AbstractCrateConverter implements App
 	      public void doWithAssociation(final Association<CratePersistentProperty> association) {	    	  
 	    	  CratePersistentProperty inverseProp = association.getInverse();
 	    	  Object obj = getValueInternal(inverseProp, source, result);
-	    	  wrapper.setProperty(inverseProp, obj);
+	    	  propertyAccessor.setProperty(inverseProp, obj);
 	      }	      
 	    });
 
@@ -375,14 +375,13 @@ public class MappingCrateConverter extends AbstractCrateConverter implements App
 	      throw new MappingException("No mapping metadata found for entity ".concat(source.getClass().getName()));
 	    }
 	    
-		final BeanWrapper<Object> wrapper = create(source, conversionService);
+		final PersistentPropertyAccessor propertyAccessor = entity.getPropertyAccessor(source);
 	    final CratePersistentProperty idProperty = entity.getIdProperty();
 	    final CratePersistentProperty versionProperty = entity.getVersionProperty();
 	    
 	    if(idProperty != null && !sink.containsKey(idProperty.getFieldName())) {
 	    	try {
-	    		Object id = convertToCrateType(wrapper.getProperty(idProperty, Object.class),
-	    									   idProperty.getTypeInformation());
+	    		Object id = convertToCrateType(propertyAccessor.getProperty(idProperty), idProperty.getTypeInformation());
 	    		sink.put(idProperty.getFieldName(), id);
 	    	}catch(ConversionException e) {
 	    		logger.warn("Failed to convert id property '{}'. {}", new Object[]{idProperty.getFieldName(),
@@ -396,7 +395,7 @@ public class MappingCrateConverter extends AbstractCrateConverter implements App
 		          continue;
 	    	}
 	    	
-	    	Object propertyObj = wrapper.getProperty(property, property.getType());
+	    	Object propertyObj = propertyAccessor.getProperty(property/*, property.getType()*/);
 	    	
 	        if(propertyObj != null) {
 	        	if(!conversions.isSimpleType(propertyObj.getClass()) || isPrimitiveArray(property)) {
@@ -411,8 +410,7 @@ public class MappingCrateConverter extends AbstractCrateConverter implements App
 	    	@Override
 	    	public void doWithAssociation(final Association<CratePersistentProperty> association) {
 	    		CratePersistentProperty inverse = association.getInverse();
-	    		Class<?> type = inverse.getType();
-	    		Object propertyObj = wrapper.getProperty(inverse, type);
+	    		Object propertyObj = propertyAccessor.getProperty(inverse);
 	    		if (propertyObj != null) {
 	    			writePropertyInternal(propertyObj, sink, inverse);
 	    		}
