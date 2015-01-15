@@ -33,8 +33,6 @@ import org.springframework.data.crate.core.convert.CustomConversions;
 import org.springframework.data.crate.core.convert.MappingCrateConverter;
 import org.springframework.data.crate.core.mapping.CrateMappingContext;
 import org.springframework.data.crate.core.mapping.annotations.Table;
-import org.springframework.data.crate.core.mapping.schema.CratePersistentEntitySchemaManager;
-import org.springframework.data.crate.core.mapping.schema.SchemaExportOption;
 import org.springframework.util.ClassUtils;
 
 /**
@@ -45,20 +43,6 @@ import org.springframework.util.ClassUtils;
  */
 @Configuration
 public abstract class AbstractCrateConfiguration {
-	
-	/**
-	 * Return the schema export option to use (CREATE | CREATE_DROP | UPDATE)
-	 * @return must not be {@literal null}.
-	 */
-	public abstract SchemaExportOption getSchemaExportOption();
-	
-	/**
-	 * Should export failures be ignored
-	 * @return 
-	 */
-	public boolean getIgnoreSchemaExportFailures() {
-		return false;
-	}
 	
 	/**
 	 * Creates a {@link CrateTemplate}
@@ -114,20 +98,6 @@ public abstract class AbstractCrateConfiguration {
 	@Bean
 	public CustomConversions customConversions() {
 		return new CustomConversions(emptyList());
-	}
-	
-	/**
-	 * Creates a {@link CratePersistentEntitySchemaManager} using the configured {@link #crateTemplate()}.
-	 * @return
-	 */
-	@Bean
-	public CratePersistentEntitySchemaManager cratePersistentEntitySchemaManager() throws Exception {
-		
-		CratePersistentEntitySchemaManager manager = new CratePersistentEntitySchemaManager(crateTemplate(),
-																							getSchemaExportOption());
-		manager.setIgnoreFailures(getIgnoreSchemaExportFailures());
-		
-		return manager;
 	}
 	
 	/**

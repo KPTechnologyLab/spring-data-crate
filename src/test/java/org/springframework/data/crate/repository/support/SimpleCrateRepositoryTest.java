@@ -34,13 +34,14 @@ import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.data.annotation.Id;
 import org.springframework.data.annotation.Version;
 import org.springframework.data.crate.config.AbstractCrateConfiguration;
 import org.springframework.data.crate.core.CrateOperations;
 import org.springframework.data.crate.core.mapping.annotations.Table;
-import org.springframework.data.crate.core.mapping.schema.SchemaExportOption;
+import org.springframework.data.crate.core.mapping.schema.CratePersistentEntitySchemaManager;
 import org.springframework.data.crate.repository.CrateRepository;
 import org.springframework.data.crate.repository.support.SimpleCrateRepositoryTest.CrateContextConfig;
 import org.springframework.test.context.ContextConfiguration;
@@ -210,9 +211,9 @@ public class SimpleCrateRepositoryTest {
 	@Configuration
 	static class CrateContextConfig extends AbstractCrateConfiguration {
 		
-		@Override
-		public SchemaExportOption getSchemaExportOption() {
-			return CREATE_DROP;
+		@Bean
+		public CratePersistentEntitySchemaManager cratePersistentEntitySchemaManager() throws Exception {
+			return new CratePersistentEntitySchemaManager(crateTemplate(), CREATE_DROP);
 		}
 	}
 	

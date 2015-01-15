@@ -22,8 +22,9 @@ import static org.junit.Assert.assertThat;
 import static org.springframework.data.crate.core.mapping.schema.SchemaExportOption.CREATE_DROP;
 
 import org.junit.Test;
+import org.springframework.context.annotation.Bean;
 import org.springframework.data.crate.core.mapping.annotations.Table;
-import org.springframework.data.crate.core.mapping.schema.SchemaExportOption;
+import org.springframework.data.crate.core.mapping.schema.CratePersistentEntitySchemaManager;
 
 /**
  * 
@@ -42,9 +43,9 @@ public class AbstractCrateConfigurationTest {
 	}
 	
 	class SampleCrateConfiguration extends AbstractCrateConfiguration {
-		@Override
-		public SchemaExportOption getSchemaExportOption() {
-			return CREATE_DROP;
+		@Bean
+		public CratePersistentEntitySchemaManager cratePersistentEntitySchemaManager() throws Exception {
+			return new CratePersistentEntitySchemaManager(crateTemplate(), CREATE_DROP);
 		}
 	}
 	
