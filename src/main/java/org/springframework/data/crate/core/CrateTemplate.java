@@ -51,6 +51,7 @@ import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Set;
+import java.util.TreeSet;
 import java.util.concurrent.ExecutionException;
 
 import org.slf4j.Logger;
@@ -743,7 +744,7 @@ public class CrateTemplate implements CrateOperations, ApplicationContextAware {
 		
 		@Override
 		protected void processDocument(CrateDocument document) {
-			document.remove(RESERVED_VESRION_FIELD_NAME);
+			// no op
 		}
 
 		@Override
@@ -1107,13 +1108,18 @@ public class CrateTemplate implements CrateOperations, ApplicationContextAware {
 	 */
 	private class BulkInsertOperation<T> extends BaseSQLBulkOperation<T> {
 		
+		private final Set<String> columns;
+		
 		public BulkInsertOperation(Class<T> entityClass, String tableName, List<T> entities) {
 			super(tableName, entityClass, entities, INSERT);
+			columns = new TreeSet<String>();
+			columns.add(DEFAULT_TYPE_KEY);
+			columns.addAll(getColumns());
 		}
 		
 		@Override
 		public String getSQLStatement() {
-			return new Insert(tableName, getColumns()).createStatement();
+			return new Insert(tableName, columns).createStatement();
 		}
 
 		@Override
@@ -1242,5 +1248,16 @@ public class CrateTemplate implements CrateOperations, ApplicationContextAware {
 				throw new MappingException(format(ID_COLUMN, entityClass.getName()));
 			}
 		}
+	}
+	
+	public static void main(String[] args) {
+		
+		CrateDocument doc = new CrateDocument();
+		doc.put("name", "name");
+		doc.put("_class", "clazz");
+		doc.put("age", "34");
+		doc.put("email", "hkhan45@gmail.com");
+		
+		System.out.println(doc);
 	}
 }
