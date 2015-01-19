@@ -103,7 +103,7 @@ public class User {
 	private String email;
 	
 	/** optional
-	@PersistentConstructor
+	@PersistenceConstructor
 	public User(String id, String email) {
 		this.id = id;
 		this.email = email;
