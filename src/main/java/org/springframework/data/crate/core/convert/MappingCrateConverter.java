@@ -21,7 +21,7 @@ import static org.slf4j.LoggerFactory.getLogger;
 import static org.springframework.core.CollectionFactory.createCollection;
 import static org.springframework.core.CollectionFactory.createMap;
 import static org.springframework.data.crate.core.convert.CrateDocumentPropertyAccessor.INSTANCE;
-import static org.springframework.data.crate.core.mapping.CratePersistentProperty.RESERVED_VESRION_FIELD_NAME;
+import static org.springframework.data.crate.core.mapping.CratePersistentProperty.RESERVED_VERSION_FIELD_NAME;
 import static org.springframework.data.util.ClassTypeInformation.MAP;
 import static org.springframework.data.util.ClassTypeInformation.OBJECT;
 import static org.springframework.data.util.ClassTypeInformation.from;
@@ -866,7 +866,7 @@ public class MappingCrateConverter extends AbstractCrateConverter implements App
 	      if(expression != null) {
 	    	  value = evaluator.evaluate(expression);
 	      }else {
-	    	  value = property.isVersionProperty() ? source.get(RESERVED_VESRION_FIELD_NAME) : source.get(property.getFieldName());
+	    	  value = property.isVersionProperty() ? source.get(RESERVED_VERSION_FIELD_NAME) : source.get(property.getFieldName());
 	      }
 	      
 	      if(value == null) {

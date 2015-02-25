@@ -32,7 +32,7 @@ import static org.hamcrest.Matchers.notNullValue;
 import static org.hamcrest.Matchers.nullValue;
 import static org.junit.Assert.assertThat;
 import static org.springframework.data.crate.core.convert.CrateTypeMapper.DEFAULT_TYPE_KEY;
-import static org.springframework.data.crate.core.mapping.CratePersistentProperty.RESERVED_VESRION_FIELD_NAME;
+import static org.springframework.data.crate.core.mapping.CratePersistentProperty.RESERVED_VERSION_FIELD_NAME;
 
 import java.util.Collection;
 import java.util.Date;
@@ -215,7 +215,7 @@ public class MappingCrateConverterTest {
 		
 		CrateDocument document = new CrateDocument();
 		document.put(DEFAULT_TYPE_KEY, VersionedEntity.class.getName());
-		document.put(RESERVED_VESRION_FIELD_NAME, 1L);
+		document.put(RESERVED_VERSION_FIELD_NAME, 1L);
 		
 		VersionedEntity entity = converter.read(VersionedEntity.class, document);
 		

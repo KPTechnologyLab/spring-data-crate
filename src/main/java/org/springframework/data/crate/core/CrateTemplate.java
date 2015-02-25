@@ -30,7 +30,7 @@ import static org.springframework.data.crate.core.ActionType.UPDATE;
 import static org.springframework.data.crate.core.ActionType.values;
 import static org.springframework.data.crate.core.convert.CrateTypeMapper.DEFAULT_TYPE_KEY;
 import static org.springframework.data.crate.core.mapping.CratePersistentProperty.INITIAL_VERSION_VALUE;
-import static org.springframework.data.crate.core.mapping.CratePersistentProperty.RESERVED_VESRION_FIELD_NAME;
+import static org.springframework.data.crate.core.mapping.CratePersistentProperty.RESERVED_VERSION_FIELD_NAME;
 import static org.springframework.util.Assert.hasText;
 import static org.springframework.util.Assert.notEmpty;
 import static org.springframework.util.Assert.notNull;
@@ -540,7 +540,7 @@ public class CrateTemplate implements CrateOperations, ApplicationContextAware {
 			String colNames = StringUtils.hasText(cols.toString()) ? cols.toString() : "*";
 			
 			StringBuilder sql = new StringBuilder(format("SELECT %s, %s FROM %s", colNames,
-																				  doubleQuote(RESERVED_VESRION_FIELD_NAME),
+																				  doubleQuote(RESERVED_VERSION_FIELD_NAME),
 																				  tableName));
 			if(StringUtils.hasText(idColumn)) {
 				sql.append(SPACE)
@@ -996,7 +996,7 @@ public class CrateTemplate implements CrateOperations, ApplicationContextAware {
 				
 				processDocument(document);
 				
-				document.remove(RESERVED_VESRION_FIELD_NAME);
+				document.remove(RESERVED_VERSION_FIELD_NAME);
 				
 				documents.add(document);
 			}
@@ -1018,9 +1018,9 @@ public class CrateTemplate implements CrateOperations, ApplicationContextAware {
 				CrateDocument document = documents.get(index);
 				
 				List<Object> extraArgs = appendArgs(entity);
-				
+
 				Object[] args = null;
-				
+
 				if(!extraArgs.isEmpty()) {
 					args = addAll(document.values().toArray(), extraArgs.toArray());
 				}else {
@@ -1149,8 +1149,37 @@ public class CrateTemplate implements CrateOperations, ApplicationContextAware {
 					 		  persistentEntity.getIdProperty().getFieldName(), 
 					 		  getColumns(persistentEntity.getIdProperty().getFieldName())).createStatement();
 		}
-		
-		@Override
+
+        @Override
+        public SQLBulkRequest getSQLRequest() {
+            Object[][] bulkArgs = new Object[documents.size()][];
+            for (int index = 0; index < documents.size(); index++) {
+                Object entity = entities.get(index);
+                CrateDocument document = documents.get(index);
+                List<Object> extraArgs = appendArgs(entity);
+                Set<String> columnNames = getColumns(persistentEntity.getIdProperty().getFieldName());
+                int argsLength = columnNames.size();
+                if (!extraArgs.isEmpty()) {
+                    argsLength += extraArgs.size();
+                }
+                Object[] args = new Object[argsLength];
+                int i = 0;
+                for (String name : columnNames) {
+                    args[i] = document.get(name);
+                    i++;
+                }
+                if (!extraArgs.isEmpty()) {
+                    for (Object o : extraArgs) {
+                        args[i] = o;
+                        i++;
+                    }
+                }
+                bulkArgs[index] = args;
+            }
+            return new SQLBulkRequest(getSQLStatement(), bulkArgs);
+        }
+
+        @Override
 		protected List<Object> appendArgs(Object entity) {
 			return asList(getIdPropertyValue(entity));
 		}
