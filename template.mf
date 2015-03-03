@@ -10,7 +10,7 @@ Import-Template:
  javax.enterprise.*;version="${cdi:[=.=.=,+1.0.0)}";resolution:=optional,
  javax.validation.*;version="${validation:[=.=.=.=,+1.0.0)}";resolution:=optional,
  org.apache.commons.collections.*;version="${commonscollections:[=.=.=,+1.0.0)}";resolution:=optional,
- org.apache.commons.lang.*;version="${commonslang:[=.=.=,+1.0.0)}",
+ org.apache.commons.lang3.*;version="${commonslang:[=.=.=,+1.0.0)}",
  com.fasterxml.jackson.*;version="${jackson:[=.=.=,+1.0.0)}";resolution:=optional,
  io.crate.*;version="${crate:[=.=.=,+1.0.0)}",
  org.elasticsearch.*;version="${crate:[=.=.=,+1.0.0)}",
