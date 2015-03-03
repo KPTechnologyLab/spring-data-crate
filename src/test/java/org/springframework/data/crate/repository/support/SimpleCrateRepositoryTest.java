@@ -27,8 +27,8 @@ import static org.springframework.data.crate.core.mapping.schema.SchemaExportOpt
 
 import java.util.List;
 
-import org.apache.commons.lang.builder.EqualsBuilder;
-import org.apache.commons.lang.builder.HashCodeBuilder;
+import org.apache.commons.lang3.builder.EqualsBuilder;
+import org.apache.commons.lang3.builder.HashCodeBuilder;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;

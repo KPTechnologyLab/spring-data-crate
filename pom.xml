@@ -23,7 +23,7 @@
 		<dist.key>DATACRATE</dist.key>
 
 		<commonscollections>3.2.1</commonscollections>
-		<commonslang>2.6</commonslang>
+		<commonslang>3.3.2</commonslang>
 		<crate>0.47.4</crate>
 		<springdata.commons>1.10.0.BUILD-SNAPSHOT</springdata.commons>
 		<validation>1.0.0.GA</validation>
@@ -70,8 +70,8 @@
 
 		<!-- APACHE -->
 		<dependency>
-			<groupId>commons-lang</groupId>
-			<artifactId>commons-lang</artifactId>
+			<groupId>org.apache.commons</groupId>
+			<artifactId>commons-lang3</artifactId>
 			<version>${commonslang}</version>
 		</dependency>
 		<dependency>

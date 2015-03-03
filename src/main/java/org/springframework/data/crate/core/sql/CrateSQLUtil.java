@@ -2,7 +2,7 @@ package org.springframework.data.crate.core.sql;
 
 import static java.lang.String.format;
 import static java.util.regex.Pattern.compile;
-import static org.apache.commons.lang.StringUtils.split;
+import static org.apache.commons.lang3.StringUtils.split;
 import static org.springframework.util.StringUtils.collectionToDelimitedString;
 import static org.springframework.util.StringUtils.hasText;
 
