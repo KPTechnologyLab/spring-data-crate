@@ -43,7 +43,7 @@ public interface UserRepository extends CrateRepository<User, String> {
 }
 ```
 
-**NOTE: **
+**NOTE:**
 Currently documents can be queried by Id. Support will be added to derive queries from method names.
 
 You can have Spring automatically create a proxy for the interface by using the following JavaConfig:
@@ -85,7 +85,7 @@ The same configuration would look like this in XML:
 
 The `servers` attribute takes a comma separated string of `host:port`
 
-**NOTE: **
+**NOTE:**
 Currently adding custom converters via XML is not supported.
 
 This will find the repository interface and register a proxy object in the container. You can use it as shown below:
@@ -102,7 +102,7 @@ public class User {
 	@NotBlank
 	private String email;
 	
-	/** optional
+	/** Optional. If other constructors are defined, then annotate one of them 
 	@PersistenceConstructor
 	public User(String id, String email) {
 		this.id = id;
@@ -129,7 +129,7 @@ public class UserService {
      repository.deleteAll();
 
      User user = new User();
-     user.setId(1L);
+     user.setId("abc123");
      user.setEmail("user@acme.com");
      
      repository.insert(user);
