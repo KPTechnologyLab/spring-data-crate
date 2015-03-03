@@ -20,7 +20,15 @@ Checkout the project repository and issue the following command from a shell/ter
 ```sh
 mvn clean install
 ```
-Add the generated jar file in your project
+Add the generated jar file in your project and add the following repository configuration in your project's pom.xml file (for spring data commons 1.10.0.BUILD-SNAPSHOT)
+
+```xml
+<repository>
+	<id>spring-libs-snapshot</id>
+	<url>http://repo.spring.io/libs-snapshot</url>
+</repository>
+```
+Please look at spring data crate's pom.xml for required dependencies
 
 ### CrateTemplate
 
