@@ -60,7 +60,7 @@ class ColumnMetadataAction implements CrateAction, CrateActionResponseHandler<Li
 	@Override
 	public List<ColumnMetadata> handle(SQLResponse response) {
 		
-		if(response.hasRowCount()) {
+		if(response.rows().length > 0) {
 			
 			List<ColumnMetadata> columns = new LinkedList<ColumnMetadata>();
 			
