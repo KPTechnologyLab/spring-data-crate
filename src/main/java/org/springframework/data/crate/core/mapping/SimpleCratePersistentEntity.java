@@ -23,6 +23,7 @@ import static org.springframework.util.StringUtils.replace;
 import java.util.HashSet;
 import java.util.LinkedHashSet;
 import java.util.Set;
+import java.util.TreeSet;
 
 import org.springframework.beans.BeansException;
 import org.springframework.context.ApplicationContext;
@@ -88,7 +89,7 @@ public class SimpleCratePersistentEntity<T> extends BasicPersistentEntity<T, Cra
 		
 		Set<String> excluded = new HashSet<String>(asList(exclude));
 		
-		Set<String> propertyNames = new LinkedHashSet<String>(properties.size());
+		Set<String> propertyNames = new TreeSet<String>();
 		
 		for(CratePersistentProperty property : properties) {
 			if(!excluded.contains(property.getFieldName())) {
