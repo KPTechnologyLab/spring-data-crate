@@ -1249,15 +1249,4 @@ public class CrateTemplate implements CrateOperations, ApplicationContextAware {
 			}
 		}
 	}
-	
-	public static void main(String[] args) {
-		
-		CrateDocument doc = new CrateDocument();
-		doc.put("name", "name");
-		doc.put("_class", "clazz");
-		doc.put("age", "34");
-		doc.put("email", "hkhan45@gmail.com");
-		
-		System.out.println(doc);
-	}
 }
