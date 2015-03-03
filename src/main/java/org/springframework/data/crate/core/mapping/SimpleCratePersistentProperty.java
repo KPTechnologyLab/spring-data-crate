@@ -64,7 +64,7 @@ public class SimpleCratePersistentProperty extends AnnotationBasedPersistentProp
 			throw new MappingException(format(RESERVED_ID, fieldName, owner.getType()));
 		}
 		
-		if(RESERVED_VESRION_FIELD_NAME.equals(fieldName)) {				
+		if(RESERVED_VERSION_FIELD_NAME.equals(fieldName)) {
 			throw new MappingException(format(RESERVED_VERSION, fieldName, owner.getType()));
 		}
 		
