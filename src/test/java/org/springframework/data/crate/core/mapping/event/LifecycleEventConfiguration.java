@@ -20,7 +20,7 @@ public class LifecycleEventConfiguration extends TestCrateConfiguration {
 	}
 
 	@Bean
-	public ValidatingCrateEventListener validatingCouchbaseEventListener() {
+	public ValidatingCrateEventListener validatingCrateEventListener() {
 		return new ValidatingCrateEventListener(validator());
 	}
 
