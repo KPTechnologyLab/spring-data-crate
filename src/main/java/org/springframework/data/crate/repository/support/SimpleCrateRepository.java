@@ -213,6 +213,11 @@ public class SimpleCrateRepository<T, ID extends Serializable> implements CrateR
 		return crateOperations.bulkDelete(ids, entityClass, tableName);
 	}
 	
+	@Override
+	public void refreshTable() {
+		crateOperations.refreshTable(tableName);
+	}
+	
     /**
 	 * Returns the underlying {@link CrateOperations} instance.
 	 * 

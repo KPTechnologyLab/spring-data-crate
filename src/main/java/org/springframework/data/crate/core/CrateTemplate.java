@@ -81,6 +81,7 @@ import org.springframework.data.crate.core.mapping.event.CrateMappingEvent;
 import org.springframework.data.crate.core.sql.AbstractStatement;
 import org.springframework.data.crate.core.sql.CrateSQLStatement;
 import org.springframework.data.crate.core.sql.Insert;
+import org.springframework.data.crate.core.sql.RefreshTable;
 import org.springframework.data.mapping.model.MappingException;
 import org.springframework.util.StringUtils;
 
@@ -363,6 +364,22 @@ public class CrateTemplate implements CrateOperations, ApplicationContextAware {
 		BulkDeleteOperation actionHandler = new BulkDeleteOperation(entityClass, tableName, ids); 
 		
 		return execute(actionHandler, actionHandler);
+	}
+	
+	@Override
+	public <T> void refreshTable(Class<T> entityClass) {
+		
+		notNull(entityClass);
+		refreshTable(getTableName(entityClass));
+	}
+
+	@Override
+	public void refreshTable(String tableName) {
+		
+		hasText(tableName);
+		
+		logger.info("refreshing table '{}'", tableName);
+		this.execute(new RefreshTableAction(tableName));
 	}
 	
 	protected <T> void maybeEmitEvent(CrateMappingEvent<T> event) {
@@ -1247,6 +1264,30 @@ public class CrateTemplate implements CrateOperations, ApplicationContextAware {
 			if(!persistentEntity.hasIdProperty()) {
 				throw new MappingException(format(ID_COLUMN, entityClass.getName()));
 			}
+		}
+	}
+	
+	/**
+	 * 
+	 * @author Hasnain Javed
+	 * @since 1.0.0
+	 */
+	private class RefreshTableAction implements CrateAction {
+
+		private CrateSQLStatement refreshTable;
+		
+		public RefreshTableAction(String tableName) {
+			refreshTable = new RefreshTable(tableName);
+		}
+		
+		@Override
+		public String getSQLStatement() {
+			return refreshTable.createStatement();
+		}
+
+		@Override
+		public SQLRequest getSQLRequest() {
+			return new SQLRequest(getSQLStatement());
 		}
 	}
 }

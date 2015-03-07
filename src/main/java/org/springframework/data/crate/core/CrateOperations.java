@@ -245,4 +245,18 @@ public interface CrateOperations {
      * @return Results containing the details of the bulk operation
      */
     <T> BulkOperartionResult<Object> bulkDelete(List<Object> ids, Class<T> entityClass, String tableName);
+    
+    /**
+     * Refreshes a table and all its rows making all changes made to a table available 
+     * to all further commands.
+     * @param entityClass the parameterized type of the object
+     */
+    <T> void refreshTable(Class<T> entityClass);
+    
+    /**
+     * Refreshes a table and all its rows making all changes made to a table available 
+     * to all further commands.
+     * @param tableName name of the table to refresh
+     */
+    void refreshTable(String tableName);
 }

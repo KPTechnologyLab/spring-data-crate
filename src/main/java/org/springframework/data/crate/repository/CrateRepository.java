@@ -78,4 +78,10 @@ public interface CrateRepository<T, ID extends Serializable> extends CrudReposit
      * @return Results containing the details of the bulk operation
      */
     BulkOperartionResult<Object> bulkDelete(List<Object> ids);
+    
+    /**
+     * Refreshes a table and all its rows making all changes made to a table available 
+     * to all further commands.
+     */
+    void refreshTable();
 }

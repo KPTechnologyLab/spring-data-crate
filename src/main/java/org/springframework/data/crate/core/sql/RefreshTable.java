@@ -1,5 +1,5 @@
 /*
- * Copyright 2002-2014 the original author or authors.
+ * Copyright 2002-2015 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -15,28 +15,25 @@
  */
 package org.springframework.data.crate.core.sql;
 
+import static org.springframework.util.Assert.hasText;
+
 /**
  * 
  * @author Hasnain Javed
- * @since 1.0.0 
+ * @since 1.0.0
  */
-public interface CrateSQLStatement {
+public class RefreshTable extends AbstractStatement {
+
+	private final String tableName;
 	
-	String SPACE = " ";
-	String COMMA = ",";
-	String OPEN_BRACE = "(";
-	String CLOSE_BRACE = ")";
-	String AS = "AS";
-	String PRIMARY_KEY = "PRIMARY KEY";
-	String CREATE_TABLE = "CREATE TABLE";
-	String DROP_TABLE = "DROP TABLE";
-	String ALTER_TABLE = "ALTER TABLE";
-	String ADD_COLUMN = "ADD COLUMN";
-	String INSERT_INTO = "INSERT INTO";
-	String WHERE = "WHERE";
-	String VALUES = "VALUES";
-	String WITH = "WITH";
-	String REFRESH_TABLE = "REFRESH TABLE";
-	
-	String createStatement();
+	public RefreshTable(String tableName) {
+		super();
+		hasText(tableName);
+		this.tableName = tableName;
+	}
+
+	@Override
+	public String createStatement() {
+		return REFRESH_TABLE.concat(SPACE).concat(tableName);
+	}
 }

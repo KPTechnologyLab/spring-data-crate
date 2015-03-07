@@ -290,4 +290,9 @@ public class CrateTemplateIntegrationTest {
     	assertThat(results.getSuccesses().size(), is(2));
     	assertThat(results.getFailures().isEmpty(), is(true));
     }
+    
+    @Test
+    public void shouldRefreshTable() {
+    	crateTemplate.refreshTable(User.class);
+    }
 }
