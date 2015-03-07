@@ -33,7 +33,6 @@ import org.springframework.data.crate.core.CrateAction;
 import org.springframework.data.crate.core.CrateOperations;
 import org.springframework.data.crate.repository.CrateRepository;
 
-
 /**
  * Crate specific repository implementation. Likely to be used as target within
  * {@link org.springframework.data.crate.repository.support.CrateRepositoryFactory}
@@ -66,7 +65,14 @@ public class SimpleCrateRepository<T, ID extends Serializable> implements CrateR
     public <S extends T> S save(S entity) {
     	
     	notNull(entity, "Entity must not be null");
-    	crateOperations.insert(entity, tableName);
+    	
+    	ID id = entityInformation.getId(entity);
+    	
+    	if(id != null && exists(id)) {
+    		crateOperations.update(entity, tableName);
+    	}else {
+    		crateOperations.insert(entity, tableName);
+    	}
     	
         return entity;
     }
@@ -89,7 +95,7 @@ public class SimpleCrateRepository<T, ID extends Serializable> implements CrateR
     @Override
     public T findOne(ID id) {
     	
-    	notNull(id, "The given id must not be null");
+    	notNull(id, "Id must not be null");
         return crateOperations.findById(id, entityClass, tableName);
     }
 

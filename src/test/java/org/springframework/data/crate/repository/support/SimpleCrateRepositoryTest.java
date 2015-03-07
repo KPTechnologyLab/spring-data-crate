@@ -1,5 +1,5 @@
 /*
- * Copyright 2014 the original author or authors.
+ * Copyright 2015 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -16,136 +16,95 @@
 
 package org.springframework.data.crate.repository.support;
 
-import static java.lang.Thread.currentThread;
-import static java.util.Arrays.asList;
-import static org.hamcrest.Matchers.is;
-import static org.hamcrest.Matchers.notNullValue;
-import static org.hamcrest.Matchers.nullValue;
-import static org.junit.Assert.assertThat;
-import static org.junit.Assert.assertTrue;
-import static org.springframework.data.crate.core.mapping.schema.SchemaExportOption.CREATE_DROP;
+import static org.mockito.Matchers.any;
+import static org.mockito.Matchers.anyObject;
+import static org.mockito.Matchers.anyString;
+import static org.mockito.Matchers.eq;
+import static org.mockito.Mockito.never;
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.when;
 
-import java.util.List;
-
-import org.apache.commons.lang3.builder.EqualsBuilder;
-import org.apache.commons.lang3.builder.HashCodeBuilder;
-import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.context.annotation.Bean;
-import org.springframework.context.annotation.Configuration;
+import org.mockito.Mock;
+import org.mockito.runners.MockitoJUnitRunner;
 import org.springframework.data.annotation.Id;
-import org.springframework.data.annotation.Version;
-import org.springframework.data.crate.config.AbstractCrateConfiguration;
 import org.springframework.data.crate.core.CrateOperations;
-import org.springframework.data.crate.core.mapping.annotations.Table;
-import org.springframework.data.crate.core.mapping.schema.CratePersistentEntitySchemaManager;
 import org.springframework.data.crate.repository.CrateRepository;
-import org.springframework.data.crate.repository.support.SimpleCrateRepositoryTest.CrateContextConfig;
-import org.springframework.test.context.ContextConfiguration;
-import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 
 /**
- * @author Rizwan Idress
  * @author Hasnain Javed
  * @since 1.0.0
  */
-@RunWith(SpringJUnit4ClassRunner.class)
-@ContextConfiguration(classes={CrateContextConfig.class})
+@RunWith(MockitoJUnitRunner.class)
 public class SimpleCrateRepositoryTest {
 	
-	@Autowired
+	@Mock
 	private CrateOperations crateOperations;
 	
-	private CrateEntityInformation<Person, String> entityInformation = new PersonInformation();
+	private CrateEntityInformation<EntityWithId, String> entityWithIdInformation = new EntityWithIdInformation();
+	private CrateEntityInformation<EntityWithOutId, String> entityWithoutIdInformation = new EntityWithoutIdInformation();
 	
-	private CrateRepository<Person, String> repository;
+	private CrateRepository<EntityWithId, String> entityWithIdRepository;
+	private CrateRepository<EntityWithOutId, String> entityWithoutIdRepository;
 	
-	private List<Person> people;
-	
-	private Person hasnain;
-	private Person rizwan;
-	
-	/**
-	 *  TODO: remove sleep method once the @Table annotation is enhanced
-	 *  to turn off replicas with number_of_replicas table property set to 0
-	 * @throws InterruptedException
-	 */	
 	@Before
-	@SuppressWarnings("static-access")
-	public void setup() throws InterruptedException {
-		
-		repository = new SimpleCrateRepository<Person, String>(entityInformation, crateOperations);
-		
-		hasnain = new Person("hasnain@test.com", "Hasnain Javed", 34);
-		rizwan = new Person("rizwan@test.com", "Rizwan Idress", 33);
-		
-		people = asList(rizwan, hasnain);
-		
-		repository.save(people);
-		
-		currentThread().sleep(1000);
-	}
-
-	@After
-	public void teardown() throws InterruptedException {
-		repository.deleteAll();
+	public void setup() {
+		entityWithIdRepository = new SimpleCrateRepository<EntityWithId, String>(entityWithIdInformation, crateOperations);
+		entityWithoutIdRepository = new SimpleCrateRepository<EntityWithOutId, String>(entityWithoutIdInformation, crateOperations);
 	}
 	
 	@Test
-	public void shouldFindOne() {
+	public void shouldSaveEntityWithId() {
 		
-		Person person = people.iterator().next();
-		Person dbPerson = repository.findOne(person.getEmail());
+		EntityWithId entity = new EntityWithId("hasnain@test.com", "Hasnain");
 		
-		assertThat(dbPerson, is(notNullValue()));
-		assertThat(dbPerson.getEmail(), is(person.getEmail()));
+		when(crateOperations.findById(entity.getEmail(), EntityWithId.class,"entitywithid")).thenReturn(null);
+		
+		entityWithIdRepository.save(entity);
+		
+		verify(crateOperations).findById(entity.getEmail(), EntityWithId.class, "entitywithid");
+		verify(crateOperations).insert(any(EntityWithId.class), eq("entitywithid"));
+		verify(crateOperations, never()).update(any(EntityWithId.class), anyString());
 	}
 	
 	@Test
-	public void shouldExist() {
-		assertTrue(repository.exists(people.iterator().next().getEmail()));
+	public void shouldUpdateEntityWithId() {
+			
+		EntityWithId entity = new EntityWithId("hasnain@test.com", "Hasnain");
+		
+		when(crateOperations.findById(entity.getEmail(), EntityWithId.class,"entitywithid")).thenReturn(entity);
+		
+		entityWithIdRepository.save(entity);
+		
+		verify(crateOperations).findById(entity.getEmail(), EntityWithId.class, "entitywithid");
+		verify(crateOperations).update(any(EntityWithId.class), eq("entitywithid"));
+		verify(crateOperations, never()).insert(any(EntityWithId.class), anyString());
 	}
 	
 	@Test
-	public void shouldFindAll() throws InterruptedException {
-		assertThat(people.size(), is(repository.findAll().size()));
+	public void shouldSaveEntityWithNoId() {
+		
+		EntityWithOutId entity = new EntityWithOutId("hasnain@test.com", "Hasnain");
+		
+		entityWithoutIdRepository.save(entity);
+		
+		verify(crateOperations).insert(any(EntityWithOutId.class), eq("entitywithoutid"));
+		verify(crateOperations, never()).findById(anyObject(), eq(EntityWithOutId.class), anyString());
+		verify(crateOperations, never()).update(any(EntityWithOutId.class), anyString());
 	}
 	
-	@Test
-	public void shouldFindAllById() throws InterruptedException {
-		assertThat(people.size(), is(repository.findAll(asList(hasnain.getEmail(), rizwan.getEmail())).size()));
-	}
-	
-	@Test
-	public void shouldCount() throws InterruptedException {
-		assertThat((long)people.size(), is(repository.count()));
-	}
-	
-	@Test
-	public void shouldDelete() throws InterruptedException {
-		repository.delete(hasnain);
-		assertThat(repository.findOne(hasnain.getEmail()), is(nullValue()));
-	}
-	
-	@Table(name="person")
-	static class Person {
+	static class EntityWithId {
 		
 		@Id
 		private String email;
 		private String name;
-		private int age;
 		
-		@Version
-		private long version;
-		
-		public Person(String email, String name, int age) {
+		public EntityWithId(String email, String name) {
 			super();
 			this.email = email;
 			this.name = name;
-			this.age = age;
 		}
 		
 		public String getEmail() {
@@ -163,69 +122,29 @@ public class SimpleCrateRepositoryTest {
 		public void setName(String name) {
 			this.name = name;
 		}
+	}
+	
+	static class EntityWithOutId {
 		
-		public int getAge() {
-			return age;
-		}
+		private String email;
+		private String name;
 		
-		public void setAge(int age) {
-			this.age = age;
-		}
-
-		public long getVersion() {
-			return version;
-		}
-
-		public void setVersion(long version) {
-			this.version = version;
-		}
-
-		@Override
-		public boolean equals(Object obj) {
-			
-			if (!(obj instanceof Person)) {
-	            return false;
-	        }
-			
-	        if (this == obj) {
-	            return true;
-	        }
-	        
-	        Person that = (Person) obj;
-	        
-	        return new EqualsBuilder().append(this.email, that.email)
-	        						  .append(this.name, that.name)
-	        						  .append(this.age, that.age)
-	        						  .isEquals();
-		}
-		
-		@Override
-		public int hashCode() {
-			return new HashCodeBuilder(11, 21).append(email)
-											  .append(name)
-											  .append(age)
-											  .toHashCode();
+		public EntityWithOutId(String email, String name) {
+			super();
+			this.email = email;
+			this.name = name;
 		}
 	}
 	
-	@Configuration
-	static class CrateContextConfig extends AbstractCrateConfiguration {
-		
-		@Bean
-		public CratePersistentEntitySchemaManager cratePersistentEntitySchemaManager() throws Exception {
-			return new CratePersistentEntitySchemaManager(crateTemplate(), CREATE_DROP);
-		}
-	}
-	
-	private static class PersonInformation implements CrateEntityInformation<Person, String> {
+	private static class EntityWithIdInformation implements CrateEntityInformation<EntityWithId, String> {
 
 		@Override
-		public boolean isNew(Person entity) {
+		public boolean isNew(EntityWithId entity) {
 			return entity.getEmail() == null;
 		}
 
 		@Override
-		public String getId(Person entity) {
+		public String getId(EntityWithId entity) {
 			return entity.getEmail();
 		}
 
@@ -235,13 +154,13 @@ public class SimpleCrateRepositoryTest {
 		}
 
 		@Override
-		public Class<Person> getJavaType() {
-			return Person.class;
+		public Class<EntityWithId> getJavaType() {
+			return EntityWithId.class;
 		}
 
 		@Override
 		public String getTableName() {
-			return Person.class.getSimpleName().toLowerCase();
+			return EntityWithId.class.getSimpleName().toLowerCase();
 		}
 
 		@Override
@@ -250,8 +169,46 @@ public class SimpleCrateRepositoryTest {
 		}
 
 		@Override
-		public Long getVersion(Person entity) {
-			return entity.getVersion();
+		public Long getVersion(EntityWithId entity) {
+			return null;
+		}
+	}
+	
+	private static class EntityWithoutIdInformation implements CrateEntityInformation<EntityWithOutId, String> {
+
+		@Override
+		public boolean isNew(EntityWithOutId entity) {
+			return true;
+		}
+
+		@Override
+		public String getId(EntityWithOutId entity) {
+			return null;
+		}
+
+		@Override
+		public Class<String> getIdType() {
+			return String.class;
+		}
+
+		@Override
+		public Class<EntityWithOutId> getJavaType() {
+			return EntityWithOutId.class;
+		}
+
+		@Override
+		public String getTableName() {
+			return EntityWithOutId.class.getSimpleName().toLowerCase();
+		}
+
+		@Override
+		public String getIdAttribute() {
+			return null;
+		}
+
+		@Override
+		public Long getVersion(EntityWithOutId entity) {
+			return null;
 		}
 	}
 }
