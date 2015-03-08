@@ -192,7 +192,7 @@ public class CratePersistentEntitySchemaManager implements InitializingBean, Dis
 		AlterTableDefinition def = tableManager.alterDefinition(entity, tableMetadata);
 		
 		if(def.hasAlteredParameters()) {
-			for(AlterTableParameterDefinition paramDef : def.getAlteredParameters()) {
+			for(AlterTableParameterDefinition paramDef : def.getTableParameters()) {
 				
 				crateOperations.execute(new AlterTableAction(new AlterTableParameter(def.getName(), paramDef)));
 				

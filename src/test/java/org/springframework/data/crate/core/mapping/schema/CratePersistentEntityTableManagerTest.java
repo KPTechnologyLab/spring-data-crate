@@ -232,7 +232,7 @@ public class CratePersistentEntityTableManagerTest {
 		assertThat(def, is(notNullValue()));
 		assertThat(def.hasAlteredParameters(), is(true));
 		
-		AlterTableParameterDefinition paramDef = def.getAlteredParameters().iterator().next(); 
+		AlterTableParameterDefinition paramDef = def.getTableParameters().iterator().next(); 
 		assertThat(paramDef.getParameterName(), is(NO_OF_REPLICAS));
 		assertThat(paramDef.getParameterValue().toString(), is("2"));
 	}

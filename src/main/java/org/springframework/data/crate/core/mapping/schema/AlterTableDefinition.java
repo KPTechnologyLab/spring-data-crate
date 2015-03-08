@@ -49,7 +49,7 @@ public class AlterTableDefinition {
 		return alteredColumns;
 	}
 
-	public List<AlterTableParameterDefinition> getAlteredParameters() {
+	public List<AlterTableParameterDefinition> getTableParameters() {
 		return alteredParameters;
 	}
 
