@@ -13,7 +13,7 @@ import org.apache.commons.lang3.builder.HashCodeBuilder;
 import org.springframework.data.annotation.Id;
 import org.springframework.data.crate.core.mapping.annotations.Table;
 
-@Table(name="obj_collection")
+@Table(name="obj_collection", numberOfReplicas="0")
 public class ObjectCollectionTypes {
 	
 	@Id

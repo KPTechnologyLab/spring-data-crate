@@ -14,7 +14,7 @@ import org.springframework.data.annotation.Id;
 import org.springframework.data.annotation.Version;
 import org.springframework.data.crate.core.mapping.annotations.Table;
 
-@Table
+@Table(numberOfReplicas="0")
 public class EntityWithNesting {
 	
 	@Id

@@ -5,7 +5,7 @@ import org.apache.commons.lang3.builder.HashCodeBuilder;
 import org.springframework.data.annotation.Id;
 import org.springframework.data.crate.core.mapping.annotations.Table;
 
-@Table(name="sub_class")
+@Table(name="sub_class", numberOfReplicas="0")
 public class SimpleEntityWithId extends SimpleEntity {
 	
 	@Id

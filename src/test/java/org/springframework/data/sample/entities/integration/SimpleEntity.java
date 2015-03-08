@@ -8,7 +8,7 @@ import org.apache.commons.lang3.builder.HashCodeBuilder;
 import org.springframework.data.annotation.Version;
 import org.springframework.data.crate.core.mapping.annotations.Table;
 
-@Table
+@Table(numberOfReplicas="0")
 public class SimpleEntity {
 	
 	@Version

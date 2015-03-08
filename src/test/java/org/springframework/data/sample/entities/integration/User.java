@@ -3,7 +3,7 @@ package org.springframework.data.sample.entities.integration;
 import org.springframework.data.annotation.Id;
 import org.springframework.data.crate.core.mapping.annotations.Table;
 
-@Table(name="users")
+@Table(name="users", numberOfReplicas="0")
 public class User {
 	
 	@Id

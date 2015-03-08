@@ -16,7 +16,6 @@
 
 package org.springframework.data.crate.repository.support;
 
-import static java.lang.Thread.currentThread;
 import static java.util.Arrays.asList;
 import static org.hamcrest.Matchers.is;
 import static org.hamcrest.Matchers.notNullValue;
@@ -68,13 +67,7 @@ public class SimpleCrateRepositoryIntegrationTest {
 	private Person hasnain;
 	private Person rizwan;
 	
-	/**
-	 *  TODO: remove sleep method once the @Table annotation is enhanced
-	 *  to turn off replicas with number_of_replicas table property set to 0
-	 * @throws InterruptedException
-	 */	
 	@Before
-	@SuppressWarnings("static-access")
 	public void setup() throws InterruptedException {
 		
 		repository = new SimpleCrateRepository<Person, String>(entityInformation, crateOperations);
@@ -85,10 +78,9 @@ public class SimpleCrateRepositoryIntegrationTest {
 		people = asList(rizwan, hasnain);
 		
 		repository.save(people);
-		
-		currentThread().sleep(1000);
+		repository.refreshTable();
 	}
-
+	
 	@After
 	public void teardown() throws InterruptedException {
 		repository.deleteAll();
@@ -130,7 +122,7 @@ public class SimpleCrateRepositoryIntegrationTest {
 		assertThat(repository.findOne(hasnain.getEmail()), is(nullValue()));
 	}
 	
-	@Table(name="person")
+	@Table(name="person", numberOfReplicas="0")
 	static class Person {
 		
 		@Id
