@@ -31,6 +31,7 @@ import org.springframework.context.ApplicationContextAware;
 import org.springframework.context.expression.BeanFactoryAccessor;
 import org.springframework.context.expression.BeanFactoryResolver;
 import org.springframework.data.crate.core.mapping.annotations.Table;
+import org.springframework.data.crate.core.mapping.schema.TableParameters;
 import org.springframework.data.mapping.PropertyHandler;
 import org.springframework.data.mapping.model.BasicPersistentEntity;
 import org.springframework.data.mapping.model.MappingException;
@@ -53,11 +54,13 @@ public class SimpleCratePersistentEntity<T> extends BasicPersistentEntity<T, Cra
 	private final StandardEvaluationContext context;
 	
 	private final String tableName;
+	private final TableParameters parameters;
 
 	public SimpleCratePersistentEntity(TypeInformation<T> typeInformation) {
 		super(typeInformation);
 		this.context = new StandardEvaluationContext();
 		this.tableName = resolveTableName(typeInformation);
+		this.parameters = resolveTableParameters();
  	}
 	
 	@Override
@@ -80,6 +83,11 @@ public class SimpleCratePersistentEntity<T> extends BasicPersistentEntity<T, Cra
 	@Override
 	public String getTableName() {
 		return tableName;
+	}
+	
+	@Override
+	public TableParameters getTableParameters() {
+		return parameters;
 	}
 
 	@Override
@@ -240,6 +248,21 @@ public class SimpleCratePersistentEntity<T> extends BasicPersistentEntity<T, Cra
 		
 		return tableName;
  	}
+	
+	private TableParameters resolveTableParameters() {
+		
+		TableParameters parameters = null;
+		
+		Table annotation = findAnnotation(Table.class); 
+		
+		if(annotation != null) {
+			parameters = new TableParameters(annotation.numberOfReplicas(), 
+											 annotation.refreshInterval(), 
+											 annotation.columnPolicy());
+		}
+		
+		return parameters;
+	}
 	
 	private boolean isLongType(Class<?> clazz) {
 		return Long.class.equals(clazz) || Long.TYPE.equals(clazz);

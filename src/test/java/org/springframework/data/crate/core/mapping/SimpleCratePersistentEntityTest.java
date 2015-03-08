@@ -29,6 +29,9 @@ import org.junit.Test;
 import org.springframework.data.annotation.Id;
 import org.springframework.data.annotation.Version;
 import org.springframework.data.crate.core.mapping.annotations.Table;
+import org.springframework.data.crate.core.mapping.schema.ColumnPloicy;
+import static org.springframework.data.crate.core.mapping.schema.ColumnPloicy.*;
+import org.springframework.data.crate.core.mapping.schema.TableParameters;
 import org.springframework.data.mapping.model.MappingException;
 import org.springframework.data.sample.entities.Book;
 import org.springframework.data.sample.entities.PropertiesContainer;
@@ -189,6 +192,40 @@ public class SimpleCratePersistentEntityTest {
 		assertThat(mapProperty.isMap(), is(true));
 	}
 	
+	@Test
+	public void shouldHaveDefaultTableParameters() {
+		
+		TableParameters parameters = prepareMappingContext(EntityWithDefaultTableParameters.class).
+						             getPersistentEntity(EntityWithDefaultTableParameters.class).
+						             getTableParameters();
+		
+		String defaultReplicas = EntityWithDefaultTableParameters.class.getAnnotation(Table.class).numberOfReplicas();
+		int defaultRefreshInterval = EntityWithDefaultTableParameters.class.getAnnotation(Table.class).refreshInterval();
+		ColumnPloicy defaultPolicy = EntityWithDefaultTableParameters.class.getAnnotation(Table.class).columnPolicy();
+		
+		assertThat(parameters, is(notNullValue()));
+		assertThat(parameters.getNumberOfReplicas(), is(defaultReplicas));
+		assertThat(parameters.getRefreshInterval(), is(defaultRefreshInterval));
+		assertThat(parameters.getColumnPloicy(), is(defaultPolicy));
+	}
+	
+	@Test
+	public void shouldHaveCustomTableParameters() {
+		
+		TableParameters parameters = prepareMappingContext(EntityWithTableParameters.class).
+						             getPersistentEntity(EntityWithTableParameters.class).
+						             getTableParameters();
+		
+		String replicas = "2";
+		int refreshInterval = 1500;
+		ColumnPloicy policy = STRICT;
+		
+		assertThat(parameters, is(notNullValue()));
+		assertThat(parameters.getNumberOfReplicas(), is(replicas));
+		assertThat(parameters.getRefreshInterval(), is(refreshInterval));
+		assertThat(parameters.getColumnPloicy(), is(policy));
+	}
+	
 	private static CrateMappingContext prepareMappingContext(Class<?> type) {
 		
 		CrateMappingContext mappingContext = new CrateMappingContext();
@@ -231,5 +268,15 @@ public class SimpleCratePersistentEntityTest {
 	static class EntityWithPrimitveWrapperVersionType {
 		@Version		
 		Long version;
+	}
+	
+	@Table
+	static class EntityWithDefaultTableParameters {
+		String string;
+	}
+	
+	@Table(numberOfReplicas="2", refreshInterval=1500, columnPolicy=STRICT)
+	static class EntityWithTableParameters {
+		String string;
 	}
 }

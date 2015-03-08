@@ -15,6 +15,7 @@
  */
 package org.springframework.data.crate.core.sql;
 
+import static java.lang.String.valueOf;
 import static org.springframework.data.crate.core.convert.CrateTypeMapper.DEFAULT_TYPE_KEY;
 import static org.springframework.data.crate.core.mapping.CrateDataType.OBJECT;
 import static org.springframework.data.crate.core.mapping.CrateDataType.STRING;
@@ -24,7 +25,10 @@ import static org.springframework.util.StringUtils.hasText;
 import java.util.Iterator;
 
 import org.springframework.data.crate.core.mapping.schema.Column;
+import org.springframework.data.crate.core.mapping.schema.ColumnPloicy;
 import org.springframework.data.crate.core.mapping.schema.TableDefinition;
+import org.springframework.data.crate.core.mapping.schema.TableParameters;
+import org.springframework.util.StringUtils;
 
 /**
  * {@link CreateTable} creates crate specific ddl for creating table.
@@ -68,6 +72,14 @@ public class CreateTable extends AbstractStatement {
 			}
 			
 			builder.append(CLOSE_BRACE);
+			
+			if(tableDefinition.hasTableParameters()) {
+				
+				WithClause clause = new WithClause(tableDefinition.getTableParameters());
+				
+				builder.append(SPACE)
+				   	   .append(clause.createClause());
+			}
 			
 			statement = builder.toString();
 		}
@@ -125,6 +137,53 @@ public class CreateTable extends AbstractStatement {
 			}
 			
 			builder.append(CLOSE_BRACE);
+		}
+	}
+	
+	public static class WithClause {
+		
+		private TableParameters parameters;
+
+		public WithClause(TableParameters parameters) {
+			notNull(parameters);
+			this.parameters = parameters;
+		}
+		
+		public String createClause() {
+			
+			String numOfReplicas = parameters.getNumberOfReplicas();
+			Integer refreshInterval = parameters.getRefreshInterval();
+			ColumnPloicy columnPloicy = parameters.getColumnPloicy();
+
+			StringBuilder builder = new StringBuilder(WITH);
+			builder.append(SPACE)
+				   .append(OPEN_BRACE);
+			
+			if(StringUtils.hasText(numOfReplicas)) {
+				builder.append(NO_OF_REPLICAS)
+					   .append("=")
+					   .append(CrateSQLUtil.singleQuote(numOfReplicas));
+			}
+			
+			if(refreshInterval != null) {
+				builder.append(COMMA)
+					   .append(SPACE)
+					   .append(REFRESH_INTERVAL)
+					   .append("=")
+					   .append(CrateSQLUtil.singleQuote(valueOf(refreshInterval)));
+			}
+			
+			if(columnPloicy != null) {
+				builder.append(COMMA)
+				   	   .append(SPACE)
+				   	   .append(COLUMN_POLICY)
+				   	   .append("=")
+					   .append(CrateSQLUtil.singleQuote(valueOf(columnPloicy)));
+			}
+			
+			builder.append(CLOSE_BRACE);
+			
+			return builder.toString();
 		}
 	}
 }

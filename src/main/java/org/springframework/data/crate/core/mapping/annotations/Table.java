@@ -23,6 +23,8 @@ import java.lang.annotation.RetentionPolicy;
 import java.lang.annotation.Target;
 
 import org.springframework.data.annotation.Persistent;
+import org.springframework.data.crate.core.mapping.schema.ColumnPloicy;
+import static org.springframework.data.crate.core.mapping.schema.ColumnPloicy.*;
 
 /**
  * Identifies a domain object to be persisted to Crate.
@@ -37,5 +39,8 @@ import org.springframework.data.annotation.Persistent;
 @Target({ ElementType.TYPE })
 public @interface Table {
 	
-	String name() default"";
+	String name() default "";
+	String numberOfReplicas() default "1";
+	int refreshInterval() default 1000;
+	ColumnPloicy columnPolicy() default DYNAMIC;
 }

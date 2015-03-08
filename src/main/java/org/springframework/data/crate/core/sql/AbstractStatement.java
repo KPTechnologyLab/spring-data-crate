@@ -39,6 +39,11 @@ public abstract class AbstractStatement implements CrateSQLStatement {
 		return CrateSQLUtil.doubleQuote(toQuote);
 	}
 	
+	protected String singleQuote(String toQuote) {
+		hasText(toQuote);
+		return CrateSQLUtil.singleQuote(toQuote);
+	}
+	
 	protected String toSqlPath(Column column) {
 		notNull(column);
 		return dotToSqlPath(column.getName());

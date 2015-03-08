@@ -18,6 +18,7 @@ package org.springframework.data.crate.core.sql;
 import static java.util.Arrays.asList;
 import static org.hamcrest.Matchers.is;
 import static org.junit.Assert.assertThat;
+import static org.springframework.data.crate.core.mapping.schema.ColumnPloicy.STRICT;
 
 import java.util.Map;
 import java.util.Set;
@@ -26,6 +27,7 @@ import org.junit.Test;
 import org.springframework.data.crate.core.mapping.annotations.Table;
 import org.springframework.data.crate.core.mapping.schema.Column;
 import org.springframework.data.crate.core.mapping.schema.TableDefinition;
+import org.springframework.data.crate.core.mapping.schema.TableParameters;
 
 /**
  * 
@@ -38,7 +40,7 @@ public class CreateTableTest {
 	public void shouldCreateStatementWithPrimaryKeyColumn() {
 		
 		Column longCol = createColumn("longField", Long.class, null, true);
-		TableDefinition tableDefinition = createTableDefinition("entity", longCol);
+		TableDefinition tableDefinition = createTableDefinition("entity", null, longCol);
 		
 		CrateSQLStatement statement = new CreateTable(tableDefinition);
 		
@@ -50,7 +52,7 @@ public class CreateTableTest {
 		
 		Column stringCol = createColumn("stringField", String.class, null, true);
 		Column intCol = createColumn("integerField", Integer.class, null, false);
-		TableDefinition tableDefinition = createTableDefinition("entity", stringCol, intCol);
+		TableDefinition tableDefinition = createTableDefinition("entity", null, stringCol, intCol);
 		
 		CrateSQLStatement statement = new CreateTable(tableDefinition);
 		
@@ -61,7 +63,7 @@ public class CreateTableTest {
 	public void shouldCreateStatementWithPrimitiveCollection() {
 		
 		Column arrayCol = createColumn("integers", Integer[].class, Integer.class, null);
-		TableDefinition tableDefinition = createTableDefinition("entity", arrayCol);
+		TableDefinition tableDefinition = createTableDefinition("entity", null, arrayCol);
 
 		CrateSQLStatement statement = new CreateTable(tableDefinition);
 		
@@ -72,7 +74,7 @@ public class CreateTableTest {
 	public void shouldCreateStatementWithMap() {
 		
 		Column mapCol = createColumn("map", Map.class, null, null);
-		TableDefinition tableDefinition = createTableDefinition("entity", mapCol);
+		TableDefinition tableDefinition = createTableDefinition("entity", null, mapCol);
 		
 		CrateSQLStatement statement = new CreateTable(tableDefinition);
 		
@@ -89,7 +91,7 @@ public class CreateTableTest {
 		
 		Column rootStringCol = createColumn("stringField", String.class, null, null);
 		
-		TableDefinition tableDefinition = createTableDefinition("entity", rootStringCol, objectCol);
+		TableDefinition tableDefinition = createTableDefinition("entity", null, rootStringCol, objectCol);
 		
 		CrateSQLStatement statement = new CreateTable(tableDefinition);
 		
@@ -109,7 +111,7 @@ public class CreateTableTest {
 		
 		Column rootStringCol = createColumn("stringField", String.class, null, null);
 		
-		TableDefinition tableDefinition = createTableDefinition("entity", rootStringCol, objectCol);
+		TableDefinition tableDefinition = createTableDefinition("entity", null, rootStringCol, objectCol);
 		
 		CrateSQLStatement statement = new CreateTable(tableDefinition);
 		
@@ -133,7 +135,7 @@ public class CreateTableTest {
 		Column rootArrayCol = createColumn("nestedEntities", Set.class, EntityWithNestedEntity.class, null);
 		rootArrayCol.setSubColumns(asList(stringColLevel1, objectColLevel1));
 		
-		TableDefinition tableDefinition = createTableDefinition("entity", rootStringCol, rootArrayCol);
+		TableDefinition tableDefinition = createTableDefinition("entity", null, rootStringCol, rootArrayCol);
 		
 		CrateSQLStatement statement = new CreateTable(tableDefinition);
 		
@@ -144,8 +146,22 @@ public class CreateTableTest {
 		assertThat(statement.createStatement(), is(sql.toString()));
 	}
 	
-	private TableDefinition createTableDefinition(String name, Column... columns) {
-		return new TableDefinition(name, asList(columns));
+	@Test
+	public void shouldCreateStatementWithTableParameters() {
+		
+		Column stringCol = createColumn("field", String.class, null, false);
+		TableParameters parameters = new TableParameters("2", 1500, STRICT);
+		TableDefinition tableDefinition = createTableDefinition("entity", parameters, stringCol);
+		
+		CrateSQLStatement statement = new CreateTable(tableDefinition);
+		
+		StringBuilder sql = new StringBuilder("CREATE TABLE entity (\"entity_class\" string, \"field\" string) ");
+		sql.append("WITH (number_of_replicas='2', refresh_interval='1500', column_policy='strict')");
+		assertThat(statement.createStatement(), is(sql.toString()));
+	}
+	
+	private TableDefinition createTableDefinition(String name, TableParameters parameters, Column... columns) {
+		return new TableDefinition(name, asList(columns), parameters);
 	}
 	
 	private Column createColumn(String name, Class<?> type, Class<?> elementType, Boolean primaryKey) {

@@ -60,12 +60,12 @@ public class CratePersistentEntityTableManager {
 	/**
 	 * Creates table definition containing table information the columns. 
 	 * @param entity instance used to generate table definition
-	 * @return table definition with column definitions  
+	 * @return table definition with column definitions and table parameters
 	 */
 	public TableDefinition createDefinition(CratePersistentEntity<?> entity) {
 		notNull(entity);		
 		List<Column> columns = entityColumnMapper.toColumns(entity);
-		return new TableDefinition(entity.getTableName(), columns);
+		return new TableDefinition(entity.getTableName(), columns, entity.getTableParameters());
 	}
 	
 	/**

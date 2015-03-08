@@ -14,6 +14,7 @@ import java.util.regex.Pattern;
 public class CrateSQLUtil {
 	
 	private static final String DOUBLE_QUOTE_TEMPLATE = "\"%s\"";
+	private static final String SINGLE_QUOTE_TEMPLATE = "'%s'";
 	private static final String SQL_PATH_TEMPLATE = "['%s']";
 	
 	private static final Pattern PATTERN = compile("\\['([^\\]]*)'\\]");
@@ -23,6 +24,15 @@ public class CrateSQLUtil {
 		
 		if(hasText(toQuote)) {
 			return format(DOUBLE_QUOTE_TEMPLATE, toQuote);
+		}
+		
+		return toQuote;
+	}
+	
+	public static String singleQuote(String toQuote) {
+		
+		if(hasText(toQuote)) {
+			return format(SINGLE_QUOTE_TEMPLATE, toQuote);
 		}
 		
 		return toQuote;

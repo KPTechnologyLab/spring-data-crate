@@ -33,12 +33,19 @@ public class TableDefinition {
 	
 	private List<Column> columns;
 
+	private TableParameters tableParameters;
+	
 	public TableDefinition(String name, List<Column> columns) {
+		this(name, columns, null);
+	}
+
+	public TableDefinition(String name, List<Column> columns, TableParameters tableParameters) {
 		super();
 		hasText(name);
 		notEmpty(columns);
 		this.name = name;
 		this.columns = columns;
+		this.tableParameters = tableParameters;
 	}
 
 	public String getName() {
@@ -47,5 +54,13 @@ public class TableDefinition {
 	
 	public List<Column> getColumns() {
 		return columns;
+	}
+	
+	public TableParameters getTableParameters() {
+		return tableParameters;
+	}
+
+	public boolean hasTableParameters() {
+		return tableParameters != null;
 	}
 }
