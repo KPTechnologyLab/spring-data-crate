@@ -40,7 +40,9 @@ import org.springframework.data.crate.core.CrateSQLAction;
 import org.springframework.data.crate.core.mapping.CrateMappingContext;
 import org.springframework.data.crate.core.mapping.CratePersistentEntity;
 import org.springframework.data.crate.core.mapping.CratePersistentProperty;
+import org.springframework.data.crate.core.mapping.schema.AlterTableDefinition.AlterTableParameterDefinition;
 import org.springframework.data.crate.core.sql.AlterTable;
+import org.springframework.data.crate.core.sql.AlterTableParameter;
 import org.springframework.data.crate.core.sql.CrateSQLStatement;
 import org.springframework.data.crate.core.sql.CreateTable;
 import org.springframework.data.crate.core.sql.DropTable;
@@ -178,8 +180,8 @@ public class CratePersistentEntitySchemaManager implements InitializingBean, Dis
 	}
 	
 	private void createTable(CratePersistentEntity<?> entity) {
-		TableDefinition tableDefinition = tableManager.createDefinition(entity);
-		crateOperations.execute(new CreateTableAction(tableDefinition));
+		TableDefinition def = tableManager.createDefinition(entity);
+		crateOperations.execute(new CreateTableAction(def));
 		logger.info("created table '{}' for '{}'", entity.getTableName(), entity.getType());
 	}
 	
@@ -187,14 +189,28 @@ public class CratePersistentEntitySchemaManager implements InitializingBean, Dis
 		
 		TableMetadata tableMetadata = getTableMetadata(entity);
 		
-		TableDefinition tableDefinition = tableManager.updateDefinition(entity, tableMetadata);
+		AlterTableDefinition def = tableManager.alterDefinition(entity, tableMetadata);
 		
-		if(tableDefinition != null) {
-			for(Column column : tableDefinition.getColumns()) {
-				crateOperations.execute(new AlterTableAction(tableDefinition.getName(), column));
-				logger.info("altered table '{}' for '{}'", entity.getTableName(), entity.getType());
+		if(def.hasAlteredParameters()) {
+			for(AlterTableParameterDefinition paramDef : def.getAlteredParameters()) {
+				
+				crateOperations.execute(new AlterTableAction(new AlterTableParameter(def.getName(), paramDef)));
+				
+				logger.info("altered table '{}' for '{}' with parameter '{}'", new Object[]{entity.getTableName(), entity.getType(), 
+																							paramDef.getParameterName()});
 			}
-		}else {
+		}
+		
+		if(def.hasAlteredColumns()) {
+			for(Column column : def.getColumns()) {
+				
+				crateOperations.execute(new AlterTableAction(new AlterTable(def.getName(), column)));
+				logger.info("altered table '{}' for '{}' with column '{}'", new Object[]{entity.getTableName(), entity.getType(), 
+																						 column.getName()});
+			}
+		}
+		
+		if(!def.hasAlteredColumns() && !def.hasAlteredParameters()) {
 			logger.info("entity '{}' and crate db table '{}' are insynch", entity.getName(), 
 																		   tableMetadata.getName());
 		}
@@ -208,9 +224,14 @@ public class CratePersistentEntitySchemaManager implements InitializingBean, Dis
 	}
 	
 	private TableMetadata getTableMetadata(CratePersistentEntity<?> entity) {
+		
+		TableMetadataAction action = new TableMetadataAction(entity, getColumnMetadata(entity));
+		return crateOperations.execute(action, action);
+	}
+	
+	private List<ColumnMetadata> getColumnMetadata(CratePersistentEntity<?> entity) {
 		ColumnMetadataAction action = new ColumnMetadataAction(entity.getTableName());
-		List<ColumnMetadata> columns = crateOperations.execute(action, action);
-		return new TableMetadata(entity.getTableName(), columns);
+		return crateOperations.execute(action, action);
 	}
 	
 	 /**
@@ -247,10 +268,10 @@ public class CratePersistentEntitySchemaManager implements InitializingBean, Dis
 	 */
 	private class AlterTableAction implements CrateAction {
 		
-		private CrateSQLStatement alterTable;
+		private CrateSQLStatement alterStatement;
 		
-		public AlterTableAction(String tableName, Column column) {
-			this.alterTable = new AlterTable(tableName, column);
+		public AlterTableAction(CrateSQLStatement alterStatement) {
+			this.alterStatement = alterStatement;
 		}
 
 		@Override
@@ -260,7 +281,7 @@ public class CratePersistentEntitySchemaManager implements InitializingBean, Dis
 
 		@Override
 		public String getSQLStatement() {
-			return alterTable.createStatement();
+			return alterStatement.createStatement();
 		}
 	}
 	

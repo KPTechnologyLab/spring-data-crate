@@ -16,10 +16,12 @@
 package org.springframework.data.crate.core.mapping.schema;
 
 import static org.slf4j.LoggerFactory.getLogger;
+import static org.springframework.data.crate.core.sql.CrateSQLStatement.NO_OF_REPLICAS;
 import static org.springframework.data.crate.core.sql.CrateSQLUtil.sqlToDotPath;
 import static org.springframework.util.Assert.notNull;
 import static org.springframework.util.StringUtils.hasText;
 
+import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.LinkedHashMap;
 import java.util.LinkedList;
@@ -27,15 +29,18 @@ import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
 
+import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.springframework.data.crate.core.mapping.CrateMappingContext;
 import org.springframework.data.crate.core.mapping.CratePersistentEntity;
 import org.springframework.data.crate.core.mapping.CratePersistentProperty;
+import org.springframework.data.crate.core.mapping.schema.AlterTableDefinition.AlterTableParameterDefinition;
 import org.springframework.data.mapping.context.MappingContext;
 
+
 /**
- * Component that generates table definition from {@link CratePersistentEntity} instances
- * for creating/altering tables in Crate DB.
+ * Component that generates definitions from {@link CratePersistentEntity} and 
+ * {@link TableMetadata} instances for creating/altering tables in Crate DB.
  *
  * @author Hasnain Javed 
  * @since 1.0.0
@@ -60,7 +65,7 @@ public class CratePersistentEntityTableManager {
 	/**
 	 * Creates table definition containing table information the columns. 
 	 * @param entity instance used to generate table definition
-	 * @return table definition with column definitions and table parameters
+	 * @return table definition with column and table parameters definitions
 	 */
 	public TableDefinition createDefinition(CratePersistentEntity<?> entity) {
 		notNull(entity);		
@@ -69,101 +74,139 @@ public class CratePersistentEntityTableManager {
 	}
 	
 	/**
-	 * Creates table definition containing table information and columns that are not
-	 * found in {@link TableMetadata}
-	 * @param entity instance used to generate table definition
-	 * @param tableMetadata metadata associated to the {@link CratePersistentEntity}
-	 * @return table with column definitions. If there is no difference in
-	 *  	   {@link CratePersistentEntity} instance and the {@link TableMetadata} information,
-	 *  	   null is returned
+	 * Creates alter table definition containing table parameters that have changed and columns (including subcolumns) 
+	 * that are not found in {@link TableMetadata}
+	 * @param entity instance used to compare columns
+	 * @param tableMetadata metadata associated to the {@link CratePersistentEntity} from the database
+	 * @return alter table definition with column and table parameters definitions
 	 */
-	public TableDefinition updateDefinition(CratePersistentEntity<?> entity, TableMetadata tableMetadata) {
+	public AlterTableDefinition alterDefinition(CratePersistentEntity<?> entity, TableMetadata tableMetadata) {
 		
-		List<Column> columns = entityColumnMapper.toColumns(entity);
+		List<Column> alteredColumns = new ColumnMatcher().compareColumns(entity, tableMetadata);
 		
-		Map<String, Column> columnPaths = columnToDotPath(columns);
-		Map<String, String> sqlPaths = convertToDotPath(tableMetadata.getColumns());
+		List<AlterTableParameterDefinition> alteredParameters = new TableParameterMatcher().compareTableParameters(entity, tableMetadata);
 		
-		List<Column> additionalColumns = new LinkedList<Column>();
+		return new AlterTableDefinition(entity.getTableName(), alteredColumns, alteredParameters);
+	}
+
+	/**
+	 * Finds columns and subcolumns which are newly added 
+	 * @author Hasnain Javed
+	 * @since 1.0.0
+	 */
+	private class ColumnMatcher {
 		
-		Iterator<Entry<String, Column>> iterator = columnPaths.entrySet().iterator();
-		
-		while(iterator.hasNext()) {
+		public List<Column> compareColumns(CratePersistentEntity<?> entity, TableMetadata tableMetadata) {
 			
-			Entry<String, Column> columnPath = iterator.next();			
-			if(!sqlPaths.containsKey(columnPath.getKey())) {
+			List<Column> columns = entityColumnMapper.toColumns(entity);
+			
+			Map<String, Column> columnPaths = columnToDotPath(columns);
+			Map<String, String> sqlPaths = convertToDotPath(tableMetadata.getColumns());
+			
+			List<Column> alteredColumns = new LinkedList<>();
+			
+			Iterator<Entry<String, Column>> iterator = columnPaths.entrySet().iterator();
+			
+			while(iterator.hasNext()) {
 				
-				logger.debug("adding new column under path '{}'", columnPath.getKey());
-				Column addedColumn = new Column(columnPath.getKey(), 
-												columnPath.getValue().getRawType(), 
-												columnPath.getValue().getElementRawType());
-				addedColumn.setSubColumns(columnPath.getValue().getSubColumns());
+				Entry<String, Column> columnPath = iterator.next();			
+				if(!sqlPaths.containsKey(columnPath.getKey())) {
+					
+					logger.debug("adding new column under path '{}'", columnPath.getKey());
+					Column addedColumn = new Column(columnPath.getKey(), 
+													columnPath.getValue().getRawType(), 
+													columnPath.getValue().getElementRawType());
+					addedColumn.setSubColumns(columnPath.getValue().getSubColumns());
+					
+					
+					alteredColumns.add(addedColumn);
+					
+					if(columnPath.getValue().isObjectColumn() || columnPath.getValue().isObjectArrayColumn()) {
+						removePropertyPaths(columnPath.getKey(), iterator);
+					}
+				}
+			}
+			
+			return alteredColumns;
+		}
+		
+		private Map<String, Column> columnToDotPath(List<Column> columns) {
+			
+			LinkedHashMap<String, Column> map = new LinkedHashMap<String, Column>();
+			
+			for(Column column : columns) {
+				logger.debug("pushing column under key '{}'", column.getName());
+				map.put(column.getName(), column);
+				columnToDotPath(column, map, column.getName());
+			}
+			
+			return map;
+		}
+		
+		private Map<String, String> convertToDotPath(List<ColumnMetadata> columns) {
+			
+			Map<String, String> sqlPaths = new LinkedHashMap<String, String>(columns.size());
+			
+			for(ColumnMetadata metadata : columns) {
 				
-				additionalColumns.add(addedColumn);
-				
-				if(columnPath.getValue().isObjectColumn() || columnPath.getValue().isObjectArrayColumn()) {
-					removePropertyPaths(columnPath.getKey(), iterator);
+				String dotPath = sqlToDotPath(metadata.getSqlPath());
+				String type = metadata.getCrateType();
+				logger.debug("pushing sqlPath under key '{}'", dotPath);
+				sqlPaths.put(dotPath, type);
+			}
+			
+			return sqlPaths;
+		}
+		
+		private void columnToDotPath(Column column, Map<String, Column> map, String columnName) {
+			
+			Iterator<Column> subColumns = column.getSubColumns().iterator();
+			
+			while(subColumns.hasNext()) {
+				Column subColumn = subColumns.next();
+				String dotPath = createdotPathKey(columnName, subColumn.getName());
+				logger.debug("pushing column under key '{}'", dotPath);
+				map.put(dotPath, subColumn);
+				columnToDotPath(subColumn, map, dotPath);
+			}
+		}
+		
+		private String createdotPathKey(String rootPropertyName, String propertyName) {
+			return hasText(rootPropertyName) ? rootPropertyName.concat(".").concat(propertyName) : 
+											   propertyName;
+		}
+		
+		private void removePropertyPaths(String dotPath, Iterator<Entry<String, Column>> columns) {
+			
+			while(columns.hasNext()) {
+				Entry<String, Column> columnPath = columns.next();
+				if(columnPath.getKey().startsWith(dotPath)) {
+					logger.info("removing column path '{}' where sql path is '{}'", columnPath.getKey(), dotPath);
+					columns.remove();
 				}
 			}
 		}
-		
-		return additionalColumns.isEmpty() ? null : new TableDefinition(entity.getTableName(), additionalColumns);
 	}
 	
-	private void removePropertyPaths(String dotPath, Iterator<Entry<String, Column>> columns) {
+	/**
+	 * Finds changed table parameters  
+	 * @author Hasnain Javed
+	 * @since 1.0.0
+	 */
+	private class TableParameterMatcher {
 		
-		while(columns.hasNext()) {
-			Entry<String, Column> columnPath = columns.next();
-			if(columnPath.getKey().startsWith(dotPath)) {
-				logger.info("removing column path '{}' where sql path is '{}'", columnPath.getKey(), dotPath);
-				columns.remove();
-			}
-		}
-	}
-	
-	private Map<String, Column> columnToDotPath(List<Column> columns) {
-		
-		LinkedHashMap<String, Column> map = new LinkedHashMap<String, Column>();
-		
-		for(Column column : columns) {
-			logger.debug("pushing column under key '{}'", column.getName());
-			map.put(column.getName(), column);
-			columnToDotPath(column, map, column.getName());
-		}
-		
-		return map;
-	}
-	
-	private void columnToDotPath(Column column, Map<String, Column> map, String columnName) {
-		
-		Iterator<Column> subColumns = column.getSubColumns().iterator();
-		
-		while(subColumns.hasNext()) {
-			Column subColumn = subColumns.next();
-			String dotPath = createdotPathKey(columnName, subColumn.getName());
-			logger.debug("pushing column under key '{}'", dotPath);
-			map.put(dotPath, subColumn);
-			columnToDotPath(subColumn, map, dotPath);
-		}
-	}
-	
-	private String createdotPathKey(String rootPropertyName, String propertyName) {
-		return hasText(rootPropertyName) ? rootPropertyName.concat(".").concat(propertyName) : 
-										   propertyName;
-	}
-	
-	private Map<String, String> convertToDotPath(List<ColumnMetadata> columns) {
-		
-		Map<String, String> sqlPaths = new LinkedHashMap<String, String>(columns.size());
-		
-		for(ColumnMetadata metadata : columns) {
+		public List<AlterTableParameterDefinition> compareTableParameters(CratePersistentEntity<?> entity, TableMetadata tableMetadata) {
 			
-			String dotPath = sqlToDotPath(metadata.getSqlPath());
-			String type = metadata.getCrateType();
-			logger.debug("pushing sqlPath under key '{}'", dotPath);
-			sqlPaths.put(dotPath, type);
+			List<AlterTableParameterDefinition> alteredParameters = new ArrayList<>(3);
+			
+			TableParameters dbParams = tableMetadata.getParameters();
+			TableParameters entityParams = entity.getTableParameters();
+			
+			if(!StringUtils.equals(dbParams.getNumberOfReplicas(), entityParams.getNumberOfReplicas())) {
+				alteredParameters.add(new AlterTableParameterDefinition(NO_OF_REPLICAS, entityParams.getNumberOfReplicas()));
+			}
+			
+			return alteredParameters;
 		}
-		
-		return sqlPaths;
 	}
 }

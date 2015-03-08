@@ -36,6 +36,7 @@ public interface CrateSQLStatement {
 	String WHERE = "WHERE";
 	String VALUES = "VALUES";
 	String WITH = "WITH";
+	String SET = "SET";
 	String REFRESH_TABLE = "REFRESH TABLE";
 	String NO_OF_REPLICAS = "number_of_replicas";
 	String REFRESH_INTERVAL = "refresh_interval";

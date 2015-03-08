@@ -24,6 +24,8 @@ import static org.springframework.data.crate.core.mapping.CrateDataType.ARRAY;
 import static org.springframework.data.crate.core.mapping.CrateDataType.LONG;
 import static org.springframework.data.crate.core.mapping.CrateDataType.OBJECT;
 import static org.springframework.data.crate.core.mapping.CrateDataType.STRING;
+import static org.springframework.data.crate.core.mapping.schema.ColumnPloicy.DYNAMIC;
+import static org.springframework.data.crate.core.sql.CrateSQLStatement.NO_OF_REPLICAS;
 
 import java.util.Date;
 import java.util.List;
@@ -34,6 +36,7 @@ import org.junit.Before;
 import org.junit.Test;
 import org.springframework.data.crate.core.mapping.CrateMappingContext;
 import org.springframework.data.crate.core.mapping.annotations.Table;
+import org.springframework.data.crate.core.mapping.schema.AlterTableDefinition.AlterTableParameterDefinition;
 
 /**
  * 
@@ -41,6 +44,8 @@ import org.springframework.data.crate.core.mapping.annotations.Table;
  * @since 1.0.0
  */
 public class CratePersistentEntityTableManagerTest {
+	
+	public static final TableParameters DEFAULT_PARAMS = new TableParameters("1", 1000, DYNAMIC);
 	
 	private CrateMappingContext mappingContext;
 	private CratePersistentEntityTableManager tableManager;
@@ -56,11 +61,11 @@ public class CratePersistentEntityTableManagerTest {
 		
 		initMappingContext(Primitives.class);
 		
-		TableDefinition tableDefinition = tableManager.createDefinition(mappingContext.getPersistentEntity(Primitives.class));
+		TableDefinition def = tableManager.createDefinition(mappingContext.getPersistentEntity(Primitives.class));
 		
-		assertThat(tableDefinition, is(notNullValue()));
-		assertThat(tableDefinition.getName(), is("primitives"));
-		assertThat(tableDefinition.getColumns().size(), is(8));
+		assertThat(def, is(notNullValue()));
+		assertThat(def.getName(), is("primitives"));
+		assertThat(def.getColumns().size(), is(8));
 	}
 	
 	@Test 
@@ -68,11 +73,11 @@ public class CratePersistentEntityTableManagerTest {
 		
 		initMappingContext(PrimitveCollectionTypes.class);
 		
-		TableDefinition tableDefinition = tableManager.createDefinition(mappingContext.getPersistentEntity(PrimitveCollectionTypes.class));
+		TableDefinition def = tableManager.createDefinition(mappingContext.getPersistentEntity(PrimitveCollectionTypes.class));
 		
-		assertThat(tableDefinition, is(notNullValue()));
-		assertThat(tableDefinition.getName(), is("PrimitveCollectionTypes"));
-		assertThat(tableDefinition.getColumns().size(), is(2));
+		assertThat(def, is(notNullValue()));
+		assertThat(def.getName(), is("PrimitveCollectionTypes"));
+		assertThat(def.getColumns().size(), is(2));
 	}
 	
 	@Test 
@@ -80,12 +85,12 @@ public class CratePersistentEntityTableManagerTest {
 		
 		initMappingContext(Entity.class);
 		
-		TableDefinition tableDefinition = tableManager.createDefinition(mappingContext.getPersistentEntity(Entity.class));
+		TableDefinition def = tableManager.createDefinition(mappingContext.getPersistentEntity(Entity.class));
 		
-		assertThat(tableDefinition, is(notNullValue()));
-		assertThat(tableDefinition.getName(), is("entity"));
-		assertThat(tableDefinition.getColumns().size(), is(1));
-		assertThat(tableDefinition.getColumns().get(0).getSubColumns().size(), is(2));
+		assertThat(def, is(notNullValue()));
+		assertThat(def.getName(), is("entity"));
+		assertThat(def.getColumns().size(), is(1));
+		assertThat(def.getColumns().get(0).getSubColumns().size(), is(2));
 	}
 	
 	@Test 
@@ -107,64 +112,67 @@ public class CratePersistentEntityTableManagerTest {
 		
 		initMappingContext(EntityWithMap.class);
 		
-		TableDefinition tableDefinition = tableManager.createDefinition(mappingContext.getPersistentEntity(EntityWithMap.class));
+		TableDefinition def = tableManager.createDefinition(mappingContext.getPersistentEntity(EntityWithMap.class));
 		
-		assertThat(tableDefinition, is(notNullValue()));
-		assertThat(tableDefinition.getName(), is("entityWithMap"));
-		assertThat(tableDefinition.getColumns().size(), is(1));
-		assertThat(tableDefinition.getColumns().get(0).getSubColumns().isEmpty(), is(true));
+		assertThat(def, is(notNullValue()));
+		assertThat(def.getName(), is("entityWithMap"));
+		assertThat(def.getColumns().size(), is(1));
+		assertThat(def.getColumns().get(0).getSubColumns().isEmpty(), is(true));
 	}
 	
 	@Test
 	public void shouldPickUpColumn() {
 		
-		TableMetadata tableMetadata = new TableMetadata("levelZero", asList(new ColumnMetadata("field1", STRING)));
+		TableMetadata tableMetadata = new TableMetadata("levelZero", asList(new ColumnMetadata("field1", STRING)), 
+														DEFAULT_PARAMS);
 		
 		initMappingContext(LevelZero.class);
 		
-		TableDefinition tableDefinition = tableManager.updateDefinition(mappingContext.getPersistentEntity(LevelZero.class),
-																		tableMetadata);
-		assertThat(tableDefinition, is(notNullValue()));
-		assertThat(tableDefinition.getName(), is("levelZero"));
-		assertThat(tableDefinition.getColumns().isEmpty(), is(false));
-		assertThat(tableDefinition.getColumns().size(), is(1));
-		assertThat(tableDefinition.getColumns().get(0).getName(), is("field2"));
-		assertThat(tableDefinition.getColumns().get(0).getCrateType(), is(LONG));
+		AlterTableDefinition def = tableManager.alterDefinition(mappingContext.getPersistentEntity(LevelZero.class),
+																tableMetadata);
+		assertThat(def, is(notNullValue()));
+		assertThat(def.getName(), is("levelZero"));
+		assertThat(def.getColumns().isEmpty(), is(false));
+		assertThat(def.getColumns().size(), is(1));
+		assertThat(def.getColumns().get(0).getName(), is("field2"));
+		assertThat(def.getColumns().get(0).getCrateType(), is(LONG));
 	}
 	
 	@Test
 	public void shouldPickUpObjectColumn() {
 		
-		TableMetadata tableMetadata = new TableMetadata("levelTwo", asList(new ColumnMetadata("stringArray", ARRAY, STRING)));
+		TableMetadata tableMetadata = new TableMetadata("levelTwo", asList(new ColumnMetadata("stringArray", ARRAY, STRING)), 
+										  DEFAULT_PARAMS);
 		
 		initMappingContext(LevelTwo.class);
 		
-		TableDefinition tableDefinition = tableManager.updateDefinition(mappingContext.getPersistentEntity(LevelTwo.class),
-																		tableMetadata);
-		assertThat(tableDefinition, is(notNullValue()));
-		assertThat(tableDefinition.getName(), is("levelTwo"));
-		assertThat(tableDefinition.getColumns().isEmpty(), is(false));
-		assertThat(tableDefinition.getColumns().size(), is(1));
-		assertThat(tableDefinition.getColumns().get(0).getName(), is("one"));
-		assertThat(tableDefinition.getColumns().get(0).getCrateType(), is(OBJECT));
+		AlterTableDefinition def = tableManager.alterDefinition(mappingContext.getPersistentEntity(LevelTwo.class),
+																tableMetadata);
+		assertThat(def, is(notNullValue()));
+		assertThat(def.getName(), is("levelTwo"));
+		assertThat(def.getColumns().isEmpty(), is(false));
+		assertThat(def.getColumns().size(), is(1));
+		assertThat(def.getColumns().get(0).getName(), is("one"));
+		assertThat(def.getColumns().get(0).getCrateType(), is(OBJECT));
 	}
 	
 	@Test
 	public void shouldPickUpObjectArrayColumn() {
 		
-		TableMetadata tableMetadata = new TableMetadata("levelFour", asList(new ColumnMetadata("field1", STRING)));
+		TableMetadata tableMetadata = new TableMetadata("levelFour", asList(new ColumnMetadata("field1", STRING)), 
+														DEFAULT_PARAMS);
 		
 		initMappingContext(LevelFour.class);
 		
-		TableDefinition tableDefinition = tableManager.updateDefinition(mappingContext.getPersistentEntity(LevelFour.class),
-																		tableMetadata);
-		assertThat(tableDefinition, is(notNullValue()));
-		assertThat(tableDefinition.getName(), is("levelFour"));
-		assertThat(tableDefinition.getColumns().isEmpty(), is(false));
-		assertThat(tableDefinition.getColumns().size(), is(1));
-		assertThat(tableDefinition.getColumns().get(0).getName(), is("zeros"));
-		assertThat(tableDefinition.getColumns().get(0).getCrateType(), is(ARRAY));
-		assertThat(tableDefinition.getColumns().get(0).getElementCrateType(), is(OBJECT));
+		AlterTableDefinition def = tableManager.alterDefinition(mappingContext.getPersistentEntity(LevelFour.class),
+															    tableMetadata);
+		assertThat(def, is(notNullValue()));
+		assertThat(def.getName(), is("levelFour"));
+		assertThat(def.getColumns().isEmpty(), is(false));
+		assertThat(def.getColumns().size(), is(1));
+		assertThat(def.getColumns().get(0).getName(), is("zeros"));
+		assertThat(def.getColumns().get(0).getCrateType(), is(ARRAY));
+		assertThat(def.getColumns().get(0).getElementCrateType(), is(OBJECT));
 	}
 	
 	@Test
@@ -173,18 +181,19 @@ public class CratePersistentEntityTableManagerTest {
 		ColumnMetadata levelZeroCol = new ColumnMetadata("zero.field1", STRING);
 		ColumnMetadata levelOneCol = new ColumnMetadata("zero", OBJECT);
 		
-		TableMetadata tableMetadata = new TableMetadata("levelOne", asList(levelOneCol, levelZeroCol));
+		TableMetadata tableMetadata = new TableMetadata("levelOne", asList(levelOneCol, levelZeroCol), 
+														DEFAULT_PARAMS);
 		
 		initMappingContext(LevelOne.class);
 		
-		TableDefinition tableDefinition = tableManager.updateDefinition(mappingContext.getPersistentEntity(LevelOne.class),
-																		tableMetadata);
-		assertThat(tableDefinition, is(notNullValue()));
-		assertThat(tableDefinition.getName(), is("levelOne"));
-		assertThat(tableDefinition.getColumns().isEmpty(), is(false));
-		assertThat(tableDefinition.getColumns().size(), is(1));
-		assertThat(tableDefinition.getColumns().get(0).getName(), is("zero.field2"));
-		assertThat(tableDefinition.getColumns().get(0).getCrateType(), is(LONG));
+		AlterTableDefinition def = tableManager.alterDefinition(mappingContext.getPersistentEntity(LevelOne.class),
+															    tableMetadata);
+		assertThat(def, is(notNullValue()));
+		assertThat(def.getName(), is("levelOne"));
+		assertThat(def.getColumns().isEmpty(), is(false));
+		assertThat(def.getColumns().size(), is(1));
+		assertThat(def.getColumns().get(0).getName(), is("zero.field2"));
+		assertThat(def.getColumns().get(0).getCrateType(), is(LONG));
 	}
 	
 	@Test
@@ -197,18 +206,35 @@ public class CratePersistentEntityTableManagerTest {
 		ColumnMetadata levelThreeCol = new ColumnMetadata("twos", ARRAY, OBJECT);
 		
 		TableMetadata tableMetadata = new TableMetadata("levelThree", asList(levelThreeCol, levelTwoCol1, 
-																			 levelTwoCol2, levelOneCol1, levelZeroCol1));
+																			 levelTwoCol2, levelOneCol1, levelZeroCol1),
+														DEFAULT_PARAMS);
 		
 		initMappingContext(LevelThree.class);
 		
-		TableDefinition tableDefinition = tableManager.updateDefinition(mappingContext.getPersistentEntity(LevelThree.class),
-																		tableMetadata);
-		assertThat(tableDefinition, is(notNullValue()));
-		assertThat(tableDefinition.getName(), is("levelThree"));
-		assertThat(tableDefinition.getColumns().isEmpty(), is(false));
-		assertThat(tableDefinition.getColumns().size(), is(1));
-		assertThat(tableDefinition.getColumns().get(0).getName(), is("twos.one.zero.field1"));
-		assertThat(tableDefinition.getColumns().get(0).getCrateType(), is(STRING));
+		AlterTableDefinition def = tableManager.alterDefinition(mappingContext.getPersistentEntity(LevelThree.class),
+																tableMetadata);
+		assertThat(def, is(notNullValue()));
+		assertThat(def.getName(), is("levelThree"));
+		assertThat(def.getColumns().isEmpty(), is(false));
+		assertThat(def.getColumns().size(), is(1));
+		assertThat(def.getColumns().get(0).getName(), is("twos.one.zero.field1"));
+		assertThat(def.getColumns().get(0).getCrateType(), is(STRING));
+	}
+	
+	@Test
+	public void shouldPickUpChangedTableParameters() {
+		
+		TableMetadata tableMetadata = new TableMetadata("entity", asList(new ColumnMetadata("field1", STRING)), DEFAULT_PARAMS);
+		
+		AlterTableDefinition def = tableManager.alterDefinition(mappingContext.getPersistentEntity(TableParams.class),
+																tableMetadata);
+		
+		assertThat(def, is(notNullValue()));
+		assertThat(def.hasAlteredParameters(), is(true));
+		
+		AlterTableParameterDefinition paramDef = def.getAlteredParameters().iterator().next(); 
+		assertThat(paramDef.getParameterName(), is(NO_OF_REPLICAS));
+		assertThat(paramDef.getParameterValue().toString(), is("2"));
 	}
 
 	private void initMappingContext(Class<?> clazz) {
@@ -276,5 +302,10 @@ public class CratePersistentEntityTableManagerTest {
 	static class LevelFour {
 		String field1;
 		List<LevelZero> zeros;
+	}
+	
+	@Table(name="entity", numberOfReplicas="2")
+	public class TableParams {
+		String field1;
 	}
 }

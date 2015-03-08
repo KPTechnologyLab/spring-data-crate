@@ -16,7 +16,7 @@
 package org.springframework.data.crate.core.mapping.schema;
 
 import static org.springframework.util.Assert.hasText;
-import static org.springframework.util.Assert.notEmpty;
+import static org.springframework.util.Assert.*;
 
 import java.util.List;
 
@@ -30,13 +30,18 @@ public class TableMetadata {
 	
 	private String name;
 	private List<ColumnMetadata> columns;
+
+	private TableParameters parameters;
 	
-	public TableMetadata(String name, List<ColumnMetadata> columns) {
-		super();
+	public TableMetadata(String name, List<ColumnMetadata> columns, TableParameters parameters) {
+		
 		hasText(name);
 		notEmpty(columns);
+		notNull(parameters);
+		
 		this.name = name;
 		this.columns = columns;
+		this.parameters = parameters;
 	}
 	
 	public String getName() {
@@ -45,5 +50,9 @@ public class TableMetadata {
 
 	public List<ColumnMetadata> getColumns() {
 		return columns;
+	}
+
+	public TableParameters getParameters() {
+		return parameters;
 	}
  }

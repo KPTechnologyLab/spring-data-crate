@@ -16,6 +16,7 @@
 
 package org.springframework.data.crate.core.mapping.schema;
 
+import static org.springframework.data.crate.core.mapping.schema.CratePersistentEntityTableManagerTest.DEFAULT_PARAMS;
 import static java.util.Arrays.asList;
 import static java.util.Collections.singleton;
 import static org.junit.Assert.fail;
@@ -186,8 +187,14 @@ public class CratePersistentEntitySchemaManagerTest {
 		List<ColumnMetadata> columns = asList(createColumnMetadata("['name']", STRING),
 											  createColumnMetadata("['age']", INTEGER));
 		
+		TableMetadata metadata = new TableMetadata("person", columns, DEFAULT_PARAMS);
+		
 		when(crateOperations.execute(isA(ColumnMetadataAction.class),
 									 isA(ColumnMetadataAction.class))).thenReturn(columns);
+		
+		when(crateOperations.execute(isA(TableMetadataAction.class),
+				 					 isA(TableMetadataAction.class))).thenReturn(metadata);
+		
 		when(crateOperations.execute(isA(CrateAction.class))).thenThrow(new InvalidDataAccessResourceUsageException("Error!!"));
 		
 		CratePersistentEntitySchemaManager manager = new CratePersistentEntitySchemaManager(crateOperations, UPDATE);
@@ -202,8 +209,13 @@ public class CratePersistentEntitySchemaManagerTest {
 		List<ColumnMetadata> columns = asList(createColumnMetadata("name", STRING),
 											  createColumnMetadata("age", INTEGER));
 		
+		TableMetadata metadata = new TableMetadata("person", columns, DEFAULT_PARAMS);
+		
 		when(crateOperations.execute(isA(ColumnMetadataAction.class),
 									 isA(ColumnMetadataAction.class))).thenReturn(columns);
+		
+		when(crateOperations.execute(isA(TableMetadataAction.class),
+									 isA(TableMetadataAction.class))).thenReturn(metadata);
 		
 		CratePersistentEntitySchemaManager manager = new CratePersistentEntitySchemaManager(crateOperations, UPDATE);
 		manager.afterPropertiesSet();
@@ -218,13 +230,18 @@ public class CratePersistentEntitySchemaManagerTest {
 		
 		List<ColumnMetadata> columns = asList(createColumnMetadata("stringField", STRING));
 		
+		TableMetadata metadata = new TableMetadata("person", columns, DEFAULT_PARAMS);
+		
 		when(crateOperations.execute(isA(ColumnMetadataAction.class),
 									 isA(ColumnMetadataAction.class))).thenReturn(columns);
+		
+		when(crateOperations.execute(isA(TableMetadataAction.class),
+				 					 isA(TableMetadataAction.class))).thenReturn(metadata);
 		
 		CratePersistentEntitySchemaManager manager = new CratePersistentEntitySchemaManager(crateOperations, UPDATE);
 		manager.afterPropertiesSet();
 		
-		verify(crateOperations).execute(isA(CrateAction.class));
+		verify(crateOperations, times(2)).execute(isA(CrateAction.class));
 	}
 	
 	private ColumnMetadata createColumnMetadata(String sqlPath, String crateType) {
@@ -242,7 +259,7 @@ public class CratePersistentEntitySchemaManagerTest {
 		private int age;
 	}
 	
-	@Table(name="entity")
+	@Table(name="entity", numberOfReplicas="0")
 	static class Entity {
 		private String stringField;
 		private List<Integer> integers;
