@@ -16,7 +16,9 @@
 package org.springframework.data.crate.core.mapping.schema;
 
 import static org.slf4j.LoggerFactory.getLogger;
+import static org.springframework.data.crate.core.sql.CrateSQLStatement.COLUMN_POLICY;
 import static org.springframework.data.crate.core.sql.CrateSQLStatement.NO_OF_REPLICAS;
+import static org.springframework.data.crate.core.sql.CrateSQLStatement.REFRESH_INTERVAL;
 import static org.springframework.data.crate.core.sql.CrateSQLUtil.sqlToDotPath;
 import static org.springframework.util.Assert.notNull;
 import static org.springframework.util.StringUtils.hasText;
@@ -82,9 +84,12 @@ public class CratePersistentEntityTableManager {
 	 */
 	public AlterTableDefinition alterDefinition(CratePersistentEntity<?> entity, TableMetadata tableMetadata) {
 		
-		List<Column> alteredColumns = new ColumnMatcher().compareColumns(entity, tableMetadata);
+		notNull(entity);
+		notNull(tableMetadata);
 		
-		List<AlterTableParameterDefinition> alteredParameters = new TableParameterMatcher().compareTableParameters(entity, tableMetadata);
+		List<Column> alteredColumns = new ColumnMatcher(entity, tableMetadata).compareColumns();
+		
+		List<AlterTableParameterDefinition> alteredParameters = new TableParameterMatcher(entity, tableMetadata).compareTableParameters();
 		
 		return new AlterTableDefinition(entity.getTableName(), alteredColumns, alteredParameters);
 	}
@@ -96,7 +101,15 @@ public class CratePersistentEntityTableManager {
 	 */
 	private class ColumnMatcher {
 		
-		public List<Column> compareColumns(CratePersistentEntity<?> entity, TableMetadata tableMetadata) {
+		private CratePersistentEntity<?> entity;
+		private TableMetadata tableMetadata;
+		
+		public ColumnMatcher(CratePersistentEntity<?> entity, TableMetadata tableMetadata) {
+			this.entity = entity;
+			this.tableMetadata = tableMetadata;
+		}
+		
+		public List<Column> compareColumns() {
 			
 			List<Column> columns = entityColumnMapper.toColumns(entity);
 			
@@ -195,7 +208,15 @@ public class CratePersistentEntityTableManager {
 	 */
 	private class TableParameterMatcher {
 		
-		public List<AlterTableParameterDefinition> compareTableParameters(CratePersistentEntity<?> entity, TableMetadata tableMetadata) {
+		private CratePersistentEntity<?> entity;
+		private TableMetadata tableMetadata;
+		
+		public TableParameterMatcher(CratePersistentEntity<?> entity, TableMetadata tableMetadata) {
+			this.entity = entity;
+			this.tableMetadata = tableMetadata;
+		}
+		
+		public List<AlterTableParameterDefinition> compareTableParameters() {
 			
 			List<AlterTableParameterDefinition> alteredParameters = new ArrayList<>(3);
 			
@@ -205,6 +226,20 @@ public class CratePersistentEntityTableManager {
 			if(!StringUtils.equals(dbParams.getNumberOfReplicas(), entityParams.getNumberOfReplicas())) {
 				alteredParameters.add(new AlterTableParameterDefinition(NO_OF_REPLICAS, entityParams.getNumberOfReplicas()));
 			}
+			
+			/**
+			 * TODO: Currently crate does not return refresh_interval and column_policy for tables.
+			 * Uncomment if conditions below when future crate release starts returning these properties.
+			 * For now, an alter statement will be executed even if these two parameters are not changed. 
+			 */
+			
+//			if(dbParams.getRefreshInterval() != entityParams.getRefreshInterval()) {
+//				alteredParameters.add(new AlterTableParameterDefinition(REFRESH_INTERVAL, entityParams.getRefreshInterval()));
+//			}
+			
+//			if(dbParams.getColumnPloicy() != entityParams.getColumnPloicy()) {
+//				alteredParameters.add(new AlterTableParameterDefinition(COLUMN_POLICY, entityParams.getColumnPloicy().toString()));
+//			}
 			
 			return alteredParameters;
 		}
