@@ -498,9 +498,10 @@ public class CrateTemplate implements CrateOperations, ApplicationContextAware {
 		
 		notNull(document);
 		
-		T dbEntity = findById(getIdPropertyValue(entity), (Class<T>)entity.getClass());
-		
-		if(dbEntity != null && isVersionPropertyDefined(entity.getClass())) {
+		if(isVersionPropertyDefined(entity.getClass())) {
+			
+			T dbEntity = findById(getIdPropertyValue(entity), (Class<T>)entity.getClass());
+			
 			setVersionPropertyValue(entity, getVersionPropertyValue(dbEntity));
 		}
 		
@@ -953,6 +954,11 @@ public class CrateTemplate implements CrateOperations, ApplicationContextAware {
 				Object id = getIdPropertyValue(entity);
 				if(response.rowCount() > 0) {
 					logger.info("Updated row with id '{}'", id);
+					
+					if(persistentEntity.hasVersionProperty()) {
+						// crate is eventually consistent. Data written with a former statement is not guaranteed to be fetched.
+						refreshTable(persistentEntity.getType());
+					}
 					doAfterUpdate(entity, document);
 				}else {
 					logger.info("No row updated with id '{}'", id);
@@ -1054,10 +1060,15 @@ public class CrateTemplate implements CrateOperations, ApplicationContextAware {
 		
 		@Override
 		public BulkOperartionResult<T> handle(SQLBulkResponse response) {
-			
+
 			Result[] results = response.results();
 			
 			BulkActionResult<T> actionResults = new BulkActionResult<T>();
+			
+			if(persistentEntity.hasIdProperty()) {
+				// crate is eventually consistent. Data written with a former statement is not guaranteed to be fetched.
+				refreshTable(persistentEntity.getType());
+			}
 			
 			for(int index = 0; index < results.length; index++) {
 				
