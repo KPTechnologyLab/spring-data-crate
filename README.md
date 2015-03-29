@@ -20,15 +20,10 @@ Checkout the project repository and issue the following command from a shell/ter
 ```sh
 mvn clean install
 ```
-Add the generated jar file in your project and add the following repository configuration in your project's pom.xml file (for spring data commons 1.10.0.BUILD-SNAPSHOT)
+This will generate a jar file. The jar file can be found under the 'target' folder and also in local maven repository in user's home directory in .m2 folder. 
+Add the generated jar file in your project.
 
-```xml
-<repository>
-	<id>spring-libs-snapshot</id>
-	<url>http://repo.spring.io/libs-snapshot</url>
-</repository>
-```
-Please look at spring data crate's pom.xml for required dependencies
+Please look at spring data crate's pom.xml for required dependencies.
 
 ### CrateTemplate
 
@@ -99,7 +94,7 @@ Currently adding custom converters via XML is not supported.
 This will find the repository interface and register a proxy object in the container. You can use it as shown below:
 
 ```java
-@Table(name="users")
+@Table(name="users", numberOfReplicas="2", refreshInterval="1500", columnPolicy="dynamic")
 public class User {
 	
 	@Id
@@ -119,6 +114,16 @@ public class User {
 	
 	// getters and setters
 }
+```
+Changes to the 'numberOfReplicas' table parameter will be reflected to the database on application restarts. Details about table parameters can be found here [Table Parameters](https://crate.io/docs/stable/sql/reference/create_table.html)
+
+**NOTE:**
+Crate currently does not return 'refresh_interval' and 'column_policy' from 'information_schema.tables'. To change the values of these two table parameters,
+you will have to execute the queries manually from Crate's 'crash' command line tool.
+
+```sh
+alter table my_table set (refresh_interval = <NEW_VALUE>);
+alter table my_table set (column_policy = <NEW_VALUE>);
 ```
 
 ```java
@@ -142,11 +147,16 @@ public class UserService {
      
      repository.insert(user);
 
+	 repository.refreshTable();
+
      User dbUser = repository.findById(user.getId());
      List<User> users = repository.findAll();
  }
 }
 ```
+
+**NOTE:**
+Information about table refresh can be found here [Refresh](https://crate.io/docs/stable/sql/refresh.html)
 
 ### Schema Export
 
