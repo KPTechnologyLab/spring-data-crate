@@ -37,6 +37,7 @@ import java.util.List;
 
 import org.junit.After;
 import org.junit.Before;
+import org.junit.Ignore;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -163,8 +164,9 @@ public class CrateTemplateIntegrationTest {
     }
     
     @Test
+    @Ignore
     public void shouldSaveComplexModelAndFindById() {
-    	
+        // Crate does not support complex data types as primary keys
     	Person entity = person();
     	crateTemplate.insert(entity);
     	Person dbEntity = crateTemplate.findById(entity.id, Person.class);
@@ -173,8 +175,9 @@ public class CrateTemplateIntegrationTest {
     }
     
     @Test
+    @Ignore
     public void shouldSaveAndFindByComplexId() {
-    	
+        // Crate does not support complex data types as primary keys
     	EntityWithComplexId entity = entityWithComplexId();
     	crateTemplate.insert(entity);
     	EntityWithComplexId dbEntity = crateTemplate.findById(entity.complexId, EntityWithComplexId.class);
@@ -184,7 +187,6 @@ public class CrateTemplateIntegrationTest {
     
     @Test
     public void shouldSaveAndRemoveBySimpleId() {
-    	
     	SimpleEntityWithId entity = simpleEntityWithId();
     	entity.id = 2L;
     	crateTemplate.insert(entity);
@@ -192,8 +194,9 @@ public class CrateTemplateIntegrationTest {
     }
     
     @Test
+    @Ignore
     public void shouldSaveAndRemoveByComplexId() {
-    	
+        // Crate does not support complex data types as primary keys
     	EntityWithComplexId entity = entityWithComplexId();
     	entity.complexId.booleanField = false;
     	crateTemplate.insert(entity);

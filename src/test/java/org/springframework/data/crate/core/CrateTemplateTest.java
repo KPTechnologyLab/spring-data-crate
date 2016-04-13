@@ -23,7 +23,7 @@ import static org.mockito.Mockito.verify;
 import io.crate.action.sql.SQLRequest;
 import io.crate.client.CrateClient;
 
-import org.elasticsearch.action.ActionListener;
+import io.crate.shade.org.elasticsearch.action.ActionListener;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;

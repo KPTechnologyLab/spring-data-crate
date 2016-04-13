@@ -39,7 +39,7 @@ import static org.springframework.data.crate.core.CrateErrorCodes.UNKNOWN_TYPE;
 import static org.springframework.data.crate.core.CrateErrorCodes.VERSION_CONFLICT;
 import io.crate.action.sql.SQLActionException;
 
-import org.elasticsearch.client.transport.NoNodeAvailableException;
+import io.crate.shade.org.elasticsearch.client.transport.NoNodeAvailableException;
 import org.springframework.dao.DataAccessException;
 import org.springframework.dao.DataAccessResourceFailureException;
 import org.springframework.dao.DataIntegrityViolationException;
