@@ -236,7 +236,7 @@ public class SimpleCratePersistentEntity<T> extends BasicPersistentEntity<T, Cra
 		
 		String fallback = replace(typeInformation.getType().getName(), ".", "_");
 		
-		String tableName = null;
+		String tableName;
 		
 		Table annotation = findAnnotation(Table.class);
 		

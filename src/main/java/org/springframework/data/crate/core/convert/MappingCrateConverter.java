@@ -861,7 +861,7 @@ public class MappingCrateConverter extends AbstractCrateConverter implements App
 	    	
 	      String expression = property.getSpelExpression();
 	      
-	      Object value = null; 
+	      Object value;
 	    		  
 	      if(expression != null) {
 	    	  value = evaluator.evaluate(expression);

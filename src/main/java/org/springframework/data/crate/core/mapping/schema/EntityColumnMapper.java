@@ -120,7 +120,7 @@ class EntityColumnMapper {
 		
 		notNull(property);
 		
-		Column column = null;
+		Column column;
 		
 		if(property.isCollectionLike()) {
 			column = new Column(property.getFieldName(), property.getRawType(), property.getComponentType());
