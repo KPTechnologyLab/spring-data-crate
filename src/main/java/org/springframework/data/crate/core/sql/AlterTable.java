@@ -64,7 +64,18 @@ public class AlterTable extends AbstractStatement {
 	private String createColumnDefinition(Column column) {
 		
 		StringBuilder builder = new StringBuilder();
+
+		createArrayColumn(column, builder);
+
+		if(column.isPrimaryKey()) {
+			builder.append(SPACE)
+				   .append(PRIMARY_KEY);
+		}
 		
+		return builder.toString();
+	}
+
+	private void createArrayColumn(Column column, StringBuilder builder) {
 		if(column.isArrayColumn()) {
 			builder.append(column.getCrateType());
 			builder.append(OPEN_BRACE);
@@ -73,22 +84,15 @@ public class AlterTable extends AbstractStatement {
 			}else {
 				createObjectColumnStatement(column, builder);
 			}
-			
+
 			builder.append(CLOSE_BRACE);
 		}else if(column.isObjectColumn()) {
 			createObjectColumnStatement(column, builder);
 		}else {
 			builder.append(column.getCrateType());
 		}
-		
-		if(column.isPrimaryKey()) {
-			builder.append(SPACE)
-				   .append(PRIMARY_KEY);
-		}
-		
-		return builder.toString();
 	}
-	
+
 	private void createObjectColumnStatement(Column column, StringBuilder builder) {
 		
 		builder.append(OBJECT);
@@ -119,23 +123,9 @@ public class AlterTable extends AbstractStatement {
 		// double quotes to preserve case in crate db
 		builder.append(doubleQuote(column.getName()));
 		builder.append(SPACE);
-		
-		if(column.isArrayColumn()) {
-			builder.append(column.getCrateType());
-			builder.append(OPEN_BRACE);
-			if(column.isPrimitiveElementType(column.getElementCrateType())) {
-				builder.append(column.getElementCrateType());
-			}else {
-				createObjectColumnStatement(column, builder);
-			}
-			
-			builder.append(CLOSE_BRACE);
-		}else if(column.isObjectColumn()) {
-			createObjectColumnStatement(column, builder);
-		}else {
-			builder.append(column.getCrateType());
-		}
-		
+
+		createArrayColumn(column, builder);
+
 		if(column.isPrimaryKey()) {
 			builder.append(SPACE)
 				   .append(PRIMARY_KEY);
