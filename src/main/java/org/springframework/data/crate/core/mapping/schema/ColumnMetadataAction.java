@@ -62,7 +62,7 @@ class ColumnMetadataAction implements CrateAction, CrateActionResponseHandler<Li
 		
 		if(response.rows().length > 0) {
 			
-			List<ColumnMetadata> columns = new LinkedList<ColumnMetadata>();
+			List<ColumnMetadata> columns = new LinkedList<>();
 			
 			Object[][] rows = response.rows();
 			

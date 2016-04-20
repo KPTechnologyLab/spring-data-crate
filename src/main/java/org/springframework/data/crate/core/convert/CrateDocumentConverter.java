@@ -144,7 +144,7 @@ public class CrateDocumentConverter {
 	
 	private List<Row> initRows(String[] columns, DataType<?>[] types, Object[] row) {
 		
-		List<Row> payload = new ArrayList<CrateDocumentConverter.Row>(getLength(rows));
+		List<Row> payload = new ArrayList<>(getLength(rows));
 
 		for (int index = 0; index < row.length; index++) {
 			payload.add(new Row(columns[index], types[index], row[index]));

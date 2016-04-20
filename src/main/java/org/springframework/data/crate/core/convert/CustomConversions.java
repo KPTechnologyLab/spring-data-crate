@@ -81,12 +81,12 @@ public class CustomConversions {
   public CustomConversions(final List<?> converters) {
     notNull(converters);
 
-    readingPairs = new LinkedHashSet<GenericConverter.ConvertiblePair>();
-    writingPairs = new LinkedHashSet<GenericConverter.ConvertiblePair>();
-    customSimpleTypes = new HashSet<Class<?>>();
-    customReadTargetTypes = new ConcurrentHashMap<GenericConverter.ConvertiblePair, CacheValue>();
+    readingPairs = new LinkedHashSet<>();
+    writingPairs = new LinkedHashSet<>();
+    customSimpleTypes = new HashSet<>();
+    customReadTargetTypes = new ConcurrentHashMap<>();
 
-    this.converters = new ArrayList<Object>();
+    this.converters = new ArrayList<>();
     this.converters.addAll(converters);
     this.converters.add(LocaleToStringConverter.INSTANCE);
     this.converters.add(DateToLongConverter.INSTANCE);

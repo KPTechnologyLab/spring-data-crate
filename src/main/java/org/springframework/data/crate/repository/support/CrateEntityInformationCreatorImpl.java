@@ -46,6 +46,6 @@ public class CrateEntityInformationCreatorImpl implements CrateEntityInformation
 
 		Assert.notNull(persistentEntity, String.format("Unable to obtain mapping metadata for %s!", domainClass));
 
-		return new MappingCrateEntityInformation<T, ID>(persistentEntity);
+		return new MappingCrateEntityInformation<>(persistentEntity);
 	}
 }
