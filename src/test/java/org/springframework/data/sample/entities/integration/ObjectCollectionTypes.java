@@ -2,7 +2,6 @@ package org.springframework.data.sample.entities.integration;
 
 import static java.util.Arrays.asList;
 import static org.springframework.data.sample.entities.integration.SimpleEntity.simpleEntity;
-import static org.springframework.data.sample.entities.integration.SimpleEntityWithId.simpleEntityWithId;
 
 import java.util.HashSet;
 import java.util.List;
@@ -18,18 +17,18 @@ public class ObjectCollectionTypes {
 	
 	@Id
 	public String id;
-	public List<SimpleEntity> simpleEntities;
-	public Set<SimpleEntityWithId> simpleEntityWithIds;
-	public SimpleEntity[] simpleEntitiesArray;
+	public List<SimpleEntity> list;
+	public Set<SimpleEntity> set;
+	public SimpleEntity[] array;
 	
 	public static ObjectCollectionTypes objectCollectionTypes() {
 		
 		ObjectCollectionTypes entity = new ObjectCollectionTypes();
 		
 		entity.id = "CRATE";
-		entity.simpleEntities = asList(simpleEntity());
-		entity.simpleEntityWithIds = new HashSet<SimpleEntityWithId>(asList(simpleEntityWithId()));
-		entity.simpleEntitiesArray = new SimpleEntity[]{simpleEntity()};
+		entity.list = asList(simpleEntity());
+		entity.set = new HashSet<SimpleEntity>(asList(simpleEntity()));
+		entity.array = new SimpleEntity[]{simpleEntity()};
 		
 		return entity;
 	}
@@ -48,18 +47,18 @@ public class ObjectCollectionTypes {
         ObjectCollectionTypes that = (ObjectCollectionTypes) obj;
         
         return new EqualsBuilder().append(this.id, that.id)
-				                  .append(this.simpleEntities, that.simpleEntities)
-				                  .append(this.simpleEntityWithIds, that.simpleEntityWithIds)
-				                  .append(this.simpleEntitiesArray, that.simpleEntitiesArray)
+				                  .append(this.list, that.list)
+				                  .append(this.set, that.set)
+				                  .append(this.array, that.array)
 				                  .isEquals();
 	}
 	
 	@Override
 	public int hashCode() {
 		return new HashCodeBuilder(9, 11).append(id)
-										 .append(simpleEntities)
-										 .append(simpleEntitiesArray)
-										 .append(simpleEntityWithIds)
+										 .append(list)
+										 .append(array)
+										 .append(set)
 										 .toHashCode();
 	}
 }

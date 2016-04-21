@@ -24,6 +24,7 @@ import java.util.Map;
 import java.util.Set;
 
 import org.junit.Test;
+import org.springframework.data.annotation.Id;
 import org.springframework.data.crate.core.mapping.annotations.Table;
 import org.springframework.data.crate.core.mapping.schema.Column;
 import org.springframework.data.crate.core.mapping.schema.TableDefinition;
@@ -48,15 +49,33 @@ public class CreateTableTest {
 	}
 	
 	@Test
-	public void shouldCreateStatementWithPrimitiveColumn() {
+	public void shouldCreateStatementWithObjectAsPrimaryKeyColumn() {
 		
-		Column stringCol = createColumn("stringField", String.class, null, true);
-		Column intCol = createColumn("integerField", Integer.class, null, false);
-		TableDefinition tableDefinition = createTableDefinition("entity", null, stringCol, intCol);
+		Column intCol = createColumn("intField", Integer.class, null, null);
+		Column stringCol = createColumn("stringField", String.class, null, null);
+		Column pk = createColumn("pk", EntityWithCompositePrimaryKey.class, null, true);
+		pk.setSubColumns(asList(intCol, stringCol));
+		
+		Column longCol = createColumn("longField", Long.class, null, false);
+		TableDefinition tableDefinition = createTableDefinition("entity", null, pk, longCol);
 		
 		CrateSQLStatement statement = new CreateTable(tableDefinition);
 		
-		assertThat(statement.createStatement(), is("CREATE TABLE entity (\"entity_class\" string, \"stringField\" string PRIMARY KEY, \"integerField\" integer)"));
+		StringBuilder sql = new StringBuilder("CREATE TABLE entity (\"entity_class\" string, \"pk\" object AS (");
+		sql.append("\"intField\" integer PRIMARY KEY, \"stringField\" string PRIMARY KEY), \"longField\" long)");
+		
+		assertThat(statement.createStatement(), is(sql.toString()));
+	}
+	
+	@Test
+	public void shouldCreateStatementWithPrimitiveColumn() {
+		
+		Column intCol = createColumn("integerField", Integer.class, null, false);
+		TableDefinition tableDefinition = createTableDefinition("entity", null, intCol);
+		
+		CrateSQLStatement statement = new CreateTable(tableDefinition);
+		
+		assertThat(statement.createStatement(), is("CREATE TABLE entity (\"entity_class\" string, \"integerField\" integer)"));
 	}
 	
 	@Test
@@ -199,5 +218,17 @@ public class CreateTableTest {
 	static class EntityWithNestedEntityCollection {
 		String stringField;
 		Set<EntityWithNestedEntity> nestedEntities;
+	}
+	
+	@Table(name="entity")
+	static class EntityWithCompositePrimaryKey {
+		@Id
+		SimplePrimaryKey pk;
+	}
+	
+	static class SimplePrimaryKey {
+		
+		int intField;
+		String stringField;
 	}
 }

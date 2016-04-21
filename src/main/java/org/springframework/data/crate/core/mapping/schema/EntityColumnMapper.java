@@ -16,6 +16,7 @@
 package org.springframework.data.crate.core.mapping.schema;
 
 import static java.lang.Boolean.TRUE;
+import static java.lang.String.format;
 import static org.slf4j.LoggerFactory.getLogger;
 import static org.springframework.data.crate.core.CyclicReferenceBarrier.cyclicReferenceBarrier;
 import static org.springframework.data.crate.core.mapping.CrateSimpleTypes.HOLDER;
@@ -45,6 +46,8 @@ import org.springframework.data.util.TypeInformation;
  * Nested arrays/collections of arrays/collections are not currently supported by crate db
  */
 class EntityColumnMapper {
+	
+	private final static String PK_CONSTRAINT = "Composite primary key '%s' must contain primitive type field(s) only";
 	
 	private final Logger logger = getLogger(getClass());
 	
@@ -129,6 +132,7 @@ class EntityColumnMapper {
 		}
 		
 		if(property.isIdProperty()) {
+			validatePrimaryKey(property);
 			column.setPrimaryKey(TRUE);
 		}
 		
@@ -220,6 +224,27 @@ class EntityColumnMapper {
 	private void checkMapKey(Class<?> componentType) {
 		if(!isSimpleType(componentType)) {
 			throw new InvalidCrateApiUsageException("Complex objects cannot be used as map's key");
+		}
+	}
+	
+	private void validatePrimaryKey(CratePersistentProperty property) {
+		
+		if(property.isArray() || 
+		   property.isCollectionLike() || 
+		   property.isMap()) {
+			throw new InvalidCrateApiUsageException(format(PK_CONSTRAINT, property.getFieldName()));
+		}
+		
+		if(property.isEntity()) {
+			
+			CratePersistentEntity<?> primaryKey = mappingContext.getPersistentEntity(property);
+			
+			if(!primaryKey.getArrayProperties().isEmpty() || 
+			   !primaryKey.getCollectionProperties().isEmpty() || 
+			   !primaryKey.getEntityProperties().isEmpty() || 
+			   !primaryKey.getMapProperties().isEmpty()) {
+				throw new InvalidCrateApiUsageException(format(PK_CONSTRAINT, property.getFieldName()));
+			}
 		}
 	}
 	
