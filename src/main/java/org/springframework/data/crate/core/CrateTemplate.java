@@ -1042,7 +1042,7 @@ public class CrateTemplate implements CrateOperations, ApplicationContextAware {
 				
 				List<Object> extraArgs = appendArgs(entity);
 				
-				Object[] args = null;
+				Object[] args;
 				
 				if(!extraArgs.isEmpty()) {
 					args = addAll(document.values().toArray(), extraArgs.toArray());
