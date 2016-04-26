@@ -43,4 +43,6 @@ abstract class CrateErrorCodes {
 	public static final int TASKS_EXECUTION_FAILED = 5001;
 	public static final int SHARDS_NOT_AVAILABLE = 5002;
 	public static final int QUERY_FAILED_ON_SHARDS = 5003;
+
+	private CrateErrorCodes() {}
 }
