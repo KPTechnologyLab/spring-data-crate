@@ -110,7 +110,7 @@ public abstract class AbstractCrateConfiguration {
 	protected Set<Class<?>> getInitialEntitySet() throws ClassNotFoundException {
 
 		String basePackage = getMappingBasePackage();
-		Set<Class<?>> initialEntitySet = new HashSet<Class<?>>();
+		Set<Class<?>> initialEntitySet = new HashSet<>();
 
 		if (hasText(basePackage)) {
 			ClassPathScanningCandidateComponentProvider componentProvider = new ClassPathScanningCandidateComponentProvider(false);

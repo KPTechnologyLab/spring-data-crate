@@ -145,7 +145,7 @@ public class CratePersistentEntityTableManager {
 		
 		private Map<String, Column> columnToDotPath(List<Column> columns) {
 			
-			LinkedHashMap<String, Column> map = new LinkedHashMap<String, Column>();
+			LinkedHashMap<String, Column> map = new LinkedHashMap<>();
 			
 			for(Column column : columns) {
 				logger.debug("pushing column under key '{}'", column.getName());
@@ -158,7 +158,7 @@ public class CratePersistentEntityTableManager {
 		
 		private Map<String, String> convertToDotPath(List<ColumnMetadata> columns) {
 			
-			Map<String, String> sqlPaths = new LinkedHashMap<String, String>(columns.size());
+			Map<String, String> sqlPaths = new LinkedHashMap<>(columns.size());
 			
 			for(ColumnMetadata metadata : columns) {
 				

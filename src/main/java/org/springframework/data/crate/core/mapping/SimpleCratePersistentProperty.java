@@ -40,7 +40,7 @@ import org.springframework.data.mapping.model.SimpleTypeHolder;
  */
 public class SimpleCratePersistentProperty extends AnnotationBasedPersistentProperty<CratePersistentProperty> implements CratePersistentProperty {
 	
-	private static final Set<String> SUPPORTED_ID_PROPERTY_NAMES = new HashSet<String>(1);
+	private static final Set<String> SUPPORTED_ID_PROPERTY_NAMES = new HashSet<>(1);
 	
 	private final FieldNamingStrategy fieldNamingStrategy;
 	

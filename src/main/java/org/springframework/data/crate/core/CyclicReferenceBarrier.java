@@ -40,7 +40,7 @@ public class CyclicReferenceBarrier {
 	private final Map<String, List<VisitedPath>> visitedPaths;
 
 	private CyclicReferenceBarrier() {
-		this.visitedPaths = new LinkedHashMap<String, List<VisitedPath>>();
+		this.visitedPaths = new LinkedHashMap<>();
 	}
 	
 	public static CyclicReferenceBarrier cyclicReferenceBarrier() {
@@ -66,7 +66,7 @@ public class CyclicReferenceBarrier {
 		List<VisitedPath> paths = visitedPaths.get(type);
 		
 		if(paths == null) {
-			paths = new LinkedList<VisitedPath>();
+			paths = new LinkedList<>();
 		}
 		
 		paths.add(new VisitedPath(property));

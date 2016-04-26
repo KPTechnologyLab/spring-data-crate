@@ -72,7 +72,7 @@ class EntityColumnMapper {
 	 */
 	List<Column> toColumns(CratePersistentEntity<?> entity) {
 		
-		List<Column> columns = new LinkedList<Column>();
+		List<Column> columns = new LinkedList<>();
 		
 		mapColumns(entity, columns, cyclicReferenceBarrier());
 		
@@ -104,7 +104,7 @@ class EntityColumnMapper {
 			
 		for(CratePersistentProperty property : properties) {
 			
-			List<Column> subColumns = new LinkedList<Column>();
+			List<Column> subColumns = new LinkedList<>();
 			
 			CratePersistentEntity<?> entity = mappingContext.getPersistentEntity(property);
 			
@@ -152,9 +152,9 @@ class EntityColumnMapper {
 	
 	private Set<CratePersistentProperty> filterPrimitiveCollectionType(CratePersistentEntity<?> entity) {
 		
-		Set<CratePersistentProperty> filtered = new LinkedHashSet<CratePersistentProperty>();
+		Set<CratePersistentProperty> filtered = new LinkedHashSet<>();
 		
-		List<CratePersistentProperty> properties = new LinkedList<CratePersistentProperty>();
+		List<CratePersistentProperty> properties = new LinkedList<>();
 		properties.addAll(entity.getArrayProperties());
 		properties.addAll(entity.getCollectionProperties());
 		
@@ -172,9 +172,9 @@ class EntityColumnMapper {
 	
 	private Set<CratePersistentProperty> filterEntityCollectionType(CratePersistentEntity<?> entity) {
 		
-		Set<CratePersistentProperty> filtered = new LinkedHashSet<CratePersistentProperty>();
+		Set<CratePersistentProperty> filtered = new LinkedHashSet<>();
 		
-		List<CratePersistentProperty> properties = new LinkedList<CratePersistentProperty>();
+		List<CratePersistentProperty> properties = new LinkedList<>();
 		properties.addAll(entity.getArrayProperties());
 		properties.addAll(entity.getCollectionProperties());
 		
@@ -194,9 +194,9 @@ class EntityColumnMapper {
 	
 	private Set<CratePersistentProperty> filterMapCollectionType(CratePersistentEntity<?> entity) {
 		
-		Set<CratePersistentProperty> filtered = new LinkedHashSet<CratePersistentProperty>();
+		Set<CratePersistentProperty> filtered = new LinkedHashSet<>();
 		
-		List<CratePersistentProperty> properties = new LinkedList<CratePersistentProperty>();
+		List<CratePersistentProperty> properties = new LinkedList<>();
 		properties.addAll(entity.getArrayProperties());
 		properties.addAll(entity.getCollectionProperties());
 		
@@ -265,7 +265,7 @@ class EntityColumnMapper {
 			
 			notNull(properties);
 			
-			List<Column> columns = new ArrayList<Column>(properties.size());
+			List<Column> columns = new ArrayList<>(properties.size());
 			
 			for(CratePersistentProperty property : properties) {
 				Column column = createColumn(property);
@@ -290,7 +290,7 @@ class EntityColumnMapper {
 		 */
 		public List<Column> mapColumns(Set<CratePersistentProperty> properties) {
 			
-			List<Column> columns = new LinkedList<Column>();
+			List<Column> columns = new LinkedList<>();
 			
 			for(CratePersistentProperty property : properties) {
 				// safety check
@@ -318,7 +318,7 @@ class EntityColumnMapper {
 		 */
 		public List<Column> mapColumns(Set<CratePersistentProperty> properties) {
 			
-			List<Column> columns = new LinkedList<Column>();
+			List<Column> columns = new LinkedList<>();
 			
 			for(CratePersistentProperty property : properties) {
 				
@@ -362,7 +362,7 @@ class EntityColumnMapper {
 			
 			notNull(properties);
 			
-			List<Column> columns = new LinkedList<Column>();
+			List<Column> columns = new LinkedList<>();
 			
 			for(CratePersistentProperty property : properties) {
 				// safety check

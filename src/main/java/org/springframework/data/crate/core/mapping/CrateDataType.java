@@ -43,7 +43,7 @@ public class CrateDataType {
 	public static final String ARRAY = "array";
 	public static final String OBJECT = "object";
 	
-	private static final Map<Class<?>, String> CRATE_TYPES = new HashMap<Class<?>, String>();
+	private static final Map<Class<?>, String> CRATE_TYPES = new HashMap<>();
 	
 	static {
 		CRATE_TYPES.put(Boolean.class, BOOLEAN);

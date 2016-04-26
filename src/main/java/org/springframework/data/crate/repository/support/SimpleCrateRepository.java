@@ -82,7 +82,7 @@ public class SimpleCrateRepository<T, ID extends Serializable> implements CrateR
     	
     	notNull(ses, "The given Iterable of entities must not be null");
     	
-    	List<S> entities = new LinkedList<S>();
+    	List<S> entities = new LinkedList<>();
     	
     	for(S entity : ses) {
     		save(entity);
@@ -118,13 +118,13 @@ public class SimpleCrateRepository<T, ID extends Serializable> implements CrateR
         
     	Iterator<ID> iterator = ids.iterator();
     	
-    	Set<ID> pks = new LinkedHashSet<ID>();
+    	Set<ID> pks = new LinkedHashSet<>();
     	
     	while(iterator.hasNext()) {
     		pks.add(iterator.next());
     	}
     	
-    	List<T> entities = new ArrayList<T>(pks.size());
+    	List<T> entities = new ArrayList<>(pks.size());
     	
     	for(ID pk : pks) {
     		T entity = findOne(pk);

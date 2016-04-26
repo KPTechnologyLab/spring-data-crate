@@ -81,7 +81,7 @@ public class CratePersistentEntitySchemaManager implements InitializingBean, Dis
 		this.exportOption = exportOption; 
 		this.mappingContext = crateOperations.getConverter().getMappingContext();
 		this.tableManager = new CratePersistentEntityTableManager(mappingContext);
-		this.inspectedEntities = new ConcurrentHashMap<Class<?>, Boolean>();
+		this.inspectedEntities = new ConcurrentHashMap<>();
 		this.ignoreFailures = false;
 		this.enabled = true;
 	}

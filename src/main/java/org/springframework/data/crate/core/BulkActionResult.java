@@ -33,11 +33,11 @@ public class BulkActionResult<T> implements BulkOperartionResult<T> {
 	private List<ActionResult<T>> results;
 	
 	public BulkActionResult() {
-		results = new LinkedList<ActionResult<T>>();
+		results = new LinkedList<>();
 	}
 	
 	public ActionResult<T> addResult(Result result, T source) {
-		ActionResult<T> actionResult = new ActionResult<T>(result, source); 
+		ActionResult<T> actionResult = new ActionResult<>(result, source);
 		results.add(actionResult);
 		return actionResult;
 	}
@@ -50,7 +50,7 @@ public class BulkActionResult<T> implements BulkOperartionResult<T> {
 	@Override
 	public List<ActionResult<T>> getFailures() {
 		
-		List<ActionResult<T>> failures = new LinkedList<ActionResult<T>>();
+		List<ActionResult<T>> failures = new LinkedList<>();
 		
 		for(ActionResult<T> result : results) {
 			if(result.isFailure()) {
@@ -64,7 +64,7 @@ public class BulkActionResult<T> implements BulkOperartionResult<T> {
 	@Override
 	public List<ActionResult<T>> getSuccesses() {
 		
-		List<ActionResult<T>> successes = new LinkedList<ActionResult<T>>();
+		List<ActionResult<T>> successes = new LinkedList<>();
 		
 		for(ActionResult<T> result : results) {
 			if(result.isSuccess()) {

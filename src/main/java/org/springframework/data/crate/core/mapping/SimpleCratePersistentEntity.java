@@ -95,9 +95,9 @@ public class SimpleCratePersistentEntity<T> extends BasicPersistentEntity<T, Cra
 		
 		Set<CratePersistentProperty> properties = getPersistentProperties();
 		
-		Set<String> excluded = new HashSet<String>(asList(exclude));
+		Set<String> excluded = new HashSet<>(asList(exclude));
 		
-		Set<String> propertyNames = new TreeSet<String>();
+		Set<String> propertyNames = new TreeSet<>();
 		
 		for(CratePersistentProperty property : properties) {
 			if(!excluded.contains(property.getFieldName())) {
@@ -114,7 +114,7 @@ public class SimpleCratePersistentEntity<T> extends BasicPersistentEntity<T, Cra
 	@Override
 	public Set<CratePersistentProperty> getPersistentProperties() {
 
-		final Set<CratePersistentProperty> properties = new LinkedHashSet<CratePersistentProperty>();
+		final Set<CratePersistentProperty> properties = new LinkedHashSet<>();
 		
 		doWithProperties(new PropertyHandler<CratePersistentProperty>() {
 			@Override
@@ -133,7 +133,7 @@ public class SimpleCratePersistentEntity<T> extends BasicPersistentEntity<T, Cra
 	public Set<CratePersistentProperty> getPrimitiveProperties() {
 		
 		Set<CratePersistentProperty> properties = getPersistentProperties();
-		Set<CratePersistentProperty> simpleProperties = new LinkedHashSet<CratePersistentProperty>();
+		Set<CratePersistentProperty> simpleProperties = new LinkedHashSet<>();
 		
 		for(CratePersistentProperty property : properties) {
 			
@@ -156,7 +156,7 @@ public class SimpleCratePersistentEntity<T> extends BasicPersistentEntity<T, Cra
 	public Set<CratePersistentProperty> getEntityProperties() {
 		
 		Set<CratePersistentProperty> properties = getPersistentProperties();
-		Set<CratePersistentProperty> compositeProperties = new LinkedHashSet<CratePersistentProperty>();
+		Set<CratePersistentProperty> compositeProperties = new LinkedHashSet<>();
 		
 		for(CratePersistentProperty property : properties) {
 			
@@ -179,7 +179,7 @@ public class SimpleCratePersistentEntity<T> extends BasicPersistentEntity<T, Cra
 	public Set<CratePersistentProperty> getCollectionProperties() {
 		
 		Set<CratePersistentProperty> properties = getPersistentProperties();
-		Set<CratePersistentProperty> collectionProperties = new LinkedHashSet<CratePersistentProperty>();
+		Set<CratePersistentProperty> collectionProperties = new LinkedHashSet<>();
 		
 		for(CratePersistentProperty property : properties) {
 			
@@ -201,7 +201,7 @@ public class SimpleCratePersistentEntity<T> extends BasicPersistentEntity<T, Cra
 	public Set<CratePersistentProperty> getMapProperties() {
 		
 		Set<CratePersistentProperty> properties = getPersistentProperties();
-		Set<CratePersistentProperty> mapProperties = new LinkedHashSet<CratePersistentProperty>();
+		Set<CratePersistentProperty> mapProperties = new LinkedHashSet<>();
 		
 		for(CratePersistentProperty property : properties) {
 			
@@ -220,7 +220,7 @@ public class SimpleCratePersistentEntity<T> extends BasicPersistentEntity<T, Cra
 	public Set<CratePersistentProperty> getArrayProperties() {
 		
 		Set<CratePersistentProperty> properties = getPersistentProperties();
-		Set<CratePersistentProperty> arrayProperties = new LinkedHashSet<CratePersistentProperty>();
+		Set<CratePersistentProperty> arrayProperties = new LinkedHashSet<>();
 		
 		for(CratePersistentProperty property : properties) {
 			

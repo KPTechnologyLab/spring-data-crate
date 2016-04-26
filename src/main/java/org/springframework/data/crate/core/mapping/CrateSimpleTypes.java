@@ -31,7 +31,7 @@ import org.springframework.data.mapping.model.SimpleTypeHolder;
 public class CrateSimpleTypes {
 	
 	static {
-	    Set<Class<?>> simpleTypes = new HashSet<Class<?>>();
+	    Set<Class<?>> simpleTypes = new HashSet<>();
 	    simpleTypes.add(CrateDocument.class);
 	    simpleTypes.add(CrateArray.class);
 	    simpleTypes.add(Boolean[].class);

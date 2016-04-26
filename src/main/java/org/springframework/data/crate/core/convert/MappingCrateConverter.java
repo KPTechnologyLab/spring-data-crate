@@ -125,11 +125,11 @@ public class MappingCrateConverter extends AbstractCrateConverter implements App
 	@SuppressWarnings("unchecked")
 	@Override
 	public Object convertToCrateType(Object obj, TypeInformation<?> typeInformation) {
-		
+
 		if(obj == null) {
 			return null;
 		}
-		
+
 		if(conversions.isSimpleType(obj.getClass())) {
 			return getPotentiallyConvertedSimpleWrite(obj);
 		}
@@ -806,7 +806,7 @@ public class MappingCrateConverter extends AbstractCrateConverter implements App
 		
 	    CratePropertyValueProvider provider = new CratePropertyValueProvider(source, evaluator, parent);
 	    
-	    PersistentEntityParameterValueProvider<CratePersistentProperty> parameterProvider = new PersistentEntityParameterValueProvider<CratePersistentProperty>(entity, provider, parent);
+	    PersistentEntityParameterValueProvider<CratePersistentProperty> parameterProvider = new PersistentEntityParameterValueProvider<>(entity, provider, parent);
 
 	    return new ConverterAwareSpELExpressionParameterValueProvider(evaluator, conversionService, parameterProvider, parent);
 	}
