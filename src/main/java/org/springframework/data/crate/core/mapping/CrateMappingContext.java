@@ -33,7 +33,7 @@ public class CrateMappingContext extends AbstractMappingContext<SimpleCratePersi
 	
 	@Override
 	protected <T> SimpleCratePersistentEntity<?> createPersistentEntity(TypeInformation<T> typeInformation) {
-		return new SimpleCratePersistentEntity<T>(typeInformation);
+		return new SimpleCratePersistentEntity<>(typeInformation);
 	}
 
 	@Override

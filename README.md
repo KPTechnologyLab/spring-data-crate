@@ -8,10 +8,14 @@ The Spring Data project aims to provide a familiar and consistent Spring-based p
 
 * Automatic table export from entities using @Table annotation
 * Support for mapping rich object model/graph to and from Crate
-* Support for simple and complex Primary Key using @Id annotation
+* Support for simple and composite Primary Key using @Id annotation. [Primary Key constraints](https://crate.io/docs/reference/sql/reference/create_table.html#primary-key-constraint)
 * JSR 303 bean validation support
 * Support for Lifecycle call back events (before/after save etc)
 * Java based configuration
+
+**NOTE:**
+Composite primary key must contain [primitive field(s)](https://crate.io/docs/reference/sql/data_types.html#primitive-types) supported by Crate. 
+ 
 
 ## Quick Start
 

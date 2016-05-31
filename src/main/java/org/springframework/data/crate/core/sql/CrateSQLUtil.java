@@ -16,10 +16,10 @@ public class CrateSQLUtil {
 	private static final String DOUBLE_QUOTE_TEMPLATE = "\"%s\"";
 	private static final String SINGLE_QUOTE_TEMPLATE = "'%s'";
 	private static final String SQL_PATH_TEMPLATE = "['%s']";
-	
+
 	private static final Pattern PATTERN = compile("\\['([^\\]]*)'\\]");
     private static final Pattern CRATE_SQL_PATTERN = compile("(.+?)(?:\\['([^\\]])*'\\])+");
-	
+
 	public static String doubleQuote(String toQuote) {
 		
 		if(hasText(toQuote)) {
@@ -65,7 +65,7 @@ public class CrateSQLUtil {
 
         int index = sqlPath.indexOf('[');
         
-        List<String> tokens = new ArrayList<String>();
+        List<String> tokens = new ArrayList<>();
         tokens.add(sqlPath.substring(0, index));
         
         Matcher matcher = PATTERN.matcher(sqlPath);

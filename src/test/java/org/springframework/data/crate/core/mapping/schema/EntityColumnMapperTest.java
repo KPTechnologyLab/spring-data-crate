@@ -18,7 +18,9 @@ package org.springframework.data.crate.core.mapping.schema;
 import static java.util.Collections.singleton;
 import static org.hamcrest.Matchers.is;
 import static org.hamcrest.Matchers.notNullValue;
+import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertThat;
+import static org.junit.Assert.assertTrue;
 import static org.springframework.data.crate.core.mapping.CrateDataType.ARRAY;
 import static org.springframework.data.crate.core.mapping.CrateDataType.BOOLEAN;
 import static org.springframework.data.crate.core.mapping.CrateDataType.BYTE;
@@ -42,12 +44,14 @@ import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.junit.runners.Suite;
 import org.junit.runners.Suite.SuiteClasses;
+import org.springframework.data.annotation.Id;
 import org.springframework.data.crate.InvalidCrateApiUsageException;
 import org.springframework.data.crate.core.CyclicReferenceException;
 import org.springframework.data.crate.core.mapping.CrateMappingContext;
 import org.springframework.data.crate.core.mapping.schema.EntityColumnMapperTest.CollectionTypeColumnMappingTest;
 import org.springframework.data.crate.core.mapping.schema.EntityColumnMapperTest.EntityTypeColumnMappingTest;
 import org.springframework.data.crate.core.mapping.schema.EntityColumnMapperTest.MapTypeColumnMappingTest;
+import org.springframework.data.crate.core.mapping.schema.EntityColumnMapperTest.PrimaryKeyColumnMappingTest;
 import org.springframework.data.crate.core.mapping.schema.EntityColumnMapperTest.PrimitivesColumnMappingTest;
 
 /**
@@ -57,7 +61,8 @@ import org.springframework.data.crate.core.mapping.schema.EntityColumnMapperTest
 
 @RunWith(Suite.class)
 @SuiteClasses({ PrimitivesColumnMappingTest.class, CollectionTypeColumnMappingTest.class, 
-				MapTypeColumnMappingTest.class, EntityTypeColumnMappingTest.class })
+				MapTypeColumnMappingTest.class, EntityTypeColumnMappingTest.class,
+				PrimaryKeyColumnMappingTest.class})
 public class EntityColumnMapperTest {
 
 	/**
@@ -558,6 +563,102 @@ public class EntityColumnMapperTest {
 		
 		static class LevelThreeCycle {
 			LevelTwoCycle levelTwo;
+		}
+	}
+	
+	/**
+	 * 
+	 * @author Hasnain Javed
+	 * @since 1.0.0 
+	 */
+	public static class PrimaryKeyColumnMappingTest {
+		
+		@Test
+		public void shouldCreateObjectColumnAsPrimaryKey() {
+			
+			List<Column> columns = initMappingContextAndGetColumns(SimpleEntity.class);
+
+			assertThat(columns, is(notNullValue()));
+			assertThat(columns.size(), is(1));
+			assertTrue(columns.iterator().next().isPrimaryKey());
+			assertEquals(columns.iterator().next().getSubColumns().size(), 8);
+		}
+		
+		@Test(expected=InvalidCrateApiUsageException.class)
+		public void shouldNotCreateObjectColumnWithArrayAsPrimaryKey() {
+				initMappingContextAndGetColumns(EntityWithArrayPK.class);
+		}
+		
+		@Test(expected=InvalidCrateApiUsageException.class)
+		public void shouldNotCreateObjectColumnWithCollectionAsPrimaryKey() {
+				initMappingContextAndGetColumns(EntityWithCollectionPK.class);
+		}
+		
+		@Test(expected=InvalidCrateApiUsageException.class)
+		public void shouldNotCreateObjectColumnWithMapAsPrimaryKey() {
+				initMappingContextAndGetColumns(EntityWithMapPK.class);
+		}
+		
+		@Test(expected=InvalidCrateApiUsageException.class)
+		public void shouldNotCreateObjectColumnWithObjectAsPrimaryKey() {
+				initMappingContextAndGetColumns(EntityWithComplexPK.class);
+		}
+		
+		static class SimpleEntity {
+			@Id
+			SimplePrimaryKey pk;
+		}
+		
+		static class EntityWithArrayPK {
+			@Id
+			PrimaryKeyWithArray pk;
+		}
+		
+		static class EntityWithCollectionPK {
+			@Id
+			PrimaryKeyWithCollection pk;
+		}
+		
+		static class EntityWithMapPK {
+			@Id
+			PrimaryKeyWithMap pk;
+		}
+		
+		static class EntityWithComplexPK {
+			@Id
+			ComplexPrimaryKey pk;
+		}
+		
+		static class SimplePrimaryKey {
+			
+			boolean boolField;
+			byte byteField;
+			short shortField;
+			int intField;
+			long longField;
+			float floatField;
+			double doubleField;
+			String stringField;
+		}
+		
+		static class PrimaryKeyWithArray {
+			boolean[] boolArray;
+		}
+		
+		static class PrimaryKeyWithCollection {
+			List<String> stringCollection;
+		}
+		
+		static class PrimaryKeyWithMap {
+			Map<String, Integer> map;
+		}
+		
+		static class ComplexPrimaryKey {
+			LevelOne levelOne;
+		}
+		
+		static class LevelOne {
+			String levelOneString;
 		}
 	}
 	

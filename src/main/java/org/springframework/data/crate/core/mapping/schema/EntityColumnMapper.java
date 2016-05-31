@@ -16,6 +16,7 @@
 package org.springframework.data.crate.core.mapping.schema;
 
 import static java.lang.Boolean.TRUE;
+import static java.lang.String.format;
 import static org.slf4j.LoggerFactory.getLogger;
 import static org.springframework.data.crate.core.CyclicReferenceBarrier.cyclicReferenceBarrier;
 import static org.springframework.data.crate.core.mapping.CrateSimpleTypes.HOLDER;
@@ -46,6 +47,8 @@ import org.springframework.data.util.TypeInformation;
  */
 class EntityColumnMapper {
 	
+	private final static String PK_CONSTRAINT = "Composite primary key '%s' must contain primitive type field(s) only";
+	
 	private final Logger logger = getLogger(getClass());
 	
 	private final PrimitiveColumnMapper primitiveTypeMapper;
@@ -69,7 +72,7 @@ class EntityColumnMapper {
 	 */
 	List<Column> toColumns(CratePersistentEntity<?> entity) {
 		
-		List<Column> columns = new LinkedList<Column>();
+		List<Column> columns = new LinkedList<>();
 		
 		mapColumns(entity, columns, cyclicReferenceBarrier());
 		
@@ -101,7 +104,7 @@ class EntityColumnMapper {
 			
 		for(CratePersistentProperty property : properties) {
 			
-			List<Column> subColumns = new LinkedList<Column>();
+			List<Column> subColumns = new LinkedList<>();
 			
 			CratePersistentEntity<?> entity = mappingContext.getPersistentEntity(property);
 			
@@ -120,7 +123,7 @@ class EntityColumnMapper {
 		
 		notNull(property);
 		
-		Column column = null;
+		Column column;
 		
 		if(property.isCollectionLike()) {
 			column = new Column(property.getFieldName(), property.getRawType(), property.getComponentType());
@@ -129,6 +132,7 @@ class EntityColumnMapper {
 		}
 		
 		if(property.isIdProperty()) {
+			validatePrimaryKey(property);
 			column.setPrimaryKey(TRUE);
 		}
 		
@@ -148,9 +152,9 @@ class EntityColumnMapper {
 	
 	private Set<CratePersistentProperty> filterPrimitiveCollectionType(CratePersistentEntity<?> entity) {
 		
-		Set<CratePersistentProperty> filtered = new LinkedHashSet<CratePersistentProperty>();
+		Set<CratePersistentProperty> filtered = new LinkedHashSet<>();
 		
-		List<CratePersistentProperty> properties = new LinkedList<CratePersistentProperty>();
+		List<CratePersistentProperty> properties = new LinkedList<>();
 		properties.addAll(entity.getArrayProperties());
 		properties.addAll(entity.getCollectionProperties());
 		
@@ -168,9 +172,9 @@ class EntityColumnMapper {
 	
 	private Set<CratePersistentProperty> filterEntityCollectionType(CratePersistentEntity<?> entity) {
 		
-		Set<CratePersistentProperty> filtered = new LinkedHashSet<CratePersistentProperty>();
+		Set<CratePersistentProperty> filtered = new LinkedHashSet<>();
 		
-		List<CratePersistentProperty> properties = new LinkedList<CratePersistentProperty>();
+		List<CratePersistentProperty> properties = new LinkedList<>();
 		properties.addAll(entity.getArrayProperties());
 		properties.addAll(entity.getCollectionProperties());
 		
@@ -190,9 +194,9 @@ class EntityColumnMapper {
 	
 	private Set<CratePersistentProperty> filterMapCollectionType(CratePersistentEntity<?> entity) {
 		
-		Set<CratePersistentProperty> filtered = new LinkedHashSet<CratePersistentProperty>();
+		Set<CratePersistentProperty> filtered = new LinkedHashSet<>();
 		
-		List<CratePersistentProperty> properties = new LinkedList<CratePersistentProperty>();
+		List<CratePersistentProperty> properties = new LinkedList<>();
 		properties.addAll(entity.getArrayProperties());
 		properties.addAll(entity.getCollectionProperties());
 		
@@ -223,6 +227,27 @@ class EntityColumnMapper {
 		}
 	}
 	
+	private void validatePrimaryKey(CratePersistentProperty property) {
+		
+		if(property.isArray() || 
+		   property.isCollectionLike() || 
+		   property.isMap()) {
+			throw new InvalidCrateApiUsageException(format(PK_CONSTRAINT, property.getFieldName()));
+		}
+		
+		if(property.isEntity()) {
+			
+			CratePersistentEntity<?> primaryKey = mappingContext.getPersistentEntity(property);
+			
+			if(!primaryKey.getArrayProperties().isEmpty() || 
+			   !primaryKey.getCollectionProperties().isEmpty() || 
+			   !primaryKey.getEntityProperties().isEmpty() || 
+			   !primaryKey.getMapProperties().isEmpty()) {
+				throw new InvalidCrateApiUsageException(format(PK_CONSTRAINT, property.getFieldName()));
+			}
+		}
+	}
+	
 	/**
 	 * 
 	 * @author Hasnain Javed
@@ -240,7 +265,7 @@ class EntityColumnMapper {
 			
 			notNull(properties);
 			
-			List<Column> columns = new ArrayList<Column>(properties.size());
+			List<Column> columns = new ArrayList<>(properties.size());
 			
 			for(CratePersistentProperty property : properties) {
 				Column column = createColumn(property);
@@ -265,7 +290,7 @@ class EntityColumnMapper {
 		 */
 		public List<Column> mapColumns(Set<CratePersistentProperty> properties) {
 			
-			List<Column> columns = new LinkedList<Column>();
+			List<Column> columns = new LinkedList<>();
 			
 			for(CratePersistentProperty property : properties) {
 				// safety check
@@ -293,7 +318,7 @@ class EntityColumnMapper {
 		 */
 		public List<Column> mapColumns(Set<CratePersistentProperty> properties) {
 			
-			List<Column> columns = new LinkedList<Column>();
+			List<Column> columns = new LinkedList<>();
 			
 			for(CratePersistentProperty property : properties) {
 				
@@ -337,7 +362,7 @@ class EntityColumnMapper {
 			
 			notNull(properties);
 			
-			List<Column> columns = new LinkedList<Column>();
+			List<Column> columns = new LinkedList<>();
 			
 			for(CratePersistentProperty property : properties) {
 				// safety check

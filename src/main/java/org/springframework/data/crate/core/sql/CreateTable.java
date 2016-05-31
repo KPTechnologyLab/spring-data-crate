@@ -109,7 +109,7 @@ public class CreateTable extends AbstractStatement {
 			builder.append(column.getCrateType());
 		}
 		
-		if(column.isPrimaryKey()) {
+		if(column.isPrimaryKey() && !column.isObjectColumn()) {
 			builder.append(SPACE)
 				   .append(PRIMARY_KEY);
 		}
@@ -130,6 +130,10 @@ public class CreateTable extends AbstractStatement {
 			
 			while(subColumns.hasNext()) {
 				createStatement(subColumns.next(), builder);
+				if(column.isPrimaryKey()) {
+					builder.append(SPACE)
+					   	   .append(PRIMARY_KEY);
+				}
 				if(subColumns.hasNext()) {
 					builder.append(COMMA)
 						   .append(SPACE);

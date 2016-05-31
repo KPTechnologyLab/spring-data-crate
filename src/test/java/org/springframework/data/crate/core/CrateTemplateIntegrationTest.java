@@ -22,11 +22,9 @@ import static org.hamcrest.Matchers.notNullValue;
 import static org.hamcrest.Matchers.nullValue;
 import static org.junit.Assert.assertThat;
 import static org.junit.Assert.assertTrue;
-import static org.springframework.data.sample.entities.integration.EntityWithComplexId.entityWithComplexId;
 import static org.springframework.data.sample.entities.integration.EntityWithNesting.entityWithNestingAndSimpleId;
 import static org.springframework.data.sample.entities.integration.ObjectCollectionTypes.objectCollectionTypes;
 import static org.springframework.data.sample.entities.integration.ObjectMapTypes.objectMapTypes;
-import static org.springframework.data.sample.entities.integration.Person.person;
 import static org.springframework.data.sample.entities.integration.SimpleCollectionTypes.simpleCollectionTypes;
 import static org.springframework.data.sample.entities.integration.SimpleEntity.simpleEntity;
 import static org.springframework.data.sample.entities.integration.SimpleEntityWithId.simpleEntityWithId;
@@ -42,7 +40,6 @@ import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.crate.config.TestCrateConfiguration;
-import org.springframework.data.sample.entities.integration.EntityWithComplexId;
 import org.springframework.data.sample.entities.integration.EntityWithNesting;
 import org.springframework.data.sample.entities.integration.Language;
 import org.springframework.data.sample.entities.integration.ObjectCollectionTypes;
@@ -78,7 +75,6 @@ public class CrateTemplateIntegrationTest {
     	crateTemplate.deleteAll(SimpleMapTypes.class);
     	crateTemplate.deleteAll(ObjectMapTypes.class);
     	crateTemplate.deleteAll(Person.class);
-    	crateTemplate.deleteAll(EntityWithComplexId.class);
     	crateTemplate.deleteAll(EntityWithNesting.class);
     	crateTemplate.deleteAll(User.class);
     }
@@ -93,7 +89,6 @@ public class CrateTemplateIntegrationTest {
     	crateTemplate.deleteAll(SimpleMapTypes.class);
     	crateTemplate.deleteAll(ObjectMapTypes.class);
     	crateTemplate.deleteAll(Person.class);
-    	crateTemplate.deleteAll(EntityWithComplexId.class);
     	crateTemplate.deleteAll(EntityWithNesting.class);
     	crateTemplate.deleteAll(User.class);
     }
@@ -164,43 +159,11 @@ public class CrateTemplateIntegrationTest {
     }
     
     @Test
-    @Ignore
-    public void shouldSaveComplexModelAndFindById() {
-        // Crate does not support complex data types as primary keys
-    	Person entity = person();
-    	crateTemplate.insert(entity);
-    	Person dbEntity = crateTemplate.findById(entity.id, Person.class);
-    	assertThat(dbEntity, is(notNullValue()));
-    	assertThat(dbEntity, is(entity));
-    }
-    
-    @Test
-    @Ignore
-    public void shouldSaveAndFindByComplexId() {
-        // Crate does not support complex data types as primary keys
-    	EntityWithComplexId entity = entityWithComplexId();
-    	crateTemplate.insert(entity);
-    	EntityWithComplexId dbEntity = crateTemplate.findById(entity.complexId, EntityWithComplexId.class);
-    	assertThat(dbEntity, is(notNullValue()));
-    	assertThat(dbEntity, is(entity));
-    }
-    
-    @Test
     public void shouldSaveAndRemoveBySimpleId() {
     	SimpleEntityWithId entity = simpleEntityWithId();
     	entity.id = 2L;
     	crateTemplate.insert(entity);
     	assertTrue(crateTemplate.delete(entity.id, SimpleEntityWithId.class));
-    }
-    
-    @Test
-    @Ignore
-    public void shouldSaveAndRemoveByComplexId() {
-        // Crate does not support complex data types as primary keys
-    	EntityWithComplexId entity = entityWithComplexId();
-    	entity.complexId.booleanField = false;
-    	crateTemplate.insert(entity);
-    	assertTrue(crateTemplate.delete(entity.complexId, EntityWithComplexId.class));
     }
     
     @Test

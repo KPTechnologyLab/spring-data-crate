@@ -861,7 +861,7 @@ public class CrateTemplate implements CrateOperations, ApplicationContextAware {
 				
 				Long rows = new Long(response.rowCount());
 				
-				List<T> entities = new ArrayList<T>(rows.intValue());
+				List<T> entities = new ArrayList<>(rows.intValue());
 				
 				for(Object[] row : payload) {
 					
@@ -871,11 +871,11 @@ public class CrateTemplate implements CrateOperations, ApplicationContextAware {
 						
 					if(!source.isEmpty()) {
 						entity = crateConverter.read(type, source);
-						maybeEmitEvent(new AfterLoadEvent<T>(source, type));
+						maybeEmitEvent(new AfterLoadEvent<>(source, type));
 					}
 					
 					if (entity != null) {
-						maybeEmitEvent(new AfterConvertEvent<T>(source, entity));
+						maybeEmitEvent(new AfterConvertEvent<>(source, entity));
 						entities.add(entity);
 					}
 				}
@@ -909,7 +909,7 @@ public class CrateTemplate implements CrateOperations, ApplicationContextAware {
 			notNull(entity);
 			notNull(actionType);
 			
-			allowedTypes = new HashSet<ActionType>(asList(INSERT, UPDATE));
+			allowedTypes = new HashSet<>(asList(INSERT, UPDATE));
 			
 			if(!allowedTypes.contains(actionType)) {
 	    		throw new CrateSQLActionException(format("Invalid sql action type '%s'. Allowed types are '%s'", actionType,
@@ -1002,8 +1002,8 @@ public class CrateTemplate implements CrateOperations, ApplicationContextAware {
 			this.actionType = actionType;
 			
 			// preserve order
-			this.entities = new ArrayList<T>(entities);
-			this.documents = new ArrayList<CrateDocument>(this.entities.size());
+			this.entities = new ArrayList<>(entities);
+			this.documents = new ArrayList<>(this.entities.size());
 		}
 		
 		/**
@@ -1042,7 +1042,7 @@ public class CrateTemplate implements CrateOperations, ApplicationContextAware {
 				
 				List<Object> extraArgs = appendArgs(entity);
 				
-				Object[] args = null;
+				Object[] args;
 				
 				if(!extraArgs.isEmpty()) {
 					args = addAll(document.values().toArray(), extraArgs.toArray());
@@ -1063,7 +1063,7 @@ public class CrateTemplate implements CrateOperations, ApplicationContextAware {
 
 			Result[] results = response.results();
 			
-			BulkActionResult<T> actionResults = new BulkActionResult<T>();
+			BulkActionResult<T> actionResults = new BulkActionResult<>();
 			
 			if(persistentEntity.hasIdProperty()) {
 				// crate is eventually consistent. Data written with a former statement is not guaranteed to be fetched.
@@ -1140,7 +1140,7 @@ public class CrateTemplate implements CrateOperations, ApplicationContextAware {
 		
 		public BulkInsertOperation(Class<T> entityClass, String tableName, List<T> entities) {
 			super(tableName, entityClass, entities, INSERT);
-			columns = new TreeSet<String>();
+			columns = new TreeSet<>();
 			columns.add(DEFAULT_TYPE_KEY);
 			columns.addAll(getColumns());
 		}
@@ -1217,7 +1217,7 @@ public class CrateTemplate implements CrateOperations, ApplicationContextAware {
 												.getIdProperty()
 												.getFieldName());
 			
-			this.convertedIds = new ArrayList<Object>(ids.size());
+			this.convertedIds = new ArrayList<>(ids.size());
 			
 			for(Object id : ids) {
 				convertedIds.add(crateConverter.convertToCrateType(id, null));
@@ -1240,7 +1240,7 @@ public class CrateTemplate implements CrateOperations, ApplicationContextAware {
 			
 			Result[] results = response.results();
 			
-			BulkActionResult<Object> actionResults = new BulkActionResult<Object>();
+			BulkActionResult<Object> actionResults = new BulkActionResult<>();
 			
 			for(int index = 0; index < results.length; index++) {
 				
