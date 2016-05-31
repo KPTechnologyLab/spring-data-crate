@@ -1,0 +1,13 @@
+=============================
+CHANGES for Spring Crate Data
+=============================
+
+Unreleased
+==========
+
+ - update dependencies:
+
+   - crate-client: 0.54.9
+   - spring-data: 1.12.1.RELEASE
+   - spring-beans: 4.2.6.RELEASE
+   - spring-core: 4.2.6.RELEASE

@@ -36,7 +36,7 @@ public class CrateClientFactoryBean implements FactoryBean<CrateClient>, Initial
 	private final Logger logger = LoggerFactory.getLogger(getClass());
 	
     private CrateClient client;
-	private String servers ="localhost:4300";
+	private String servers = "localhost:4300";
 
     @Override
 	public CrateClient getObject() throws Exception {

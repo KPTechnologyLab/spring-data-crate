@@ -8,14 +8,14 @@ Export-Template:
  org.springframework.data.crate.*;version="${project.version}"
 Import-Template:
  javax.enterprise.*;version="${cdi:[=.=.=,+1.0.0)}";resolution:=optional,
- javax.validation.*;version="${validation:[=.=.=.=,+1.0.0)}";resolution:=optional,
- org.apache.commons.collections.*;version="${commonscollections:[=.=.=,+1.0.0)}";resolution:=optional,
- org.apache.commons.lang3.*;version="${commonslang:[=.=.=,+1.0.0)}",
+ javax.validation.*;version="${javax-validation.version:[=.=.=.=,+1.0.0)}";resolution:=optional,
+ org.apache.commons.collections.*;version="${commons-collections.version:[=.=.=,+1.0.0)}";resolution:=optional,
+ org.apache.commons.lang3.*;version="${commons-lang.version:[=.=.=,+1.0.0)}",
  com.fasterxml.jackson.*;version="${jackson:[=.=.=,+1.0.0)}";resolution:=optional,
- io.crate.*;version="${crate:[=.=.=,+1.0.0)}",
- org.elasticsearch.*;version="${crate:[=.=.=,+1.0.0)}",
+ io.crate.*;version="${crate-client.version:[=.=.=,+1.0.0)}",
+ org.elasticsearch.*;version="${crate-client.version:[=.=.=,+1.0.0)}",
  org.joda.time.*;version="${jodatime:[=.=.=,+1.0.0)}",
  org.slf4j.*;version="${slf4j:[=.=.=,+1.0.0)}",
  org.springframework.*;version="${spring:[=.=.=.=,+1.0.0)}",
- org.springframework.data.*;version="${springdata.commons:[=.=.=.=,+1.0.0)}",
+ org.springframework.data.*;version="${spring-data-commons.version:[=.=.=.=,+1.0.0)}",
  org.w3c.*;version="0.0.0"
