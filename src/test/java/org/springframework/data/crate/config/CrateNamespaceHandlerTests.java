@@ -22,10 +22,12 @@ import static org.hamcrest.core.Is.is;
 import static org.junit.Assert.assertThat;
 import static org.springframework.data.crate.config.BeanNames.SCHEMA_EXPORT_MANAGER;
 
+import org.junit.Ignore;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.ApplicationContext;
+import org.springframework.data.crate.CrateIntegrationTest;
 import org.springframework.data.crate.client.CrateClientFactoryBean;
 import org.springframework.data.crate.core.mapping.schema.CratePersistentEntitySchemaManager;
 import org.springframework.data.sample.repositories.SampleCrateRepository;
@@ -38,6 +40,8 @@ import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 
 @RunWith(SpringJUnit4ClassRunner.class)
 @ContextConfiguration("/namespace.xml")
+@Ignore("This test is ignored, because it requires a Crate instance running on localhost on port 4300." +
+        "This cannot be guaranteed in a randomized test environment.")
 public class CrateNamespaceHandlerTests {
 
     @Autowired

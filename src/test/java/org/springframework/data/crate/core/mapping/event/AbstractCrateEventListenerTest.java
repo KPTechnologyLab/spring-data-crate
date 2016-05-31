@@ -17,16 +17,22 @@ package org.springframework.data.crate.core.mapping.event;
 
 import static org.junit.Assert.assertEquals;
 
+import io.crate.client.CrateClient;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.annotation.Bean;
+import org.springframework.context.annotation.Configuration;
+import org.springframework.data.crate.CrateIntegrationTest;
 import org.springframework.data.crate.core.CrateOperations;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.TestExecutionListeners;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 import org.springframework.test.context.support.DependencyInjectionTestExecutionListener;
+
+import java.util.Locale;
 
 /**
  * 
@@ -34,9 +40,9 @@ import org.springframework.test.context.support.DependencyInjectionTestExecution
  * @since 1.0.0
  */
 @RunWith(SpringJUnit4ClassRunner.class)
-@ContextConfiguration(classes={LifecycleEventConfiguration.class})
+@ContextConfiguration(classes={AbstractCrateEventListenerTest.TestConfiguration.class})
 @TestExecutionListeners({DependencyInjectionTestExecutionListener.class})
-public class AbstractCrateEventListenerTest {
+public class AbstractCrateEventListenerTest extends CrateIntegrationTest {
 
 	@Autowired
 	private CrateOperations crateOperations;
@@ -104,5 +110,16 @@ public class AbstractCrateEventListenerTest {
 		User user = new User("1@test.com", "hasnain javed", 34);
 		crateOperations.insert(user);
 		return user;
+	}
+
+
+	@Configuration
+	static class TestConfiguration extends LifecycleEventConfigurationBase {
+
+		@Bean
+		public CrateClient crateClient() {
+			return new CrateClient(String.format(Locale.ENGLISH, "%s:%d", server.crateHost(), server.transportPort()));
+		}
+
 	}
 }

@@ -7,7 +7,7 @@
 	   http://www.springframework.org/schema/beans/spring-beans.xsd
 	   http://www.springframework.org/schema/data/crate
        http://www.springframework.org/schema/data/crate/spring-crate.xsd">
-       
+
     <bean name="crateTemplate"
           class="org.springframework.data.crate.core.CrateTemplate">
         <constructor-arg ref="client"/>
@@ -18,5 +18,5 @@
     <crate:repositories base-package="org.springframework.data.sample.repositories"/>
 
 	<crate:schema-export ignoreFailures="false" export-option="CREATE_DROP" enabled="true"/>
-	
+
 </beans>

@@ -25,6 +25,7 @@
         <commons-collections.version>3.2.2</commons-collections.version>
         <commons-lang.version>3.4</commons-lang.version>
         <crate-client.version>0.54.9</crate-client.version>
+        <crate-testing>0.4.0</crate-testing>
         <spring-data-commons.version>1.12.1.RELEASE</spring-data-commons.version>
         <spring-beans.version>4.2.6.RELEASE</spring-beans.version>
         <spring-core.version>4.2.6.RELEASE</spring-core.version>
@@ -129,6 +130,13 @@
         <dependency>
             <groupId>org.springframework</groupId>
             <artifactId>spring-test</artifactId>
+            <scope>test</scope>
+        </dependency>
+
+        <dependency>
+            <groupId>io.crate</groupId>
+            <artifactId>crate-testing</artifactId>
+            <version>${crate-testing}</version>
             <scope>test</scope>
         </dependency>
 

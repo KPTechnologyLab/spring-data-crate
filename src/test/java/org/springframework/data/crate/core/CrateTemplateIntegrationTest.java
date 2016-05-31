@@ -32,13 +32,17 @@ import static org.springframework.data.sample.entities.integration.SimpleMapType
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Locale;
 
+import io.crate.client.CrateClient;
 import org.junit.After;
 import org.junit.Before;
-import org.junit.Ignore;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.annotation.Bean;
+import org.springframework.context.annotation.Configuration;
+import org.springframework.data.crate.CrateIntegrationTest;
 import org.springframework.data.crate.config.TestCrateConfiguration;
 import org.springframework.data.sample.entities.integration.EntityWithNesting;
 import org.springframework.data.sample.entities.integration.Language;
@@ -59,15 +63,14 @@ import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
  * @since 1.0.0
  */
 @RunWith(SpringJUnit4ClassRunner.class)
-@ContextConfiguration(classes= TestCrateConfiguration.class)
-public class CrateTemplateIntegrationTest {
+@ContextConfiguration(classes={CrateTemplateIntegrationTest.TestConfig.class})
+public class CrateTemplateIntegrationTest extends CrateIntegrationTest {
 
     @Autowired
     private CrateTemplate crateTemplate;
     
     @Before
     public void setup() {
-    	
     	crateTemplate.deleteAll(SimpleEntity.class);
     	crateTemplate.deleteAll(SimpleEntityWithId.class);
     	crateTemplate.deleteAll(SimpleCollectionTypes.class);
@@ -81,7 +84,6 @@ public class CrateTemplateIntegrationTest {
     
     @After
     public void teardown() {
-    	
     	crateTemplate.deleteAll(SimpleEntity.class);
     	crateTemplate.deleteAll(SimpleEntityWithId.class);
     	crateTemplate.deleteAll(SimpleCollectionTypes.class);
@@ -95,7 +97,6 @@ public class CrateTemplateIntegrationTest {
     
     @Test
     public void shouldSaveWithoutIdAndInitialVersion() {
-    	
     	SimpleEntity entity = simpleEntity();
     	crateTemplate.insert(entity);
     	assertThat(entity.version, is(notNullValue()));
@@ -104,7 +105,6 @@ public class CrateTemplateIntegrationTest {
     
     @Test
     public void shouldSaveWithInitialVersionAndFindBySimpleId() {
-    	
     	SimpleEntityWithId entity = simpleEntityWithId();
     	crateTemplate.insert(entity);
     	assertThat(entity.version, is(1L));
@@ -117,7 +117,6 @@ public class CrateTemplateIntegrationTest {
     
     @Test
     public void shouldSaveSimpleCollectionTypesAndFindById() {
-    	
     	SimpleCollectionTypes entity = simpleCollectionTypes();
     	crateTemplate.insert(entity);
     	SimpleCollectionTypes dbEntity = crateTemplate.findById(entity.id, SimpleCollectionTypes.class);
@@ -127,7 +126,6 @@ public class CrateTemplateIntegrationTest {
     
     @Test
     public void shouldSaveObjectCollectionTypesAndFindById() {
-    	
     	ObjectCollectionTypes entity = objectCollectionTypes();
     	crateTemplate.insert(entity);
     	ObjectCollectionTypes dbEntity = crateTemplate.findById(entity.id, ObjectCollectionTypes.class);
@@ -137,7 +135,6 @@ public class CrateTemplateIntegrationTest {
     
     @Test
     public void shouldSaveSimpleMapTypesAndFindById() {
-    	
     	SimpleMapTypes entity = simpleMapTypes();
     	crateTemplate.insert(entity);
     	SimpleMapTypes dbEntity = crateTemplate.findById(entity.id, SimpleMapTypes.class);
@@ -150,7 +147,6 @@ public class CrateTemplateIntegrationTest {
     
     @Test
     public void shouldSaveObjectMapTypesAndFindById() {
-    	
     	ObjectMapTypes entity = objectMapTypes();
     	crateTemplate.insert(entity);
     	ObjectMapTypes dbEntity = crateTemplate.findById(entity.id, ObjectMapTypes.class);
@@ -168,7 +164,6 @@ public class CrateTemplateIntegrationTest {
     
     @Test
     public void shouldSaveAndUpdateEntityAndBumpUpVersion() {
-    	
     	Language language = new Language();
     	language.name = "Groovy";
     	
@@ -191,7 +186,6 @@ public class CrateTemplateIntegrationTest {
     
     @Test
     public void shouldNotUpdateWhenIdIsChanged() {
-    	
     	Language language = new Language();
     	language.name = "Groovy";
     	
@@ -214,7 +208,6 @@ public class CrateTemplateIntegrationTest {
     
     @Test
     public void shouldBulkInsert() {
-    	
     	User hasnain = new User("hasnain@test.com", "Hasnain Javed", 34);
     	User rizwan = new User("rizwan@test.com", "Rizwan Idrees", 33);
     	
@@ -226,7 +219,6 @@ public class CrateTemplateIntegrationTest {
     
     @Test
     public void shouldBulkUpdate() {
-    	
     	User hasnain = new User("hasnain@test.com", "Hasnain Javed", 34);
     	User rizwan = new User("rizwan@test.com", "Rizwan Idrees", 33);
     	
@@ -243,7 +235,6 @@ public class CrateTemplateIntegrationTest {
     
     @Test
     public void shouldBulkDelete() {
-    	
     	User hasnain = new User("hasnain@test.com", "Hasnain Javed", 34);
     	User rizwan = new User("rizwan@test.com", "Rizwan Idrees", 33);
     	
@@ -260,5 +251,20 @@ public class CrateTemplateIntegrationTest {
     @Test
     public void shouldRefreshTable() {
     	crateTemplate.refreshTable(User.class);
+    }
+
+
+    @Configuration
+    static class TestConfig extends TestCrateConfiguration {
+
+        @Bean
+        public CrateClient crateClient() {
+            return new CrateClient(String.format(Locale.ENGLISH, "%s:%d", server.crateHost(), server.transportPort()));
+        }
+
+        @Override
+        protected String getMappingBasePackage() {
+            return "org.springframework.data.sample.entities.integration";
+        }
     }
 }

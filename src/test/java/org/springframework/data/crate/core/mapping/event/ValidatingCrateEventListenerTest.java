@@ -21,12 +21,18 @@ import static org.junit.Assert.fail;
 
 import javax.validation.ConstraintViolationException;
 
+import io.crate.client.CrateClient;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.annotation.Bean;
+import org.springframework.context.annotation.Configuration;
+import org.springframework.data.crate.CrateIntegrationTest;
 import org.springframework.data.crate.core.CrateOperations;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
+
+import java.util.Locale;
 
 /**
  * 
@@ -34,8 +40,8 @@ import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
  * @since 1.0.0
  */
 @RunWith(SpringJUnit4ClassRunner.class)
-@ContextConfiguration(classes={LifecycleEventConfiguration.class})
-public class ValidatingCrateEventListenerTest {
+@ContextConfiguration(classes={ValidatingCrateEventListenerTest.TestConfiguration.class})
+public class ValidatingCrateEventListenerTest extends CrateIntegrationTest {
 
 	@Autowired
 	CrateOperations crateOperations;
@@ -56,5 +62,16 @@ public class ValidatingCrateEventListenerTest {
 	@Test
 	public void shouldNotThrowAnyExceptions() {
 		crateOperations.insert(new User("test@test.com", "hasnain javed", 34));
+	}
+
+
+	@Configuration
+	static class TestConfiguration extends LifecycleEventConfigurationBase {
+
+		@Bean
+		public CrateClient crateClient() {
+			return new CrateClient(String.format(Locale.ENGLISH, "%s:%d", server.crateHost(), server.transportPort()));
+		}
+
 	}
 }

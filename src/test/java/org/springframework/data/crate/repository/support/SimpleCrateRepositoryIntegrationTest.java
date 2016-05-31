@@ -22,27 +22,25 @@ import static org.hamcrest.Matchers.notNullValue;
 import static org.hamcrest.Matchers.nullValue;
 import static org.junit.Assert.assertThat;
 import static org.junit.Assert.assertTrue;
-import static org.springframework.data.crate.core.mapping.schema.SchemaExportOption.CREATE_DROP;
 
 import java.util.List;
+import java.util.Locale;
 
+import io.crate.client.CrateClient;
 import org.apache.commons.lang3.builder.EqualsBuilder;
 import org.apache.commons.lang3.builder.HashCodeBuilder;
-import org.junit.After;
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.*;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.data.annotation.Id;
 import org.springframework.data.annotation.Version;
-import org.springframework.data.crate.config.AbstractCrateConfiguration;
+import org.springframework.data.crate.CrateIntegrationTest;
+import org.springframework.data.crate.config.TestCrateConfiguration;
 import org.springframework.data.crate.core.CrateOperations;
 import org.springframework.data.crate.core.mapping.annotations.Table;
-import org.springframework.data.crate.core.mapping.schema.CratePersistentEntitySchemaManager;
 import org.springframework.data.crate.repository.CrateRepository;
-import org.springframework.data.crate.repository.support.SimpleCrateRepositoryIntegrationTest.CrateContextConfig;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 
@@ -52,9 +50,9 @@ import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
  * @since 1.0.0
  */
 @RunWith(SpringJUnit4ClassRunner.class)
-@ContextConfiguration(classes={CrateContextConfig.class})
-public class SimpleCrateRepositoryIntegrationTest {
-	
+@ContextConfiguration(classes={SimpleCrateRepositoryIntegrationTest.TestConfig.class})
+public class SimpleCrateRepositoryIntegrationTest extends CrateIntegrationTest {
+
 	@Autowired
 	private CrateOperations crateOperations;
 	
@@ -199,16 +197,7 @@ public class SimpleCrateRepositoryIntegrationTest {
 											  .toHashCode();
 		}
 	}
-	
-	@Configuration
-	static class CrateContextConfig extends AbstractCrateConfiguration {
-		
-		@Bean
-		public CratePersistentEntitySchemaManager cratePersistentEntitySchemaManager() throws Exception {
-			return new CratePersistentEntitySchemaManager(crateTemplate(), CREATE_DROP);
-		}
-	}
-	
+
 	private static class PersonInformation implements CrateEntityInformation<Person, String> {
 
 		@Override
@@ -246,4 +235,15 @@ public class SimpleCrateRepositoryIntegrationTest {
 			return entity.getVersion();
 		}
 	}
+
+	@Configuration
+	static class TestConfig extends TestCrateConfiguration {
+
+		@Bean
+		public CrateClient crateClient() {
+			return new CrateClient(String.format(Locale.ENGLISH, "%s:%d", server.crateHost(), server.transportPort()));
+		}
+
+	}
+
 }
