@@ -1,0 +1,20 @@
+language: java
+jdk:
+  - openjdk7
+  - oraclejdk7
+  - oraclejdk8
+
+cache:
+  directories:
+    - $HOME/.m2
+
+sudo: false
+
+env:
+  global:
+    _JAVA_OPTIONS="-Xmx1g -XX:MaxPermSize=256m"
+
+script: mvn clean test
+
+notifications:
+  email: false
