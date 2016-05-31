@@ -1,49 +1,70 @@
 # Spring Data Crate
 
-The primary goal of the [Spring Data](http://projects.spring.io/spring-data) project is to make it easier to build Spring-powered applications that use new data access technologies such as non-relational databases, map-reduce frameworks, and cloud based data services.
+The primary goal of the [Spring Data](http://projects.spring.io/spring-data)
+project is to make it easier to build Spring-powered applications that use
+new data access technologies such as non-relational databases, map-reduce
+frameworks, and cloud based data services.
 
-The Spring Data project aims to provide a familiar and consistent Spring-based programming model for new datastores while retaining store-specific features and capabilities. The Spring Data Crate project provides integration with the [Crate Data](http://crate.io). [Crate Data](http://crate.io) is a shared-nothing, fully searchable, document-oriented cluster data store. It is a quick and powerful massively scalable backend for data intensive apps, like the Internet of Things or real-time analytics.
+The Spring Data project aims to provide a familiar and consistent Spring-based
+programming model for new datastores while retaining store-specific features
+and capabilities. The Spring Data Crate project provides integration with the
+[Crate](http://crate.io). [Crate](http://crate.io) is a shared-nothing,
+fully searchable, document-oriented cluster data store. It is a quick and
+powerful massively scalable backend for data intensive apps, like the
+Internet of Things or real-time analytics.
 
 ## Features
 
 * Automatic table export from entities using @Table annotation
 * Support for mapping rich object model/graph to and from Crate
-* Support for simple and composite Primary Key using @Id annotation. [Primary Key constraints](https://crate.io/docs/reference/sql/reference/create_table.html#primary-key-constraint)
+* Support for simple and composite Primary Key using @Id annotation.
+  [Primary Key constraints](https://crate.io/docs/reference/sql/reference/create_table.html#primary-key-constraint)
 * JSR 303 bean validation support
 * Support for Lifecycle call back events (before/after save etc)
 * Java based configuration
 
 **NOTE:**
-Composite primary key must contain [primitive field(s)](https://crate.io/docs/reference/sql/data_types.html#primitive-types) supported by Crate. 
- 
+Composite primary key must contain [primitive field(s)](https://crate.io/docs/reference/sql/data_types.html#primitive-types)
+supported by Crate.
+
 
 ## Quick Start
 
-Checkout the project repository and issue the following command from a shell/terminal
+Checkout the project repository and issue the following command from
+a shell/terminal.
 
 ```sh
 mvn clean install
 ```
-This will generate a jar file. The jar file can be found under the 'target' folder and also in local maven repository in user's home directory in .m2 folder. 
+
+This will generate a jar file. The jar file can be found under the 'target'
+folder and also in local maven repository in user's home directory in .m2folder.
 Add the generated jar file in your project.
 
 Please look at spring data crate's pom.xml for required dependencies.
 
 ### CrateTemplate
 
-CrateTemplate is the central support class for Crate database operations. It provides:
+CrateTemplate is the central support class for Crate database operations.
+It provides:
 
 * Basic POJO mapping support to and from Crate Documents
-* Convenience methods to interact with the store (insert, update, delete objects) and Crate specific ones (bulk insert, bulk update and bulk delete operations)
+* Convenience methods to interact with the store (insert, update, delete objects)
+  and Crate specific ones (bulk insert, bulk update and bulk delete operations)
 * Exception translation into Spring's [technology agnostic DAO exception hierarchy](http://docs.spring.io/spring/docs/current/spring-framework-reference/html/dao.html#dao-exceptions).
 
 ### CrateRepository
 
-To simplify the creation of data repositories Spring Data Crate provides a generic repository programming model. A default implementation of CrateRepository, aligning to the generic Repository Interfaces, is provided.  
+To simplify the creation of data repositories Spring Data Crate provides a
+generic repository programming model. A default implementation of
+CrateRepository, aligning to the generic Repository Interfaces, is provided.
 
-CrateRepository extends `CrudRepository` which causes CRUD methods being pulled into the interface so that you can easily save and find single entities and collections of them.
+CrateRepository extends `CrudRepository` which causes CRUD methods being
+pulled into the interface so that you can easily save and find single entities
+and collections of them.
 
-For example, given a `User` class with Id property of type String, a `UserRepository` interface can be defined as shown below:
+For example, given a `User` class with Id property of type String, a
+`UserRepository` interface can be defined as shown below:
 
 ```java
 public interface UserRepository extends CrateRepository<User, String> {
@@ -51,9 +72,11 @@ public interface UserRepository extends CrateRepository<User, String> {
 ```
 
 **NOTE:**
-Currently documents can be queried by Id. Support will be added to derive queries from method names.
+Currently documents can be queried by Id. Support will be added to derive
+queries from method names.
 
-You can have Spring automatically create a proxy for the interface by using the following JavaConfig:
+You can have Spring automatically create a proxy for the interface by using
+the following JavaConfig:
 
 ```java
 @Configuration
@@ -61,11 +84,16 @@ You can have Spring automatically create a proxy for the interface by using the 
 class ApplicationConfig extends AbstractCrateConfiguration {
 }
 ```
-This sets up a connection to a Crate instance and enables the detection of Spring Data repositories (through `@EnableCrateRepositories`)
 
-Custom converters can be added by overridding methods provided in AbstractCrateConfiguration class.
+This sets up a connection to a Crate instance and enables the detection of
+Spring Data repositories (through `@EnableCrateRepositories`).
 
-By default, a crate client will be created to connect to Crate running on `localhost` on port `4300`. A custom host and port can be specified as shown below:
+Custom converters can be added by overridding methods provided in
+AbstractCrateConfiguration class.
+
+By default, a crate client will be created to connect to Crate running on
+`localhost` on port `4300`. A custom host and port can be specified as
+shown below:
 
 ```java
 @Configuration
@@ -88,42 +116,47 @@ The same configuration would look like this in XML:
 <crate:client id="client" servers="127.0.0.1:4300"/>
 
 <crate:repositories base-package="com.acme.repository"/>
-``` 
+```
 
 The `servers` attribute takes a comma separated string of `host:port`
 
 **NOTE:**
 Currently adding custom converters via XML is not supported.
 
-This will find the repository interface and register a proxy object in the container. You can use it as shown below:
+This will find the repository interface and register a proxy object in the
+container. You can use it as shown below:
 
 ```java
 @Table(name="users", numberOfReplicas="2", refreshInterval="1500", columnPolicy="dynamic")
 public class User {
-	
+
 	@Id
 	private String id;
-	
+
 	// JSR-303 annotations
 	@Email
 	@NotBlank
 	private String email;
-	
-	/** Optional. If other constructors are defined, then annotate one of them 
+
+	/** Optional. If other constructors are defined, then annotate one of them
 	@PersistenceConstructor
 	public User(String id, String email) {
 		this.id = id;
 		this.email = email;
 	}**/
-	
+
 	// getters and setters
 }
 ```
-Changes to the 'numberOfReplicas' table parameter will be reflected to the database on application restarts. Details about table parameters can be found here [Table Parameters](https://crate.io/docs/stable/sql/reference/create_table.html)
+Changes to the `numberOfReplicas` table parameter will be reflected to the
+database on application restarts. Details about table parameters can be found
+here [Table Parameters](https://crate.io/docs/stable/sql/reference/create_table.html)
 
 **NOTE:**
-Crate currently does not return 'refresh_interval' and 'column_policy' from 'information_schema.tables'. To change the values of these two table parameters,
-you will have to execute the queries manually from Crate's 'crash' command line tool.
+Crate currently does not return `refresh_interval` and `column_policy` from
+`information_schema.tables`. To change the values of these two table parameters,
+you will have to execute the queries manually from Crate's `crash` command
+line tool.
 
 ```sh
 alter table my_table set (refresh_interval = <NEW_VALUE>);
@@ -148,7 +181,7 @@ public class UserService {
      User user = new User();
      user.setId("abc123");
      user.setEmail("user@acme.com");
-     
+
      repository.insert(user);
 
 	 repository.refreshTable();
@@ -160,13 +193,18 @@ public class UserService {
 ```
 
 **NOTE:**
-Information about table refresh can be found here [Refresh](https://crate.io/docs/stable/sql/refresh.html)
+Information about table refresh can be found here
+[Refresh](https://crate.io/docs/stable/sql/refresh.html)
 
 ### Schema Export
 
-Spring Data Crate can export tables from entities annotated with `@Table` annotation. By default, the table name will be derived from the entity package and class name. Otherwise, the name will be used from the name attribute of the annotation `@Table(name="myTable")`.
+Spring Data Crate can export tables from entities annotated with `@Table`
+annotation. By default, the table name will be derived from the entity package
+and class name. Otherwise, the name will be used from the name attribute of
+the annotation `@Table(name="myTable")`.
 
-To enable automatic creation of tables, register the following bean as shown below:
+To enable automatic creation of tables, register the following bean as shown
+below:
 
 ```java
 @Configuration
@@ -179,7 +217,10 @@ class ApplicationConfig extends AbstractCrateConfiguration {
 	}
 }
 ```
-The CratePersistentEntitySchemaManager can be configured to ignore failures and enabled (useful if using the spring's environment abstraction to enable/disable schema export) as follows:
+
+The CratePersistentEntitySchemaManager can be configured to ignore failures
+and enabled (useful if using the spring's environment abstraction to
+enable/disable schema export) as follows:
 
 ```java
 @Configuration
@@ -196,7 +237,8 @@ class ApplicationConfig extends AbstractCrateConfiguration {
 }
 ```
 
-If the CratePersistentEntitySchemaManager is not enabled, tables will not be exported to Crate.
+If the CratePersistentEntitySchemaManager is not enabled, tables will not be
+exported to Crate.
 
 Full configuration would look like this in XML:
 
@@ -210,7 +252,7 @@ Full configuration would look like this in XML:
 <crate:repositories base-package="com.acme.repository"/>
 
 <crate:schema-export ignoreFailures="false" export-option="CREATE_DROP" enabled="true"/>
-``` 
+```
 
 There are 3 schema export options
 
@@ -222,6 +264,9 @@ There are 3 schema export options
 
 `CREATE` will create the tables if they do not exist.
 
-`CRATE_DROP` will do the same as `CREATE` but will drop all the tables on application shutdown.
+`CRATE_DROP` will do the same as `CREATE` but will drop all the tables on
+application shutdown.
 
-`UPDATE` will create the tables if they do not exist. Otherwise, the tables will be updated if new fields are added to the entities resulting in new columns being added to the tables.   
+`UPDATE` will create the tables if they do not exist. Otherwise, the tables
+will be updated if new fields are added to the entities resulting in new
+columns being added to the tables.
