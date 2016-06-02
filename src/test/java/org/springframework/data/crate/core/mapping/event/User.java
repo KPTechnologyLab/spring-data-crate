@@ -15,52 +15,51 @@
  */
 package org.springframework.data.crate.core.mapping.event;
 
-import javax.validation.constraints.Min;
-import javax.validation.constraints.Size;
-
 import org.springframework.data.annotation.Id;
 import org.springframework.data.crate.core.mapping.annotations.Table;
 
+import javax.validation.constraints.Min;
+import javax.validation.constraints.Size;
+
 /**
- * 
  * @author Hasnain Javed
  * @since 1.0.0
  */
 @Table
 public class User {
 
-	@Id
-	private String id;
+    @Id
+    private String id;
 
-	@Size(min=10)
-	private String name;
+    @Size(min = 10)
+    private String name;
 
-	@Min(18)
-	private Integer age;
+    @Min(18)
+    private Integer age;
 
-	public User(String id, String name, Integer age) {
-		this.id = id;
-		this.name = name;
-		this.age = age;
-	}
-	
-	public String getId() {
-		return id;
-	}
+    public User(String id, String name, Integer age) {
+        this.id = id;
+        this.name = name;
+        this.age = age;
+    }
 
-	public String getName() {
-		return name;
-	}
+    public String getId() {
+        return id;
+    }
 
-	public void setName(String name) {
-		this.name = name;
-	}
+    public String getName() {
+        return name;
+    }
 
-	public void setAge(Integer age) {
-		this.age = age;
-	}
+    public void setName(String name) {
+        this.name = name;
+    }
 
-	public Integer getAge() {
-		return age;
-	}
+    public void setAge(Integer age) {
+        this.age = age;
+    }
+
+    public Integer getAge() {
+        return age;
+    }
 }

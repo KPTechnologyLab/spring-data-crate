@@ -20,9 +20,9 @@ import org.springframework.data.crate.repository.CrateRepository;
 import org.springframework.data.sample.entities.SampleEntity;
 
 /**
- *  SampleCrateRepository for testing
+ * SampleCrateRepository for testing
  *
- *  @author Rizwan Idrees
+ * @author Rizwan Idrees
  */
-public interface SampleCrateRepository extends CrateRepository<SampleEntity,Integer> {
+public interface SampleCrateRepository extends CrateRepository<SampleEntity, Integer> {
 }

@@ -23,7 +23,7 @@ import org.springframework.data.crate.core.mapping.annotations.Table;
 
 /**
  * @author Rizwan Idrees
- * @author Hasnain Javed 
+ * @author Hasnain Javed
  */
 @Table
 public class SampleEntity {

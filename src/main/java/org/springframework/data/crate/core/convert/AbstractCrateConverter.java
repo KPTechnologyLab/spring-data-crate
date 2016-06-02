@@ -15,73 +15,73 @@
  */
 package org.springframework.data.crate.core.convert;
 
-import static org.springframework.util.Assert.notNull;
-
 import org.springframework.beans.factory.InitializingBean;
 import org.springframework.core.convert.ConversionService;
 import org.springframework.core.convert.support.DefaultConversionService;
 import org.springframework.core.convert.support.GenericConversionService;
 import org.springframework.data.convert.EntityInstantiators;
 
+import static org.springframework.util.Assert.notNull;
+
 /**
  * Base implementation of {@link CrateConverter} providing basic functionality for {@link MappingCrateConverter}.
- * Sets up a {@link GenericConversionService} and populates basic converters while allowing registration of 
+ * Sets up a {@link GenericConversionService} and populates basic converters while allowing registration of
  * {@link CustomConversions}.
- * 
+ *
  * @author Hasnain Javed
  * @since 1.0.0
  */
 public abstract class AbstractCrateConverter implements CrateConverter, InitializingBean {
-	
-	protected final GenericConversionService conversionService;
-	protected EntityInstantiators instantiators;
-	protected CustomConversions conversions;
 
-	protected AbstractCrateConverter(GenericConversionService conversionService) {
-		super();
-		this.conversionService = conversionService == null ? new DefaultConversionService() 
-														   : conversionService;
-		this.instantiators = new EntityInstantiators();
-		this.conversions = new CustomConversions();
-	}
+    protected final GenericConversionService conversionService;
+    protected EntityInstantiators instantiators;
+    protected CustomConversions conversions;
 
-	@Override
-	public void afterPropertiesSet() throws Exception {
-		notNull(instantiators, "An instance of EntityInstantiators is required");
-		notNull(conversions, "An instance of CustomConversions is required");
-		initializeConverters();
-	}
-	
-	/**
-	 * @return the conversion service.
-	 */
-	  @Override
-	  public ConversionService getConversionService() {
-	    return conversionService;
-	  }
-	
-	/**
-	 * Registers {@link EntityInstantiators} to customize entity instantiation.
-	 * 
-	 * @param instantiators
-	 */
-	public void setInstantiators(EntityInstantiators instantiators) {
-		this.instantiators = instantiators;
-	}
-	
-	/**
-	 * Registers the given custom conversions with the converter.
-	 * 
-	 * @param conversions
-	 */
-	public void setCustomConversions(CustomConversions conversions) {
-		this.conversions = conversions;
-	}
-	
-	/**
-	 * Registers additional converters that will be available when using the {@link ConversionService} directly.
-	 */
-	private void initializeConverters() {
-		conversions.registerConvertersIn(conversionService);
-	}
+    protected AbstractCrateConverter(GenericConversionService conversionService) {
+        super();
+        this.conversionService = conversionService == null ? new DefaultConversionService()
+                : conversionService;
+        this.instantiators = new EntityInstantiators();
+        this.conversions = new CustomConversions();
+    }
+
+    @Override
+    public void afterPropertiesSet() throws Exception {
+        notNull(instantiators, "An instance of EntityInstantiators is required");
+        notNull(conversions, "An instance of CustomConversions is required");
+        initializeConverters();
+    }
+
+    /**
+     * @return the conversion service.
+     */
+    @Override
+    public ConversionService getConversionService() {
+        return conversionService;
+    }
+
+    /**
+     * Registers {@link EntityInstantiators} to customize entity instantiation.
+     *
+     * @param instantiators
+     */
+    public void setInstantiators(EntityInstantiators instantiators) {
+        this.instantiators = instantiators;
+    }
+
+    /**
+     * Registers the given custom conversions with the converter.
+     *
+     * @param conversions
+     */
+    public void setCustomConversions(CustomConversions conversions) {
+        this.conversions = conversions;
+    }
+
+    /**
+     * Registers additional converters that will be available when using the {@link ConversionService} directly.
+     */
+    private void initializeConverters() {
+        conversions.registerConvertersIn(conversionService);
+    }
 }

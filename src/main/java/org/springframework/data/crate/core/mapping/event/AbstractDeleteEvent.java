@@ -18,34 +18,34 @@ package org.springframework.data.crate.core.mapping.event;
 
 /**
  * Base class for delete events.
- * 
+ *
  * @author Martin Baumgartner
  * @author Hasnain Javed
  * @since 1.0.0
  */
 public abstract class AbstractDeleteEvent<T, E> extends CrateMappingEvent<T> {
 
-	private static final long serialVersionUID = -5190716892116238395L;
-	
-	private final Class<E> type;
+    private static final long serialVersionUID = -5190716892116238395L;
 
-	/**
-	 * Creates a new {@link AbstractDeleteEvent} for the given source and type.
-	 * 
-	 * @param source must not be {@literal null}.
-	 * @param type the source's type. must not be {@literal null}.
-	 */
-	public AbstractDeleteEvent(T source, Class<E> type) {
-		super(source, null);
-		this.type = type;
-	}
+    private final Class<E> type;
 
-	/**
-	 * Returns the type for which the {@link AbstractDeleteEvent} shall be invoked for.
-	 * 
-	 * @return
-	 */
-	public Class<E> getType() {
-		return type;
-	}
+    /**
+     * Creates a new {@link AbstractDeleteEvent} for the given source and type.
+     *
+     * @param source must not be {@literal null}.
+     * @param type   the source's type. must not be {@literal null}.
+     */
+    public AbstractDeleteEvent(T source, Class<E> type) {
+        super(source, null);
+        this.type = type;
+    }
+
+    /**
+     * Returns the type for which the {@link AbstractDeleteEvent} shall be invoked for.
+     *
+     * @return
+     */
+    public Class<E> getType() {
+        return type;
+    }
 }

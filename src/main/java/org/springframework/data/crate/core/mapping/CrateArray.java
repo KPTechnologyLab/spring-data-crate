@@ -19,18 +19,18 @@ import java.util.LinkedList;
 
 /**
  * {@link CrateArray} represents an array to be stored in Crate DB.
- * 
+ *
  * @author Hasnain Javed
  * @since 1.0.0
  */
 public class CrateArray extends LinkedList<Object> implements CrateDBObject {
 
-	private static final long serialVersionUID = -7257092605681328365L;
-	
-	public CrateArray() {
-	}
-	
-	public CrateArray(Object value) {
-		add(value);
-	}
+    private static final long serialVersionUID = -7257092605681328365L;
+
+    public CrateArray() {
+    }
+
+    public CrateArray(Object value) {
+        add(value);
+    }
 }

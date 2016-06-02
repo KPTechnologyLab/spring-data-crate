@@ -24,5 +24,5 @@ import java.io.Serializable;
  */
 public interface CrateEntityInformationCreator {
 
-	<T, ID extends Serializable> CrateEntityInformation<T, ID> getEntityInformation(Class<T> domainClass);
+    <T, ID extends Serializable> CrateEntityInformation<T, ID> getEntityInformation(Class<T> domainClass);
 }

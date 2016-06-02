@@ -18,20 +18,18 @@ package org.springframework.data.crate;
 import org.springframework.dao.InvalidDataAccessApiUsageException;
 
 /**
- * 
  * @author Hasnain Javed
- *  
  * @since 1.0.0
  */
 public class InvalidCrateApiUsageException extends InvalidDataAccessApiUsageException {
 
-	private static final long serialVersionUID = 3223184356539114174L;
+    private static final long serialVersionUID = 3223184356539114174L;
 
-	public InvalidCrateApiUsageException(String msg) {
-		super(msg);
-	}
-	
-	public InvalidCrateApiUsageException(String msg, Throwable cause) {
-		super(msg, cause);
-	}
+    public InvalidCrateApiUsageException(String msg) {
+        super(msg);
+    }
+
+    public InvalidCrateApiUsageException(String msg, Throwable cause) {
+        super(msg, cause);
+    }
 }

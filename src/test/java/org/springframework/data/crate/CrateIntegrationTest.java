@@ -4,8 +4,6 @@ import io.crate.testing.CrateTestCluster;
 import io.crate.testing.CrateTestServer;
 import org.junit.BeforeClass;
 import org.junit.ClassRule;
-import org.junit.Rule;
-import org.junit.rules.ExpectedException;
 
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;

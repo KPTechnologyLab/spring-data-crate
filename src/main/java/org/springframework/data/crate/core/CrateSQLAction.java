@@ -19,10 +19,9 @@ package org.springframework.data.crate.core;
 
 /**
  * @author Hasnain Javed
- *
  * @since 1.0.0
  */
 public interface CrateSQLAction {
-	
-	public String getSQLStatement();
+
+    public String getSQLStatement();
 }

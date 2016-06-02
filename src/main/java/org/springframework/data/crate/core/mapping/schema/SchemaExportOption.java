@@ -16,12 +16,11 @@
 package org.springframework.data.crate.core.mapping.schema;
 
 /**
- * 
  * @author Hasnain Javed
  * @since 1.0.0
  */
 public enum SchemaExportOption {
-	CREATE,
-	UPDATE,
-	CREATE_DROP;
+    CREATE,
+    UPDATE,
+    CREATE_DROP;
 }

@@ -15,6 +15,14 @@
  */
 package org.springframework.data.crate.core.sql;
 
+import org.springframework.data.crate.core.mapping.schema.Column;
+import org.springframework.data.crate.core.mapping.schema.ColumnPolicy;
+import org.springframework.data.crate.core.mapping.schema.TableDefinition;
+import org.springframework.data.crate.core.mapping.schema.TableParameters;
+import org.springframework.util.StringUtils;
+
+import java.util.Iterator;
+
 import static java.lang.String.valueOf;
 import static org.springframework.data.crate.core.convert.CrateTypeMapper.DEFAULT_TYPE_KEY;
 import static org.springframework.data.crate.core.mapping.CrateDataType.OBJECT;
@@ -22,172 +30,164 @@ import static org.springframework.data.crate.core.mapping.CrateDataType.STRING;
 import static org.springframework.util.Assert.notNull;
 import static org.springframework.util.StringUtils.hasText;
 
-import java.util.Iterator;
-
-import org.springframework.data.crate.core.mapping.schema.Column;
-import org.springframework.data.crate.core.mapping.schema.ColumnPolicy;
-import org.springframework.data.crate.core.mapping.schema.TableDefinition;
-import org.springframework.data.crate.core.mapping.schema.TableParameters;
-import org.springframework.util.StringUtils;
-
 /**
  * {@link CreateTable} creates crate specific ddl for creating table.
- * 
+ *
  * @author Hasnain Javed
- * @since 1.0.0 
+ * @since 1.0.0
  */
 public class CreateTable extends AbstractStatement {
-	
-	private TableDefinition tableDefinition;
 
-	public CreateTable(TableDefinition tableDefinition) {
-		notNull(tableDefinition);
-		this.tableDefinition = tableDefinition;
-	}
-	
-	@Override
-	public String createStatement() {
-		
-		if(!hasText(statement)) {
-			
-			StringBuilder builder = new StringBuilder(CREATE_TABLE).append(SPACE)
-																   .append(tableDefinition.getName())
-																   .append(SPACE)
-																   .append(OPEN_BRACE)
-																   .append(doubleQuote(DEFAULT_TYPE_KEY))
-																   .append(SPACE)
-																   .append(STRING)
-																   .append(COMMA)
-																   .append(SPACE);
-			
-			Iterator<Column> iterator = tableDefinition.getColumns().iterator();
-			
-			while(iterator.hasNext()) {
-				
-				createStatement(iterator.next(), builder);
-				if(iterator.hasNext()) {
-					builder.append(COMMA)
-						   .append(SPACE);
-				}
-			}
-			
-			builder.append(CLOSE_BRACE);
-			
-			if(tableDefinition.hasTableParameters()) {
-				
-				WithClause clause = new WithClause(tableDefinition.getTableParameters());
-				
-				builder.append(SPACE)
-				   	   .append(clause.createClause());
-			}
-			
-			statement = builder.toString();
-		}
-		
-		return statement;
-	}
-	
-	private void createStatement(Column column, StringBuilder builder) {
-		
-		// double quotes to preserve case in crate db
-		builder.append(doubleQuote(column.getName()));
-		builder.append(SPACE);
-		
-		if(column.isArrayColumn()) {
-			builder.append(column.getCrateType());
-			builder.append(OPEN_BRACE);
-			if(column.isPrimitiveElementType(column.getElementCrateType())) {
-				builder.append(column.getElementCrateType());
-			}else {
-				createObjectColumn(column, builder);
-			}
-			
-			builder.append(CLOSE_BRACE);
-		}else if(column.isObjectColumn()) {
-			createObjectColumn(column, builder);
-		}else {
-			builder.append(column.getCrateType());
-		}
-		
-		if(column.isPrimaryKey() && !column.isObjectColumn()) {
-			builder.append(SPACE)
-				   .append(PRIMARY_KEY);
-		}
-	}
-	
-	private void createObjectColumn(Column column, StringBuilder builder) {
-		
-		builder.append(OBJECT);
-		
-		if(!column.getSubColumns().isEmpty()) {
-			
-			builder.append(SPACE)
-				   .append(AS)
-				   .append(SPACE)
-			   	   .append(OPEN_BRACE);
-			
-			Iterator<Column> subColumns = column.getSubColumns().iterator();
-			
-			while(subColumns.hasNext()) {
-				createStatement(subColumns.next(), builder);
-				if(column.isPrimaryKey()) {
-					builder.append(SPACE)
-					   	   .append(PRIMARY_KEY);
-				}
-				if(subColumns.hasNext()) {
-					builder.append(COMMA)
-						   .append(SPACE);
-				}
-			}
-			
-			builder.append(CLOSE_BRACE);
-		}
-	}
-	
-	public static class WithClause {
-		
-		private TableParameters parameters;
+    private TableDefinition tableDefinition;
 
-		public WithClause(TableParameters parameters) {
-			notNull(parameters);
-			this.parameters = parameters;
-		}
-		
-		public String createClause() {
-			
-			String numOfReplicas = parameters.getNumberOfReplicas();
-			Integer refreshInterval = parameters.getRefreshInterval();
-			ColumnPolicy columnPolicy = parameters.getColumnPolicy();
+    public CreateTable(TableDefinition tableDefinition) {
+        notNull(tableDefinition);
+        this.tableDefinition = tableDefinition;
+    }
 
-			StringBuilder builder = new StringBuilder(WITH);
-			builder.append(SPACE)
-				   .append(OPEN_BRACE);
-			
-			if(StringUtils.hasText(numOfReplicas)) {
-				builder.append(NO_OF_REPLICAS)
-					   .append("=")
-					   .append(CrateSQLUtil.singleQuote(numOfReplicas));
-			}
-			
-			if(refreshInterval != null) {
-				builder.append(COMMA)
-					   .append(SPACE)
-					   .append(REFRESH_INTERVAL)
-					   .append("=")
-					   .append(CrateSQLUtil.singleQuote(valueOf(refreshInterval)));
-			}
-			
-			if(columnPolicy != null) {
-				builder.append(COMMA)
-				   	   .append(SPACE)
-				   	   .append(COLUMN_POLICY)
-				   	   .append("=")
-					   .append(CrateSQLUtil.singleQuote(valueOf(columnPolicy)));
-			}
-			
-			builder.append(CLOSE_BRACE);
-			
-			return builder.toString();
-		}
-	}
+    @Override
+    public String createStatement() {
+
+        if (!hasText(statement)) {
+
+            StringBuilder builder = new StringBuilder(CREATE_TABLE).append(SPACE)
+                    .append(tableDefinition.getName())
+                    .append(SPACE)
+                    .append(OPEN_BRACE)
+                    .append(doubleQuote(DEFAULT_TYPE_KEY))
+                    .append(SPACE)
+                    .append(STRING)
+                    .append(COMMA)
+                    .append(SPACE);
+
+            Iterator<Column> iterator = tableDefinition.getColumns().iterator();
+
+            while (iterator.hasNext()) {
+
+                createStatement(iterator.next(), builder);
+                if (iterator.hasNext()) {
+                    builder.append(COMMA)
+                            .append(SPACE);
+                }
+            }
+
+            builder.append(CLOSE_BRACE);
+
+            if (tableDefinition.hasTableParameters()) {
+
+                WithClause clause = new WithClause(tableDefinition.getTableParameters());
+
+                builder.append(SPACE)
+                        .append(clause.createClause());
+            }
+
+            statement = builder.toString();
+        }
+
+        return statement;
+    }
+
+    private void createStatement(Column column, StringBuilder builder) {
+
+        // double quotes to preserve case in crate db
+        builder.append(doubleQuote(column.getName()));
+        builder.append(SPACE);
+
+        if (column.isArrayColumn()) {
+            builder.append(column.getCrateType());
+            builder.append(OPEN_BRACE);
+            if (column.isPrimitiveElementType(column.getElementCrateType())) {
+                builder.append(column.getElementCrateType());
+            } else {
+                createObjectColumn(column, builder);
+            }
+
+            builder.append(CLOSE_BRACE);
+        } else if (column.isObjectColumn()) {
+            createObjectColumn(column, builder);
+        } else {
+            builder.append(column.getCrateType());
+        }
+
+        if (column.isPrimaryKey() && !column.isObjectColumn()) {
+            builder.append(SPACE)
+                    .append(PRIMARY_KEY);
+        }
+    }
+
+    private void createObjectColumn(Column column, StringBuilder builder) {
+
+        builder.append(OBJECT);
+
+        if (!column.getSubColumns().isEmpty()) {
+
+            builder.append(SPACE)
+                    .append(AS)
+                    .append(SPACE)
+                    .append(OPEN_BRACE);
+
+            Iterator<Column> subColumns = column.getSubColumns().iterator();
+
+            while (subColumns.hasNext()) {
+                createStatement(subColumns.next(), builder);
+                if (column.isPrimaryKey()) {
+                    builder.append(SPACE)
+                            .append(PRIMARY_KEY);
+                }
+                if (subColumns.hasNext()) {
+                    builder.append(COMMA)
+                            .append(SPACE);
+                }
+            }
+
+            builder.append(CLOSE_BRACE);
+        }
+    }
+
+    public static class WithClause {
+
+        private TableParameters parameters;
+
+        public WithClause(TableParameters parameters) {
+            notNull(parameters);
+            this.parameters = parameters;
+        }
+
+        public String createClause() {
+
+            String numOfReplicas = parameters.getNumberOfReplicas();
+            Integer refreshInterval = parameters.getRefreshInterval();
+            ColumnPolicy columnPolicy = parameters.getColumnPolicy();
+
+            StringBuilder builder = new StringBuilder(WITH);
+            builder.append(SPACE)
+                    .append(OPEN_BRACE);
+
+            if (StringUtils.hasText(numOfReplicas)) {
+                builder.append(NO_OF_REPLICAS)
+                        .append("=")
+                        .append(CrateSQLUtil.singleQuote(numOfReplicas));
+            }
+
+            if (refreshInterval != null) {
+                builder.append(COMMA)
+                        .append(SPACE)
+                        .append(REFRESH_INTERVAL)
+                        .append("=")
+                        .append(CrateSQLUtil.singleQuote(valueOf(refreshInterval)));
+            }
+
+            if (columnPolicy != null) {
+                builder.append(COMMA)
+                        .append(SPACE)
+                        .append(COLUMN_POLICY)
+                        .append("=")
+                        .append(CrateSQLUtil.singleQuote(valueOf(columnPolicy)));
+            }
+
+            builder.append(CLOSE_BRACE);
+
+            return builder.toString();
+        }
+    }
 }

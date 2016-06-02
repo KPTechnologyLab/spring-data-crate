@@ -18,11 +18,10 @@ package org.springframework.data.crate.core;
 import io.crate.action.sql.SQLRequest;
 
 /**
- * 
  * @author Hasnain Javed
  * @since 1.0.0
  */
 public interface CrateAction extends CrateSQLAction {
-	
-	public SQLRequest getSQLRequest();
+
+    public SQLRequest getSQLRequest();
 }

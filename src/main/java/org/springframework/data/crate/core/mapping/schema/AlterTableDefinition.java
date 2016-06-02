@@ -15,72 +15,73 @@
  */
 package org.springframework.data.crate.core.mapping.schema;
 
+import java.util.List;
+
 import static org.springframework.util.Assert.hasText;
 import static org.springframework.util.Assert.notNull;
 
-import java.util.List;
-
 /**
  * {@link AlterTableDefinition} holds definition for columns and table parameters.
+ *
  * @author Hasnain Javed
  * @since 1.0.0
  */
 public class AlterTableDefinition {
-	
-	private String name;
-	
-	private List<Column> alteredColumns;
-	private List<AlterTableParameterDefinition> alteredParameters;
-	
-	public AlterTableDefinition(String tableName, List<Column> alteredColumns, List<AlterTableParameterDefinition> alteredParameters) {
-		
-		hasText(tableName);
-		
-		this.name = tableName;
-		this.alteredColumns = alteredColumns;
-		this.alteredParameters = alteredParameters;
-	}
-	
-	public String getName() {
-		return name;
-	}
 
-	public List<Column> getColumns() {
-		return alteredColumns;
-	}
+    private String name;
 
-	public List<AlterTableParameterDefinition> getTableParameters() {
-		return alteredParameters;
-	}
+    private List<Column> alteredColumns;
+    private List<AlterTableParameterDefinition> alteredParameters;
 
-	public boolean hasAlteredColumns() {
-		return (alteredColumns != null && !alteredColumns.isEmpty());
-	}
-	
-	public boolean hasAlteredParameters() {
-		return (alteredParameters != null && !alteredParameters.isEmpty());
-	}
-	
-	public static class AlterTableParameterDefinition {
-		
-		private String parameterName;
-		private Object parameterValue;
-		
-		public AlterTableParameterDefinition(String parameterName, Object parameterValue) {
-			
-			hasText(parameterName);
-			notNull(parameterValue);
-			
-			this.parameterName = parameterName;
-			this.parameterValue = parameterValue;
-		}
+    public AlterTableDefinition(String tableName, List<Column> alteredColumns, List<AlterTableParameterDefinition> alteredParameters) {
 
-		public String getParameterName() {
-			return parameterName;
-		}
-		
-		public Object getParameterValue() {
-			return parameterValue;
-		}
-	}
+        hasText(tableName);
+
+        this.name = tableName;
+        this.alteredColumns = alteredColumns;
+        this.alteredParameters = alteredParameters;
+    }
+
+    public String getName() {
+        return name;
+    }
+
+    public List<Column> getColumns() {
+        return alteredColumns;
+    }
+
+    public List<AlterTableParameterDefinition> getTableParameters() {
+        return alteredParameters;
+    }
+
+    public boolean hasAlteredColumns() {
+        return (alteredColumns != null && !alteredColumns.isEmpty());
+    }
+
+    public boolean hasAlteredParameters() {
+        return (alteredParameters != null && !alteredParameters.isEmpty());
+    }
+
+    public static class AlterTableParameterDefinition {
+
+        private String parameterName;
+        private Object parameterValue;
+
+        public AlterTableParameterDefinition(String parameterName, Object parameterValue) {
+
+            hasText(parameterName);
+            notNull(parameterValue);
+
+            this.parameterName = parameterName;
+            this.parameterValue = parameterValue;
+        }
+
+        public String getParameterName() {
+            return parameterName;
+        }
+
+        public Object getParameterValue() {
+            return parameterValue;
+        }
+    }
 }

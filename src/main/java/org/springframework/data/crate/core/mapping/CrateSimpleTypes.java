@@ -16,38 +16,37 @@
 
 package org.springframework.data.crate.core.mapping;
 
-import static java.util.Collections.unmodifiableSet;
+import org.springframework.data.mapping.model.SimpleTypeHolder;
 
 import java.util.HashSet;
 import java.util.Set;
 
-import org.springframework.data.mapping.model.SimpleTypeHolder;
+import static java.util.Collections.unmodifiableSet;
 
 /**
- * 
  * @author Hasnain Javed
  * @since 1.0.0
  */
 public class CrateSimpleTypes {
-	
-	static {
-	    Set<Class<?>> simpleTypes = new HashSet<>();
-	    simpleTypes.add(CrateDocument.class);
-	    simpleTypes.add(CrateArray.class);
-	    simpleTypes.add(Boolean[].class);
-	    simpleTypes.add(Long[].class);
-	    simpleTypes.add(Short[].class);
-	    simpleTypes.add(Integer[].class);
-	    simpleTypes.add(Byte[].class);
-	    simpleTypes.add(Float[].class);
-	    simpleTypes.add(Double[].class);
-	    simpleTypes.add(Character[].class);
-	    CRATE_SIMPLE_TYPES = unmodifiableSet(simpleTypes);
-	}
-	
-	private static final Set<Class<?>> CRATE_SIMPLE_TYPES;
-	public static final SimpleTypeHolder HOLDER = new SimpleTypeHolder(CRATE_SIMPLE_TYPES, true);
-	
-	private CrateSimpleTypes() {
-	}
+
+    static {
+        Set<Class<?>> simpleTypes = new HashSet<>();
+        simpleTypes.add(CrateDocument.class);
+        simpleTypes.add(CrateArray.class);
+        simpleTypes.add(Boolean[].class);
+        simpleTypes.add(Long[].class);
+        simpleTypes.add(Short[].class);
+        simpleTypes.add(Integer[].class);
+        simpleTypes.add(Byte[].class);
+        simpleTypes.add(Float[].class);
+        simpleTypes.add(Double[].class);
+        simpleTypes.add(Character[].class);
+        CRATE_SIMPLE_TYPES = unmodifiableSet(simpleTypes);
+    }
+
+    private static final Set<Class<?>> CRATE_SIMPLE_TYPES;
+    public static final SimpleTypeHolder HOLDER = new SimpleTypeHolder(CRATE_SIMPLE_TYPES, true);
+
+    private CrateSimpleTypes() {
+    }
 }

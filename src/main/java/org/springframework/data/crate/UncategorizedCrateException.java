@@ -18,15 +18,14 @@ package org.springframework.data.crate;
 import org.springframework.dao.UncategorizedDataAccessException;
 
 /**
- * 
  * @author Hasnain Javed
  * @since 1.0.0
  */
 public class UncategorizedCrateException extends UncategorizedDataAccessException {
 
-	private static final long serialVersionUID = -557745250501049785L;
+    private static final long serialVersionUID = -557745250501049785L;
 
-	public UncategorizedCrateException(String msg, Throwable cause) {
-		super(msg, cause);
-	}
+    public UncategorizedCrateException(String msg, Throwable cause) {
+        super(msg, cause);
+    }
 }

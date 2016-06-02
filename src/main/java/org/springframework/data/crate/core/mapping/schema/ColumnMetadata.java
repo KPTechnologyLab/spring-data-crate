@@ -15,54 +15,53 @@
  */
 package org.springframework.data.crate.core.mapping.schema;
 
-import static org.springframework.util.Assert.hasText;
-
 import org.springframework.util.StringUtils;
 
+import static org.springframework.util.Assert.hasText;
+
 /**
- * 
  * @author Hasnain Javed
  * @since 1.0.0
  */
 class ColumnMetadata {
-	
-	private String sqlPath;
-	private String crateType;
-	private String elementCrateType;
-	
-	public ColumnMetadata(String sqlPath, String crateType) {
-		this(sqlPath, crateType, null);
-	}
-	
-	public ColumnMetadata(String sqlPath, String crateType, String elementCrateType) {
-		super();
-		hasText(sqlPath);
-		hasText(crateType);
-		this.sqlPath = sqlPath;
-		this.crateType = crateType;
-		
-		if(StringUtils.hasText(elementCrateType)) {
-			this.elementCrateType = elementCrateType;
-		}
-	}
 
-	public String getSqlPath() {
-		return sqlPath;
-	}
+    private String sqlPath;
+    private String crateType;
+    private String elementCrateType;
 
-	public String getCrateType() {
-		return crateType;
-	}
+    public ColumnMetadata(String sqlPath, String crateType) {
+        this(sqlPath, crateType, null);
+    }
 
-	public String getElementCrateType() {
-		return elementCrateType;
-	}
+    public ColumnMetadata(String sqlPath, String crateType, String elementCrateType) {
+        super();
+        hasText(sqlPath);
+        hasText(crateType);
+        this.sqlPath = sqlPath;
+        this.crateType = crateType;
 
-	@Override
-	public String toString() {
-		return "[name: ".concat(sqlPath)
-						.concat(", crateType: "
-						.concat(crateType)
-						.concat("]"));
-	}
+        if (StringUtils.hasText(elementCrateType)) {
+            this.elementCrateType = elementCrateType;
+        }
+    }
+
+    public String getSqlPath() {
+        return sqlPath;
+    }
+
+    public String getCrateType() {
+        return crateType;
+    }
+
+    public String getElementCrateType() {
+        return elementCrateType;
+    }
+
+    @Override
+    public String toString() {
+        return "[name: ".concat(sqlPath)
+                .concat(", crateType: "
+                        .concat(crateType)
+                        .concat("]"));
+    }
 }

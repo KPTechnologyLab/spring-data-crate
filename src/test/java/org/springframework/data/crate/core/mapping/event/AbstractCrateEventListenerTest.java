@@ -15,8 +15,6 @@
  */
 package org.springframework.data.crate.core.mapping.event;
 
-import static org.junit.Assert.assertEquals;
-
 import io.crate.client.CrateClient;
 import org.junit.After;
 import org.junit.Before;
@@ -34,92 +32,94 @@ import org.springframework.test.context.support.DependencyInjectionTestExecution
 
 import java.util.Locale;
 
+import static org.junit.Assert.assertEquals;
+
 /**
- * 
  * @author Hasnain Javed
  * @since 1.0.0
  */
 @RunWith(SpringJUnit4ClassRunner.class)
-@ContextConfiguration(classes={AbstractCrateEventListenerTest.TestConfiguration.class})
+@ContextConfiguration(classes = {AbstractCrateEventListenerTest.TestConfiguration.class})
 @TestExecutionListeners({DependencyInjectionTestExecutionListener.class})
 public class AbstractCrateEventListenerTest extends CrateIntegrationTest {
 
-	@Autowired
-	private CrateOperations crateOperations;
+    @Autowired
+    private CrateOperations crateOperations;
 
-	@Autowired
-	private SimpleMappingEventListener eventListener;
-	
-	@Before
-	public void setup() {
-		crateOperations.deleteAll(User.class);
-	}
-	
-	@After
-	public void teardown() {
-		eventListener.clearEvents();
-		crateOperations.deleteAll(User.class);
-	}
-	
-	@Test
-	public void shouldEmitEventsOnInsert() {
-		
-		insertUser();
-		
-		assertEquals(1, eventListener.onBeforeConvertEvents.size());
-		assertEquals(1, eventListener.onBeforeSaveEvents.size());
-		assertEquals(1, eventListener.onAfterSaveEvents.size());
-	}
-	
-	@Test
-	public void shouldEmitEventsOnUpdate() {
-		
-		User user = insertUser();
-		user.setAge(35);
-		
-		crateOperations.update(user);
-		
-		assertEquals(2, eventListener.onBeforeConvertEvents.size()); // once for insert and once for update
-		assertEquals(2, eventListener.onBeforeSaveEvents.size()); // once for insert and once for update
-		assertEquals(1, eventListener.onAfterSaveEvents.size());
-	}
-	
-	@Test
-	public void shouldEmitEventsOnRemove() {
-		
-		User user = insertUser();;
+    @Autowired
+    private SimpleMappingEventListener eventListener;
 
-		crateOperations.delete(user.getId(), User.class);
-		
-		assertEquals(1, eventListener.onBeforeDeleteEvents.size());
-		assertEquals(1, eventListener.onAfterDeleteEvents.size());
-	}
-	
-	@Test
-	public void shouldEmitEventsOnFindById() {
-		
-		User user = insertUser();
-		
-		crateOperations.findById(user.getId(), User.class);
+    @Before
+    public void setup() {
+        crateOperations.deleteAll(User.class);
+    }
 
-		assertEquals(1, eventListener.onAfterLoadEvents.size());
-		assertEquals(1, eventListener.onAfterConvertEvents.size());
-	}
-	
-	private User insertUser() {
-		User user = new User("1@test.com", "hasnain javed", 34);
-		crateOperations.insert(user);
-		return user;
-	}
+    @After
+    public void teardown() {
+        eventListener.clearEvents();
+        crateOperations.deleteAll(User.class);
+    }
+
+    @Test
+    public void shouldEmitEventsOnInsert() {
+
+        insertUser();
+
+        assertEquals(1, eventListener.onBeforeConvertEvents.size());
+        assertEquals(1, eventListener.onBeforeSaveEvents.size());
+        assertEquals(1, eventListener.onAfterSaveEvents.size());
+    }
+
+    @Test
+    public void shouldEmitEventsOnUpdate() {
+
+        User user = insertUser();
+        user.setAge(35);
+
+        crateOperations.update(user);
+
+        assertEquals(2, eventListener.onBeforeConvertEvents.size()); // once for insert and once for update
+        assertEquals(2, eventListener.onBeforeSaveEvents.size()); // once for insert and once for update
+        assertEquals(1, eventListener.onAfterSaveEvents.size());
+    }
+
+    @Test
+    public void shouldEmitEventsOnRemove() {
+
+        User user = insertUser();
+        ;
+
+        crateOperations.delete(user.getId(), User.class);
+
+        assertEquals(1, eventListener.onBeforeDeleteEvents.size());
+        assertEquals(1, eventListener.onAfterDeleteEvents.size());
+    }
+
+    @Test
+    public void shouldEmitEventsOnFindById() {
+
+        User user = insertUser();
+
+        crateOperations.findById(user.getId(), User.class);
+
+        assertEquals(1, eventListener.onAfterLoadEvents.size());
+        assertEquals(1, eventListener.onAfterConvertEvents.size());
+    }
+
+    private User insertUser() {
+        User user = new User("1@test.com", "hasnain javed", 34);
+        crateOperations.insert(user);
+        return user;
+    }
 
 
-	@Configuration
-	static class TestConfiguration extends LifecycleEventConfigurationBase {
+    @Configuration
+    static class TestConfiguration extends LifecycleEventConfigurationBase {
 
-		@Bean
-		public CrateClient crateClient() {
-			return new CrateClient(String.format(Locale.ENGLISH, "%s:%d", server.crateHost(), server.transportPort()));
-		}
+        @Bean
+        public CrateClient crateClient() {
+            return new CrateClient(String.format(Locale.ENGLISH, "%s:%d", server.crateHost(), server.transportPort()));
+        }
 
-	}
+    }
 }

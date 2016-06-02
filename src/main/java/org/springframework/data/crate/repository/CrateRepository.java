@@ -15,12 +15,12 @@
  */
 package org.springframework.data.crate.repository;
 
-import java.io.Serializable;
-import java.util.List;
-
 import org.springframework.data.crate.core.BulkOperartionResult;
 import org.springframework.data.repository.CrudRepository;
 import org.springframework.data.repository.NoRepositoryBean;
+
+import java.io.Serializable;
+import java.util.List;
 
 /**
  * @param <T>
@@ -33,26 +33,26 @@ import org.springframework.data.repository.NoRepositoryBean;
 // TODO: extend PagingAndSortigRepository once the criteria api is in place
 @NoRepositoryBean
 public interface CrateRepository<T, ID extends Serializable> extends CrudRepository<T, ID> {
-	
-	/*
-	 * (non-Javadoc)
-	 * @see org.springframework.data.repository.CrudRepository#save(java.lang.Iterable)
-	 */
-	<S extends T> List<S> save(Iterable<S> entites);
-	
-	/*
-	 * (non-Javadoc)
-	 * @see org.springframework.data.repository.CrudRepository#findAll()
-	 */
-	List<T> findAll();
-	
-	/*
-	 * (non-Javadoc)
-	 * @see org.springframework.data.repository.CrudRepository#findAll(java.lang.Iterable)
-	 */
-	List<T> findAll(Iterable<ID> ids);
-	
-	/**
+
+    /*
+     * (non-Javadoc)
+     * @see org.springframework.data.repository.CrudRepository#save(java.lang.Iterable)
+     */
+    <S extends T> List<S> save(Iterable<S> entites);
+
+    /*
+     * (non-Javadoc)
+     * @see org.springframework.data.repository.CrudRepository#findAll()
+     */
+    List<T> findAll();
+
+    /*
+     * (non-Javadoc)
+     * @see org.springframework.data.repository.CrudRepository#findAll(java.lang.Iterable)
+     */
+    List<T> findAll(Iterable<ID> ids);
+
+    /**
      * Insert the given list of objects. If the object defines an id (primary key), it must not be null.
      * All life cycle callback methods will be invoked for entities succeeding the insert operation.
      *
@@ -60,7 +60,7 @@ public interface CrateRepository<T, ID extends Serializable> extends CrudReposit
      * @return Results containing the details of the bulk operation
      */
     BulkOperartionResult<T> bulkInsert(List<T> entities);
-    
+
     /**
      * Update the given list of objects. The object must define an id (primary key).
      * All life cycle callback methods will be invoked for entities succeeding the update operation.
@@ -69,7 +69,7 @@ public interface CrateRepository<T, ID extends Serializable> extends CrudReposit
      * @return Results containing the details of the bulk operation
      */
     BulkOperartionResult<T> bulkUpdate(List<T> entities);
-    
+
     /**
      * Delete the given list of objects. The object must define an id (primary key).
      * All life cycle callback methods will be invoked for an id succeeding the delete operation.
@@ -78,9 +78,9 @@ public interface CrateRepository<T, ID extends Serializable> extends CrudReposit
      * @return Results containing the details of the bulk operation
      */
     BulkOperartionResult<Object> bulkDelete(List<Object> ids);
-    
+
     /**
-     * Refreshes a table and all its rows making all changes made to a table available 
+     * Refreshes a table and all its rows making all changes made to a table available
      * to all further commands.
      */
     void refreshTable();

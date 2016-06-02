@@ -16,13 +16,12 @@
 package org.springframework.data.crate.core;
 
 /**
- * 
  * @author Hasnain Javed
  * @since 1.0.0
  */
 public enum ActionType {
-	
-	INSERT,
-	UPDATE,
-	DELETE;
+
+    INSERT,
+    UPDATE,
+    DELETE;
 }

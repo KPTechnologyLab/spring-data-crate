@@ -30,20 +30,20 @@ import org.springframework.data.mapping.context.MappingContext;
  * @author Hasnain Javed
  */
 
-public interface CrateConverter extends EntityConverter<CratePersistentEntity<?>, CratePersistentProperty, Object, CrateDocument>, 
-										CrateWriter<Object>, 
-										EntityReader<Object, CrateDocument> {
-	/**
-	 * Returns the underlying {@link org.springframework.data.mapping.context.MappingContext} used by the converter.
-	 *
-	 * @return never {@literal null}
-	 */
-	MappingContext<? extends CratePersistentEntity<?>, CratePersistentProperty> getMappingContext();
+public interface CrateConverter extends EntityConverter<CratePersistentEntity<?>, CratePersistentProperty, Object, CrateDocument>,
+        CrateWriter<Object>,
+        EntityReader<Object, CrateDocument> {
+    /**
+     * Returns the underlying {@link org.springframework.data.mapping.context.MappingContext} used by the converter.
+     *
+     * @return never {@literal null}
+     */
+    MappingContext<? extends CratePersistentEntity<?>, CratePersistentProperty> getMappingContext();
 
-	/**
-	 * Returns the underlying {@link org.springframework.core.convert.ConversionService} used by the converter.
-	 *
-	 * @return never {@literal null}.
-	 */
-	ConversionService getConversionService();
+    /**
+     * Returns the underlying {@link org.springframework.core.convert.ConversionService} used by the converter.
+     *
+     * @return never {@literal null}.
+     */
+    ConversionService getConversionService();
 }

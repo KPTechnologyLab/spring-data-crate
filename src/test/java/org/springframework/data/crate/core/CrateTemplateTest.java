@@ -15,14 +15,8 @@
  */
 package org.springframework.data.crate.core;
 
-import static java.util.Arrays.asList;
-import static org.junit.Assert.assertFalse;
-import static org.mockito.Matchers.any;
-import static org.mockito.Mockito.never;
-import static org.mockito.Mockito.verify;
 import io.crate.action.sql.SQLRequest;
 import io.crate.client.CrateClient;
-
 import io.crate.shade.org.elasticsearch.action.ActionListener;
 import org.junit.Before;
 import org.junit.Test;
@@ -36,85 +30,90 @@ import org.springframework.data.crate.core.mapping.CrateMappingContext;
 import org.springframework.data.crate.core.mapping.annotations.Table;
 import org.springframework.data.mapping.model.MappingException;
 
+import static java.util.Arrays.asList;
+import static org.junit.Assert.assertFalse;
+import static org.mockito.Matchers.any;
+import static org.mockito.Mockito.never;
+import static org.mockito.Mockito.verify;
+
 /**
- * 
  * @author Hasnain Javed
  * @since 1.0.0
  */
 @RunWith(MockitoJUnitRunner.class)
 public class CrateTemplateTest {
 
-	@Mock
-	private CrateClient client;
-	
-	private CrateMappingContext mappingContext;
-	private CrateConverter crateConverter;
-	private CrateOperations crateOperations;
-	
-	@Before
-	public void setup() {
-		mappingContext = new CrateMappingContext();
-		crateConverter = new MappingCrateConverter(mappingContext);
-		crateOperations = new CrateTemplate(client, crateConverter);
-	}
-	
-	@SuppressWarnings("unchecked")
-	@Test(expected=IllegalArgumentException.class)
-	public void shouldNotSaveCollectionType() {
-		crateOperations.insert(asList("CRATE"));
-		verify(client, never()).sql(any(SQLRequest.class), any(ActionListener.class));
-	}
-	
-	@SuppressWarnings("unchecked")
-	@Test(expected=MappingException.class)
-	public void shouldNotSaveWithNullId() {
-		crateOperations.insert(new ClassWithSimpleId());
-		verify(client, never()).sql(any(SQLRequest.class), any(ActionListener.class));
-	}
-	
-	@Test(expected=IllegalArgumentException.class)
-	public void shouldNotFindByIdWhenIdIsNull() {
-		crateOperations.findById(null, Object.class);
-	}
-	
-	@Test(expected=MappingException.class)
-	public void shouldNotRemoveWhenEntityHasNoId() {
-		assertFalse(crateOperations.delete("id", ClassWithNoId.class, "test"));
-	}
-	
-	@Test
-	public void shouldNotRemoveWhenObjectIsNull() {
-		assertFalse(crateOperations.delete(null, Object.class, "test"));
-	}
-	
-	@Test(expected=IllegalArgumentException.class)
-	public void shouldNotFindByIdWhenEntityClassIsNull() {
-		crateOperations.findById(1, null);
-	}
-	
-	@Test(expected=MappingException.class)
-	public void shouldNotFindByIdEntityHasNoId() {
-		crateOperations.findById(1, ClassWithNoId.class);
-	}
-	
-	@Test(expected=MappingException.class)
-	public void shouldNotUpdatedWhenEntityHasNoId() {
-		crateOperations.update(new ClassWithNoId());
-	}
-	
-	@Test(expected=MappingException.class)
-	public void shouldNotUpdatedWhenIdIsNull() {
-		crateOperations.update(new ClassWithSimpleId());
-	}
-	
-	@Table(name="entity")
-	static class ClassWithSimpleId {
-		@Id
-		String id;
-	}
-	
-	@Table(name="entity")
-	static class ClassWithNoId {
-		String field;
-	}
+    @Mock
+    private CrateClient client;
+
+    private CrateMappingContext mappingContext;
+    private CrateConverter crateConverter;
+    private CrateOperations crateOperations;
+
+    @Before
+    public void setup() {
+        mappingContext = new CrateMappingContext();
+        crateConverter = new MappingCrateConverter(mappingContext);
+        crateOperations = new CrateTemplate(client, crateConverter);
+    }
+
+    @SuppressWarnings("unchecked")
+    @Test(expected = IllegalArgumentException.class)
+    public void shouldNotSaveCollectionType() {
+        crateOperations.insert(asList("CRATE"));
+        verify(client, never()).sql(any(SQLRequest.class), any(ActionListener.class));
+    }
+
+    @SuppressWarnings("unchecked")
+    @Test(expected = MappingException.class)
+    public void shouldNotSaveWithNullId() {
+        crateOperations.insert(new ClassWithSimpleId());
+        verify(client, never()).sql(any(SQLRequest.class), any(ActionListener.class));
+    }
+
+    @Test(expected = IllegalArgumentException.class)
+    public void shouldNotFindByIdWhenIdIsNull() {
+        crateOperations.findById(null, Object.class);
+    }
+
+    @Test(expected = MappingException.class)
+    public void shouldNotRemoveWhenEntityHasNoId() {
+        assertFalse(crateOperations.delete("id", ClassWithNoId.class, "test"));
+    }
+
+    @Test
+    public void shouldNotRemoveWhenObjectIsNull() {
+        assertFalse(crateOperations.delete(null, Object.class, "test"));
+    }
+
+    @Test(expected = IllegalArgumentException.class)
+    public void shouldNotFindByIdWhenEntityClassIsNull() {
+        crateOperations.findById(1, null);
+    }
+
+    @Test(expected = MappingException.class)
+    public void shouldNotFindByIdEntityHasNoId() {
+        crateOperations.findById(1, ClassWithNoId.class);
+    }
+
+    @Test(expected = MappingException.class)
+    public void shouldNotUpdatedWhenEntityHasNoId() {
+        crateOperations.update(new ClassWithNoId());
+    }
+
+    @Test(expected = MappingException.class)
+    public void shouldNotUpdatedWhenIdIsNull() {
+        crateOperations.update(new ClassWithSimpleId());
+    }
+
+    @Table(name = "entity")
+    static class ClassWithSimpleId {
+        @Id
+        String id;
+    }
+
+    @Table(name = "entity")
+    static class ClassWithNoId {
+        String field;
+    }
 }

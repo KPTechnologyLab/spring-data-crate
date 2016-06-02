@@ -15,37 +15,36 @@
  */
 package org.springframework.data.crate.core.sql;
 
+import org.springframework.data.crate.core.mapping.schema.Column;
+
 import static org.springframework.data.crate.core.sql.CrateSQLUtil.dotToSqlPath;
 import static org.springframework.util.Assert.hasText;
 import static org.springframework.util.Assert.notNull;
 
-import org.springframework.data.crate.core.mapping.schema.Column;
-
 /**
- * 
  * @author Hasnain Javed
- * @since 1.0.0 
+ * @since 1.0.0
  */
 public abstract class AbstractStatement implements CrateSQLStatement {
-	
-	protected String statement;
 
-	public String getStatement() {
-		return statement;
-	}
-	
-	protected String doubleQuote(String toQuote) {
-		hasText(toQuote);
-		return CrateSQLUtil.doubleQuote(toQuote);
-	}
-	
-	protected String singleQuote(String toQuote) {
-		hasText(toQuote);
-		return CrateSQLUtil.singleQuote(toQuote);
-	}
-	
-	protected String toSqlPath(Column column) {
-		notNull(column);
-		return dotToSqlPath(column.getName());
-	}
+    protected String statement;
+
+    public String getStatement() {
+        return statement;
+    }
+
+    protected String doubleQuote(String toQuote) {
+        hasText(toQuote);
+        return CrateSQLUtil.doubleQuote(toQuote);
+    }
+
+    protected String singleQuote(String toQuote) {
+        hasText(toQuote);
+        return CrateSQLUtil.singleQuote(toQuote);
+    }
+
+    protected String toSqlPath(Column column) {
+        notNull(column);
+        return dotToSqlPath(column.getName());
+    }
 }

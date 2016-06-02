@@ -20,18 +20,18 @@ import org.springframework.data.crate.core.mapping.CrateDocument;
 
 /**
  * Crate specific {@link TypeMapper}
- * 
+ *
  * @author Hasnain Javed
  * @since 1.0.0
  */
 public interface CrateTypeMapper extends TypeMapper<CrateDocument> {
-	
-	String DEFAULT_TYPE_KEY = "entity_class";
-	
-	/**
-	 * Returns whether the given key is the type key.
-	 * 
-	 * @return
-	 */
-	boolean isTypeKey(String typeKey);
+
+    String DEFAULT_TYPE_KEY = "entity_class";
+
+    /**
+     * Returns whether the given key is the type key.
+     *
+     * @return
+     */
+    boolean isTypeKey(String typeKey);
 }

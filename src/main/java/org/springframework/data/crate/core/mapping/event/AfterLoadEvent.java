@@ -15,13 +15,13 @@
  */
 package org.springframework.data.crate.core.mapping.event;
 
-import static org.springframework.util.Assert.notNull;
-
 import org.springframework.data.crate.core.mapping.CrateDocument;
+
+import static org.springframework.util.Assert.notNull;
 
 /**
  * Event to be triggered after loading {@link CrateDocument}s to be mapped onto a given type.
- * 
+ *
  * @author Oliver Gierke
  * @author Jon Brisbin
  * @author Christoph Leiter
@@ -30,29 +30,29 @@ import org.springframework.data.crate.core.mapping.CrateDocument;
  */
 public class AfterLoadEvent<T> extends CrateMappingEvent<CrateDocument> {
 
-	private static final long serialVersionUID = 8004512960298852177L;
-	
-	private final Class<T> type;
+    private static final long serialVersionUID = 8004512960298852177L;
 
-	/**
-	 * Creates a new {@link AfterLoadEvent} for the given {@link CrateDocument} and type.
-	 * 
-	 * @param document must not be {@literal null}.
-	 * @param type must not be {@literal null}.
-	 */
-	public AfterLoadEvent(CrateDocument document, Class<T> type) {
+    private final Class<T> type;
 
-		super(document, document);
-		notNull(type, "Type must not be null!");
-		this.type = type;
-	}
+    /**
+     * Creates a new {@link AfterLoadEvent} for the given {@link CrateDocument} and type.
+     *
+     * @param document must not be {@literal null}.
+     * @param type     must not be {@literal null}.
+     */
+    public AfterLoadEvent(CrateDocument document, Class<T> type) {
 
-	/**
-	 * Returns the type for which the {@link AfterLoadEvent} shall be invoked for.
-	 * 
-	 * @return
-	 */
-	public Class<T> getType() {
-		return type;
-	}
+        super(document, document);
+        notNull(type, "Type must not be null!");
+        this.type = type;
+    }
+
+    /**
+     * Returns the type for which the {@link AfterLoadEvent} shall be invoked for.
+     *
+     * @return
+     */
+    public Class<T> getType() {
+        return type;
+    }
 }

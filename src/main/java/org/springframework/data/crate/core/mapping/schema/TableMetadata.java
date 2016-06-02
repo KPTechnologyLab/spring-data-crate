@@ -15,44 +15,43 @@
  */
 package org.springframework.data.crate.core.mapping.schema;
 
-import static org.springframework.util.Assert.hasText;
-import static org.springframework.util.Assert.*;
-
 import java.util.List;
+
+import static org.springframework.util.Assert.*;
 
 /**
  * {@link TableMetadata} holds metadata information for table and it's columns.
- * 
+ *
  * @author Hasnain Javed
  * @since 1.0.0
  */
 public class TableMetadata {
-	
-	private String name;
-	private List<ColumnMetadata> columns;
 
-	private TableParameters parameters;
-	
-	public TableMetadata(String name, List<ColumnMetadata> columns, TableParameters parameters) {
-		
-		hasText(name);
-		notEmpty(columns);
-		notNull(parameters);
-		
-		this.name = name;
-		this.columns = columns;
-		this.parameters = parameters;
-	}
-	
-	public String getName() {
-		return name;
-	}
+    private String name;
+    private List<ColumnMetadata> columns;
 
-	public List<ColumnMetadata> getColumns() {
-		return columns;
-	}
+    private TableParameters parameters;
 
-	public TableParameters getParameters() {
-		return parameters;
-	}
- }
+    public TableMetadata(String name, List<ColumnMetadata> columns, TableParameters parameters) {
+
+        hasText(name);
+        notEmpty(columns);
+        notNull(parameters);
+
+        this.name = name;
+        this.columns = columns;
+        this.parameters = parameters;
+    }
+
+    public String getName() {
+        return name;
+    }
+
+    public List<ColumnMetadata> getColumns() {
+        return columns;
+    }
+
+    public TableParameters getParameters() {
+        return parameters;
+    }
+}

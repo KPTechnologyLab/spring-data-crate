@@ -18,22 +18,21 @@ package org.springframework.data.crate.core.sql;
 import static org.springframework.util.Assert.hasText;
 
 /**
- * 
  * @author Hasnain Javed
  * @since 1.0.0
  */
 public class DropTable extends AbstractStatement {
-	
-	private final String tableName;
-	
-	public DropTable(String tableName) {
-		super();
-		hasText(tableName);
-		this.tableName = tableName;
-	}
 
-	@Override
-	public String createStatement() {
-		return DROP_TABLE.concat(SPACE).concat(tableName);
-	}
+    private final String tableName;
+
+    public DropTable(String tableName) {
+        super();
+        hasText(tableName);
+        this.tableName = tableName;
+    }
+
+    @Override
+    public String createStatement() {
+        return DROP_TABLE.concat(SPACE).concat(tableName);
+    }
 }

@@ -15,9 +15,9 @@
  */
 package org.springframework.data.crate.repository.support;
 
-import java.io.Serializable;
-
 import org.springframework.data.repository.core.EntityInformation;
+
+import java.io.Serializable;
 
 /**
  * @param <T>
@@ -28,24 +28,24 @@ import org.springframework.data.repository.core.EntityInformation;
  */
 public interface CrateEntityInformation<T, ID extends Serializable> extends EntityInformation<T, ID> {
 
-	/**
-	 * Returns the name of the table the entity will be persisted to.
-	 * 
-	 * @return
-	 */
-	String getTableName();
-	
-	/**
-	 * Returns the attribute that the id will be persisted to.
-	 * 
-	 * @return
-	 */
-	String getIdAttribute();
+    /**
+     * Returns the name of the table the entity will be persisted to.
+     *
+     * @return
+     */
+    String getTableName();
 
-	/**
-	 * Returns the version value from the given entity.
-	 * 
-	 * @return
-	 */
-	Long getVersion(T entity);
+    /**
+     * Returns the attribute that the id will be persisted to.
+     *
+     * @return
+     */
+    String getIdAttribute();
+
+    /**
+     * Returns the version value from the given entity.
+     *
+     * @return
+     */
+    Long getVersion(T entity);
 }

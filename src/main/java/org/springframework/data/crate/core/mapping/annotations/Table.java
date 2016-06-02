@@ -16,31 +16,30 @@
 
 package org.springframework.data.crate.core.mapping.annotations;
 
-import java.lang.annotation.ElementType;
-import java.lang.annotation.Inherited;
-import java.lang.annotation.Retention;
-import java.lang.annotation.RetentionPolicy;
-import java.lang.annotation.Target;
-
 import org.springframework.data.annotation.Persistent;
 import org.springframework.data.crate.core.mapping.schema.ColumnPolicy;
-import static org.springframework.data.crate.core.mapping.schema.ColumnPolicy.*;
+
+import java.lang.annotation.*;
+
+import static org.springframework.data.crate.core.mapping.schema.ColumnPolicy.DYNAMIC;
 
 /**
  * Identifies a domain object to be persisted to Crate.
- * 
+ *
  * @author Hasnain Javed
  * @since 1.0.0
- *
  */
 @Persistent
 @Inherited
 @Retention(RetentionPolicy.RUNTIME)
-@Target({ ElementType.TYPE })
+@Target({ElementType.TYPE})
 public @interface Table {
-	
-	String name() default "";
-	String numberOfReplicas() default "1";
-	int refreshInterval() default 1000;
-	ColumnPolicy columnPolicy() default DYNAMIC;
+
+    String name() default "";
+
+    String numberOfReplicas() default "1";
+
+    int refreshInterval() default 1000;
+
+    ColumnPolicy columnPolicy() default DYNAMIC;
 }

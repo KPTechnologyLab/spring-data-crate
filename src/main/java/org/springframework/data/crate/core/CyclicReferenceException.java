@@ -22,21 +22,21 @@ import static java.lang.String.format;
  * @since 1.0.0
  */
 public class CyclicReferenceException extends RuntimeException {
-	
-	private static final long serialVersionUID = 6018750758104136572L;
-	
-	private final String propertyName;
-	private final Class<?> type;
-	private final String dotPath;
 
-	public CyclicReferenceException(String propertyName, Class<?> type, String dotPath) {
-		this.propertyName = propertyName;
-		this.type = type;
-		this.dotPath = dotPath;
-	}
-	
-	@Override
-	public String getMessage() {
-		return format("Found cycle for field '%s' in type '%s' for path '%s'", propertyName, type.getName(), dotPath);
-	}
+    private static final long serialVersionUID = 6018750758104136572L;
+
+    private final String propertyName;
+    private final Class<?> type;
+    private final String dotPath;
+
+    public CyclicReferenceException(String propertyName, Class<?> type, String dotPath) {
+        this.propertyName = propertyName;
+        this.type = type;
+        this.dotPath = dotPath;
+    }
+
+    @Override
+    public String getMessage() {
+        return format("Found cycle for field '%s' in type '%s' for path '%s'", propertyName, type.getName(), dotPath);
+    }
 }

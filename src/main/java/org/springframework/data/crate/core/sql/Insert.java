@@ -15,66 +15,67 @@
  */
 package org.springframework.data.crate.core.sql;
 
-import static org.springframework.util.Assert.notEmpty;
-import static org.springframework.util.StringUtils.hasText;
-
 import java.util.Iterator;
 import java.util.Set;
 
+import static org.springframework.util.Assert.notEmpty;
+import static org.springframework.util.StringUtils.hasText;
+
 /**
  * Generates crate specific INSERT statement
+ *
  * @author Hasnain Javed
  * @since 1.0.0
  */
 public class Insert extends AbstractStatement {
-	
-	private String tableName;
-	private Set<String> columns;
-	
-	public Insert(String tableName, Set<String> columns) {
-		hasText(tableName);
-		notEmpty(columns);
-		
-		this.tableName = tableName;
-		this.columns = columns;
-	}
-	
-	@Override
-	public String createStatement() {
-		
-		if(!hasText(statement)) {
-			
-			StringBuilder builder = new StringBuilder(INSERT_INTO).append(SPACE)
-																  .append(tableName);
-			
-			StringBuilder cols = new StringBuilder(SPACE);
-			cols.append(OPEN_BRACE);
-			
-		    StringBuilder placeholders = new StringBuilder(VALUES);
-		    placeholders.append(SPACE);
-		    placeholders.append(OPEN_BRACE);
-		    
-			Iterator<String> iterator = columns.iterator();
-			
-			while(iterator.hasNext()) {
-				cols.append(doubleQuote(iterator.next()));
-				placeholders.append("?");
-				if(iterator.hasNext()) {
-					cols.append(COMMA);
-					placeholders.append(COMMA);
-				}
-			}
-			
-			cols.append(CLOSE_BRACE);
-			placeholders.append(CLOSE_BRACE);
-			
-			builder.append(cols);
-			builder.append(SPACE);
-			builder.append(placeholders);
-			
-			statement = builder.toString();
-		}
-		
-		return statement;
-	}
+
+    private String tableName;
+    private Set<String> columns;
+
+    public Insert(String tableName, Set<String> columns) {
+        hasText(tableName);
+        notEmpty(columns);
+
+        this.tableName = tableName;
+        this.columns = columns;
+    }
+
+    @Override
+    public String createStatement() {
+
+        if (!hasText(statement)) {
+
+            StringBuilder builder = new StringBuilder(INSERT_INTO).append(SPACE)
+                    .append(tableName);
+
+            StringBuilder cols = new StringBuilder(SPACE);
+            cols.append(OPEN_BRACE);
+
+            StringBuilder placeholders = new StringBuilder(VALUES);
+            placeholders.append(SPACE);
+            placeholders.append(OPEN_BRACE);
+
+            Iterator<String> iterator = columns.iterator();
+
+            while (iterator.hasNext()) {
+                cols.append(doubleQuote(iterator.next()));
+                placeholders.append("?");
+                if (iterator.hasNext()) {
+                    cols.append(COMMA);
+                    placeholders.append(COMMA);
+                }
+            }
+
+            cols.append(CLOSE_BRACE);
+            placeholders.append(CLOSE_BRACE);
+
+            builder.append(cols);
+            builder.append(SPACE);
+            builder.append(placeholders);
+
+            statement = builder.toString();
+        }
+
+        return statement;
+    }
 }

@@ -20,13 +20,13 @@ import org.springframework.data.crate.core.mapping.CrateDocument;
 /**
  * @author Jon Brisbin <jbrisbin@vmware.com>
  * @author Hasnain Javed
- * @since 1.0.0 
+ * @since 1.0.0
  */
 public class BeforeSaveEvent<E> extends CrateMappingEvent<E> {
-	
-	private static final long serialVersionUID = 2624674701519221114L;
 
-	public BeforeSaveEvent(E source, CrateDocument document) {
-		super(source, document);
-	}
+    private static final long serialVersionUID = 2624674701519221114L;
+
+    public BeforeSaveEvent(E source, CrateDocument document) {
+        super(source, document);
+    }
 }

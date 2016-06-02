@@ -30,21 +30,21 @@ import org.w3c.dom.Element;
 
 public class CrateClientBeanDefinitionParser extends AbstractBeanDefinitionParser {
 
-	@Override
-	protected AbstractBeanDefinition parseInternal(Element element, ParserContext parserContext) {
-		BeanDefinitionBuilder builder = BeanDefinitionBuilder.rootBeanDefinition(CrateClientFactoryBean.class);
-		setConfigurations(element, builder);
-		return getSourcedBeanDefinition(builder, element, parserContext);
-	}
+    @Override
+    protected AbstractBeanDefinition parseInternal(Element element, ParserContext parserContext) {
+        BeanDefinitionBuilder builder = BeanDefinitionBuilder.rootBeanDefinition(CrateClientFactoryBean.class);
+        setConfigurations(element, builder);
+        return getSourcedBeanDefinition(builder, element, parserContext);
+    }
 
-	private void setConfigurations(Element element, BeanDefinitionBuilder builder) {
-		builder.addPropertyValue("servers", element.getAttribute("servers"));
-	}
+    private void setConfigurations(Element element, BeanDefinitionBuilder builder) {
+        builder.addPropertyValue("servers", element.getAttribute("servers"));
+    }
 
-	private AbstractBeanDefinition getSourcedBeanDefinition(BeanDefinitionBuilder builder, Element source,
-															ParserContext context) {
-		AbstractBeanDefinition definition = builder.getBeanDefinition();
-		definition.setSource(context.extractSource(source));
-		return definition;
-	}
+    private AbstractBeanDefinition getSourcedBeanDefinition(BeanDefinitionBuilder builder, Element source,
+                                                            ParserContext context) {
+        AbstractBeanDefinition definition = builder.getBeanDefinition();
+        definition.setSource(context.extractSource(source));
+        return definition;
+    }
 }

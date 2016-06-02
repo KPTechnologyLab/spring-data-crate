@@ -20,20 +20,19 @@ import org.springframework.data.crate.core.mapping.CrateDocument;
 /**
  * Event being thrown after a single or a set of documents has/have been deleted. The {@link CrateDocument} held in the event
  * will be the query document <em>after</am> it has been mapped onto the domain type handled.
- * 
+ *
  * @author Martin Baumgartner
  * @author Hasnain Javed
- * @since 1.0.0 
+ * @since 1.0.0
  */
 public class AfterDeleteEvent<T> extends CrateMappingEvent<T> {
-	
-	private static final long serialVersionUID = 1691362279201298878L;
 
-	/**
-	 * Creates a new {@link AfterDeleteEvent} for the given type.
-	 * 
-	 */
-	public AfterDeleteEvent(T source) {
-		super(source, null);
-	}
+    private static final long serialVersionUID = 1691362279201298878L;
+
+    /**
+     * Creates a new {@link AfterDeleteEvent} for the given type.
+     */
+    public AfterDeleteEvent(T source) {
+        super(source, null);
+    }
 }

@@ -17,6 +17,7 @@ package org.springframework.data.crate.core.mapping;
 
 /**
  * Interface containing common infrastructure for both {@link CrateDocument} and {@link CrateArray}.
+ *
  * @author Hasnain Javed
  * @since 1.0.0
  */

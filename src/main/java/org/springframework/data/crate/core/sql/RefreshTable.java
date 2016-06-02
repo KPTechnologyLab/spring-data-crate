@@ -18,22 +18,21 @@ package org.springframework.data.crate.core.sql;
 import static org.springframework.util.Assert.hasText;
 
 /**
- * 
  * @author Hasnain Javed
  * @since 1.0.0
  */
 public class RefreshTable extends AbstractStatement {
 
-	private final String tableName;
-	
-	public RefreshTable(String tableName) {
-		super();
-		hasText(tableName);
-		this.tableName = tableName;
-	}
+    private final String tableName;
 
-	@Override
-	public String createStatement() {
-		return REFRESH_TABLE.concat(SPACE).concat(tableName);
-	}
+    public RefreshTable(String tableName) {
+        super();
+        hasText(tableName);
+        this.tableName = tableName;
+    }
+
+    @Override
+    public String createStatement() {
+        return REFRESH_TABLE.concat(SPACE).concat(tableName);
+    }
 }

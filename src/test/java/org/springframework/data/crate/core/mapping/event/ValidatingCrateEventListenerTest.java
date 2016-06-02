@@ -15,12 +15,6 @@
  */
 package org.springframework.data.crate.core.mapping.event;
 
-import static org.hamcrest.CoreMatchers.equalTo;
-import static org.junit.Assert.assertThat;
-import static org.junit.Assert.fail;
-
-import javax.validation.ConstraintViolationException;
-
 import io.crate.client.CrateClient;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -32,46 +26,50 @@ import org.springframework.data.crate.core.CrateOperations;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 
+import javax.validation.ConstraintViolationException;
 import java.util.Locale;
 
+import static org.hamcrest.CoreMatchers.equalTo;
+import static org.junit.Assert.assertThat;
+import static org.junit.Assert.fail;
+
 /**
- * 
  * @author Hasnain Javed
  * @since 1.0.0
  */
 @RunWith(SpringJUnit4ClassRunner.class)
-@ContextConfiguration(classes={ValidatingCrateEventListenerTest.TestConfiguration.class})
+@ContextConfiguration(classes = {ValidatingCrateEventListenerTest.TestConfiguration.class})
 public class ValidatingCrateEventListenerTest extends CrateIntegrationTest {
 
-	@Autowired
-	CrateOperations crateOperations;
+    @Autowired
+    CrateOperations crateOperations;
 
-	@Test
-	public void shouldThrowConstraintViolationException() {
-		
-		User user = new User("1@test.com", "hasnain", 10);
+    @Test
+    public void shouldThrowConstraintViolationException() {
 
-		try {
-			crateOperations.insert(user);
-			fail();
-		} catch (ConstraintViolationException e) {
-			assertThat(e.getConstraintViolations().size(), equalTo(2));
-		}
-	}
+        User user = new User("1@test.com", "hasnain", 10);
 
-	@Test
-	public void shouldNotThrowAnyExceptions() {
-		crateOperations.insert(new User("test@test.com", "hasnain javed", 34));
-	}
+        try {
+            crateOperations.insert(user);
+            fail();
+        } catch (ConstraintViolationException e) {
+            assertThat(e.getConstraintViolations().size(), equalTo(2));
+        }
+    }
+
+    @Test
+    public void shouldNotThrowAnyExceptions() {
+        crateOperations.insert(new User("test@test.com", "hasnain javed", 34));
+    }
 
 
-	@Configuration
-	static class TestConfiguration extends LifecycleEventConfigurationBase {
+    @Configuration
+    static class TestConfiguration extends LifecycleEventConfigurationBase {
 
-		@Bean
-		public CrateClient crateClient() {
-			return new CrateClient(String.format(Locale.ENGLISH, "%s:%d", server.crateHost(), server.transportPort()));
-		}
+        @Bean
+        public CrateClient crateClient() {
+            return new CrateClient(String.format(Locale.ENGLISH, "%s:%d", server.crateHost(), server.transportPort()));
+        }
 
-	}
+    }
 }

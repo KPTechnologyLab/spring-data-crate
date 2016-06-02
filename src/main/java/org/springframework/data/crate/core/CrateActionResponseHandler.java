@@ -19,9 +19,8 @@ import io.crate.action.sql.SQLResponse;
 
 /**
  * @author Hasnain Javed
- *
  * @since 1.0.0
  */
 public interface CrateActionResponseHandler<T> {
-	public T handle(SQLResponse response);
+    public T handle(SQLResponse response);
 }

@@ -16,51 +16,51 @@
 
 package org.springframework.data.crate.core.mapping.schema;
 
+import java.util.List;
+
 import static org.springframework.util.Assert.hasText;
 import static org.springframework.util.Assert.notEmpty;
 
-import java.util.List;
-
 /**
  * {@link TableDefinition} holds definition for table and columns.
- * 
+ *
  * @author Hasnain Javed
  * @since 1.0.0
  */
 public class TableDefinition {
-	
-	private String name;
-	
-	private List<Column> columns;
 
-	private TableParameters tableParameters;
-	
-	public TableDefinition(String name, List<Column> columns) {
-		this(name, columns, null);
-	}
+    private String name;
 
-	public TableDefinition(String name, List<Column> columns, TableParameters tableParameters) {
-		super();
-		hasText(name);
-		notEmpty(columns);
-		this.name = name;
-		this.columns = columns;
-		this.tableParameters = tableParameters;
-	}
+    private List<Column> columns;
 
-	public String getName() {
-		return name;
-	}
-	
-	public List<Column> getColumns() {
-		return columns;
-	}
-	
-	public TableParameters getTableParameters() {
-		return tableParameters;
-	}
+    private TableParameters tableParameters;
 
-	public boolean hasTableParameters() {
-		return tableParameters != null;
-	}
+    public TableDefinition(String name, List<Column> columns) {
+        this(name, columns, null);
+    }
+
+    public TableDefinition(String name, List<Column> columns, TableParameters tableParameters) {
+        super();
+        hasText(name);
+        notEmpty(columns);
+        this.name = name;
+        this.columns = columns;
+        this.tableParameters = tableParameters;
+    }
+
+    public String getName() {
+        return name;
+    }
+
+    public List<Column> getColumns() {
+        return columns;
+    }
+
+    public TableParameters getTableParameters() {
+        return tableParameters;
+    }
+
+    public boolean hasTableParameters() {
+        return tableParameters != null;
+    }
 }

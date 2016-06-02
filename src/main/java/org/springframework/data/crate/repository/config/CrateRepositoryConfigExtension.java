@@ -32,43 +32,43 @@ import org.w3c.dom.Element;
  */
 public class CrateRepositoryConfigExtension extends RepositoryConfigurationExtensionSupport {
 
-	/*
-	 * (non-Javadoc)
-	 * @see org.springframework.data.repository.config.RepositoryConfigurationExtension#getRepositoryFactoryClassName()
-	 */
-	@Override
-	public String getRepositoryFactoryClassName() {
-		return CrateRepositoryFactoryBean.class.getName();
-	}
+    /*
+     * (non-Javadoc)
+     * @see org.springframework.data.repository.config.RepositoryConfigurationExtension#getRepositoryFactoryClassName()
+     */
+    @Override
+    public String getRepositoryFactoryClassName() {
+        return CrateRepositoryFactoryBean.class.getName();
+    }
 
-	/*
-	 * (non-Javadoc)
-	 * @see org.springframework.data.repository.config.RepositoryConfigurationExtensionSupport#getModulePrefix()
-	 */
-	@Override
-	protected String getModulePrefix() {
-		return "crate";
-	}
+    /*
+     * (non-Javadoc)
+     * @see org.springframework.data.repository.config.RepositoryConfigurationExtensionSupport#getModulePrefix()
+     */
+    @Override
+    protected String getModulePrefix() {
+        return "crate";
+    }
 
-	/* 
-	 * (non-Javadoc)
-	 * @see org.springframework.data.repository.config.RepositoryConfigurationExtensionSupport#postProcess(org.springframework.beans.factory.support.BeanDefinitionBuilder, org.springframework.data.repository.config.AnnotationRepositoryConfigurationSource)
-	 */
-	@Override
-	public void postProcess(BeanDefinitionBuilder builder, AnnotationRepositoryConfigurationSource config) {
+    /*
+     * (non-Javadoc)
+     * @see org.springframework.data.repository.config.RepositoryConfigurationExtensionSupport#postProcess(org.springframework.beans.factory.support.BeanDefinitionBuilder, org.springframework.data.repository.config.AnnotationRepositoryConfigurationSource)
+     */
+    @Override
+    public void postProcess(BeanDefinitionBuilder builder, AnnotationRepositoryConfigurationSource config) {
 
-		AnnotationAttributes attributes = config.getAttributes();
-		builder.addPropertyReference("crateOperations", attributes.getString("crateTemplateRef"));
-	}
+        AnnotationAttributes attributes = config.getAttributes();
+        builder.addPropertyReference("crateOperations", attributes.getString("crateTemplateRef"));
+    }
 
-	/* 
-	 * (non-Javadoc)
-	 * @see org.springframework.data.repository.config.RepositoryConfigurationExtensionSupport#postProcess(org.springframework.beans.factory.support.BeanDefinitionBuilder, org.springframework.data.repository.config.XmlRepositoryConfigurationSource)
-	 */
-	@Override
-	public void postProcess(BeanDefinitionBuilder builder, XmlRepositoryConfigurationSource config) {
+    /*
+     * (non-Javadoc)
+     * @see org.springframework.data.repository.config.RepositoryConfigurationExtensionSupport#postProcess(org.springframework.beans.factory.support.BeanDefinitionBuilder, org.springframework.data.repository.config.XmlRepositoryConfigurationSource)
+     */
+    @Override
+    public void postProcess(BeanDefinitionBuilder builder, XmlRepositoryConfigurationSource config) {
 
-		Element element = config.getElement();
-		builder.addPropertyReference("crateOperations", element.getAttribute("crate-template-ref"));
-	}
+        Element element = config.getElement();
+        builder.addPropertyReference("crateOperations", element.getAttribute("crate-template-ref"));
+    }
 }

@@ -15,12 +15,12 @@
  */
 package org.springframework.data.crate.repository.support;
 
-import java.io.Serializable;
-
 import org.springframework.data.crate.core.mapping.CratePersistentEntity;
 import org.springframework.data.crate.core.mapping.CratePersistentProperty;
 import org.springframework.data.mapping.context.MappingContext;
 import org.springframework.util.Assert;
+
+import java.io.Serializable;
 
 /**
  * CrateEntityInformationCreatorImpl
@@ -29,23 +29,23 @@ import org.springframework.util.Assert;
  */
 public class CrateEntityInformationCreatorImpl implements CrateEntityInformationCreator {
 
-	private final MappingContext<? extends CratePersistentEntity<?>, CratePersistentProperty> mappingContext;
+    private final MappingContext<? extends CratePersistentEntity<?>, CratePersistentProperty> mappingContext;
 
-	public CrateEntityInformationCreatorImpl(
+    public CrateEntityInformationCreatorImpl(
             MappingContext<? extends CratePersistentEntity<?>, CratePersistentProperty> mappingContext) {
-		Assert.notNull(mappingContext);
-		this.mappingContext = mappingContext;
-	}
+        Assert.notNull(mappingContext);
+        this.mappingContext = mappingContext;
+    }
 
-	@Override
-	@SuppressWarnings("unchecked")
-	public <T, ID extends Serializable> CrateEntityInformation<T, ID> getEntityInformation(Class<T> domainClass) {
+    @Override
+    @SuppressWarnings("unchecked")
+    public <T, ID extends Serializable> CrateEntityInformation<T, ID> getEntityInformation(Class<T> domainClass) {
 
-		CratePersistentEntity<T> persistentEntity = (CratePersistentEntity<T>) mappingContext
-				.getPersistentEntity(domainClass);
+        CratePersistentEntity<T> persistentEntity = (CratePersistentEntity<T>) mappingContext
+                .getPersistentEntity(domainClass);
 
-		Assert.notNull(persistentEntity, String.format("Unable to obtain mapping metadata for %s!", domainClass));
+        Assert.notNull(persistentEntity, String.format("Unable to obtain mapping metadata for %s!", domainClass));
 
-		return new MappingCrateEntityInformation<>(persistentEntity);
-	}
+        return new MappingCrateEntityInformation<>(persistentEntity);
+    }
 }

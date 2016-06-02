@@ -15,19 +15,20 @@
  */
 package org.springframework.data.crate.core;
 
-import java.util.List;
-
 import org.springframework.data.crate.core.BulkActionResult.ActionResult;
 
+import java.util.List;
+
 /**
- * 
+ * @param T
  * @author Hasnain Javed
  * @since 1.0.0
- * @param T
  */
 public interface BulkOperartionResult<T> {
-	
-	public List<ActionResult<T>> getResults();
-	public List<ActionResult<T>> getSuccesses();
-	public List<ActionResult<T>> getFailures();
+
+    public List<ActionResult<T>> getResults();
+
+    public List<ActionResult<T>> getSuccesses();
+
+    public List<ActionResult<T>> getFailures();
 }

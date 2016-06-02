@@ -20,20 +20,19 @@ import org.springframework.data.crate.core.mapping.CrateDocument;
 /**
  * Event being thrown before a document is deleted. The {@link CrateDocument} held in the event will represent the query
  * document <em>before</em> being mapped based on the domain class handled.
- * 
+ *
  * @author Martin Baumgartner
  * @author Hasnain Javed
  * @since 1.0.0
  */
 public class BeforeDeleteEvent<T> extends CrateMappingEvent<T> {
 
-	private static final long serialVersionUID = -8155521415970971960L;
+    private static final long serialVersionUID = -8155521415970971960L;
 
-	/**
-	 * Creates a new {@link BeforeDeleteEvent} for the given type.
-	 * 
-	 */
-	public BeforeDeleteEvent(T source) {
-		super(source, null);
-	}
+    /**
+     * Creates a new {@link BeforeDeleteEvent} for the given type.
+     */
+    public BeforeDeleteEvent(T source) {
+        super(source, null);
+    }
 }

@@ -17,8 +17,8 @@
 package org.springframework.data.sample.entities;
 
 public class Author {
-	
-	private String name;	
-	private int age;	
-	private Book book;
+
+    private String name;
+    private int age;
+    private Book book;
 }

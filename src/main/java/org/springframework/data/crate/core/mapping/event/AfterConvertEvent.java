@@ -20,13 +20,13 @@ import org.springframework.data.crate.core.mapping.CrateDocument;
 /**
  * @author Jon Brisbin <jbrisbin@vmware.com>
  * @author Hasnain Javed
- * @since 1.0.0 
+ * @since 1.0.0
  */
 public class AfterConvertEvent<E> extends CrateMappingEvent<E> {
 
-	private static final long serialVersionUID = -8068074117593506006L;
+    private static final long serialVersionUID = -8068074117593506006L;
 
-	public AfterConvertEvent(CrateDocument document, E source) {
-		super(source, document);
-	}
+    public AfterConvertEvent(CrateDocument document, E source) {
+        super(source, document);
+    }
 }

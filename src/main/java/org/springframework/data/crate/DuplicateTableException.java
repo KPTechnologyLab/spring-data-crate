@@ -18,19 +18,18 @@ package org.springframework.data.crate;
 import org.springframework.dao.NonTransientDataAccessException;
 
 /**
- * 
  * @author Hasnain Javed
  * @since 1.0.0
  */
 public class DuplicateTableException extends NonTransientDataAccessException {
 
-	private static final long serialVersionUID = 1313189950408175180L;
+    private static final long serialVersionUID = 1313189950408175180L;
 
-	public DuplicateTableException(String msg) {
-		super(msg);
-	}
-	
-	public DuplicateTableException(String msg, Throwable cause) {
-		super(msg, cause);
-	}
+    public DuplicateTableException(String msg) {
+        super(msg);
+    }
+
+    public DuplicateTableException(String msg, Throwable cause) {
+        super(msg, cause);
+    }
 }

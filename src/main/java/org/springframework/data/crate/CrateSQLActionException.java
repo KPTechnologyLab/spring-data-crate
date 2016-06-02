@@ -16,20 +16,18 @@
 package org.springframework.data.crate;
 
 /**
- * 
  * @author Hasnain Javed
- *  
  * @since 1.0.0
  */
 public class CrateSQLActionException extends RuntimeException {
-	
-	private static final long serialVersionUID = 6852337558766008917L;
 
-	public CrateSQLActionException(String msg) {
-		this(msg, null);
-	}
-	
-	public CrateSQLActionException(String msg, Throwable cause) {
-		super(msg, cause);
-	}
+    private static final long serialVersionUID = 6852337558766008917L;
+
+    public CrateSQLActionException(String msg) {
+        this(msg, null);
+    }
+
+    public CrateSQLActionException(String msg, Throwable cause) {
+        super(msg, cause);
+    }
 }

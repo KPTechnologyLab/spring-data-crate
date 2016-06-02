@@ -21,35 +21,35 @@ import static org.springframework.util.Assert.notNull;
 
 /**
  * {@link TableParameters} holds a table's parameters.
- * 
+ *
  * @author Hasnain Javed
  * @since 1.0.0
  */
 public class TableParameters {
-	
-	private final String numberOfReplicas;
-	private final int refreshInterval;
-	private final ColumnPolicy columnPolicy;
-	
-	public TableParameters(String numberOfReplicas, int refreshInterval, ColumnPolicy columnPolicy) {
-		
-		hasText(numberOfReplicas);
-		notNull(columnPolicy);
-		
-		this.numberOfReplicas = numberOfReplicas;
-		this.refreshInterval = refreshInterval;
-		this.columnPolicy = columnPolicy;
-	}
-	
-	public String getNumberOfReplicas() {
-		return numberOfReplicas;
-	}
-	
-	public int getRefreshInterval() {
-		return refreshInterval;
-	}
 
-	public ColumnPolicy getColumnPolicy() {
-		return columnPolicy;
-	}
+    private final String numberOfReplicas;
+    private final int refreshInterval;
+    private final ColumnPolicy columnPolicy;
+
+    public TableParameters(String numberOfReplicas, int refreshInterval, ColumnPolicy columnPolicy) {
+
+        hasText(numberOfReplicas);
+        notNull(columnPolicy);
+
+        this.numberOfReplicas = numberOfReplicas;
+        this.refreshInterval = refreshInterval;
+        this.columnPolicy = columnPolicy;
+    }
+
+    public String getNumberOfReplicas() {
+        return numberOfReplicas;
+    }
+
+    public int getRefreshInterval() {
+        return refreshInterval;
+    }
+
+    public ColumnPolicy getColumnPolicy() {
+        return columnPolicy;
+    }
 }

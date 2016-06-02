@@ -15,63 +15,62 @@
  */
 package org.springframework.data.crate.core.convert;
 
-import static org.springframework.util.StringUtils.hasText;
-import static org.springframework.util.StringUtils.startsWithIgnoreCase;
-
 import org.springframework.data.convert.DefaultTypeMapper;
 import org.springframework.data.convert.TypeAliasAccessor;
 import org.springframework.data.crate.InvalidCrateApiUsageException;
 import org.springframework.data.crate.core.mapping.CrateDocument;
 
+import static org.springframework.util.StringUtils.hasText;
+import static org.springframework.util.StringUtils.startsWithIgnoreCase;
+
 /**
- * 
  * @author Hasnain Javed
  * @since 1.0.0
  */
 public class DefaultCrateTypeMapper extends DefaultTypeMapper<CrateDocument> implements CrateTypeMapper {
-	
-	private final String typeKey;
-	
-	public DefaultCrateTypeMapper() {
-		this(DEFAULT_TYPE_KEY);
-	}
-	
-	public DefaultCrateTypeMapper(String typeKey) {
-		super(new CrateDocumentTypeAliasAccessor(typeKey));
-		this.typeKey = typeKey;
-	}
-	
-	@Override
-	public boolean isTypeKey(String typeKey) {
-		return hasText(typeKey) ? this.typeKey.equals(typeKey) : false;
-	}
-	
-	public static class CrateDocumentTypeAliasAccessor implements TypeAliasAccessor<CrateDocument> {
 
-		private final String typeKey;
-		
-		private CrateDocumentTypeAliasAccessor(String typeKey) {
-			super();
-			validateTypeKey(typeKey);
-			this.typeKey = typeKey;
-		}
-		
-		@Override
-		public Object readAliasFrom(CrateDocument source) {
-			return source.get(typeKey);
-		}
+    private final String typeKey;
 
-		@Override
-		public void writeTypeTo(CrateDocument sink, Object alias) {
-			if (typeKey != null) {
-				sink.put(typeKey, alias);
-			}
-		}		
-	}
-	
-	private static void validateTypeKey(String typeKey) {
-		if(startsWithIgnoreCase(typeKey, "_")) {
-			throw new InvalidCrateApiUsageException("Type key can not start with an '_'");
-		}
-	}
+    public DefaultCrateTypeMapper() {
+        this(DEFAULT_TYPE_KEY);
+    }
+
+    public DefaultCrateTypeMapper(String typeKey) {
+        super(new CrateDocumentTypeAliasAccessor(typeKey));
+        this.typeKey = typeKey;
+    }
+
+    @Override
+    public boolean isTypeKey(String typeKey) {
+        return hasText(typeKey) ? this.typeKey.equals(typeKey) : false;
+    }
+
+    public static class CrateDocumentTypeAliasAccessor implements TypeAliasAccessor<CrateDocument> {
+
+        private final String typeKey;
+
+        private CrateDocumentTypeAliasAccessor(String typeKey) {
+            super();
+            validateTypeKey(typeKey);
+            this.typeKey = typeKey;
+        }
+
+        @Override
+        public Object readAliasFrom(CrateDocument source) {
+            return source.get(typeKey);
+        }
+
+        @Override
+        public void writeTypeTo(CrateDocument sink, Object alias) {
+            if (typeKey != null) {
+                sink.put(typeKey, alias);
+            }
+        }
+    }
+
+    private static void validateTypeKey(String typeKey) {
+        if (startsWithIgnoreCase(typeKey, "_")) {
+            throw new InvalidCrateApiUsageException("Type key can not start with an '_'");
+        }
+    }
 }

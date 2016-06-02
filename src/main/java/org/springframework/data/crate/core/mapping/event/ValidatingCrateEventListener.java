@@ -15,56 +15,55 @@
  */
 package org.springframework.data.crate.core.mapping.event;
 
-import java.util.Set;
-
-import javax.validation.ConstraintViolationException;
-import javax.validation.Validator;
-
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.data.crate.core.mapping.CrateDocument;
 import org.springframework.util.Assert;
 
+import javax.validation.ConstraintViolationException;
+import javax.validation.Validator;
+import java.util.Set;
+
 
 /**
  * javax.validation dependant entities validator. When it is registered as Spring component its automatically invoked
  * before entities are saved in database.
- * 
+ *
  * @author Maciej Walkowiak
  * @author Hasnain Javed
  * @since 1.0.0
  */
 public class ValidatingCrateEventListener extends AbstractCrateEventListener<Object> {
 
-	private static final Logger LOG = LoggerFactory.getLogger(ValidatingCrateEventListener.class);
+    private static final Logger LOG = LoggerFactory.getLogger(ValidatingCrateEventListener.class);
 
-	private final Validator validator;
+    private final Validator validator;
 
-	/**
-	 * Creates a new {@link ValidatingCrateEventListener} using the given {@link Validator}.
-	 * 
-	 * @param validator must not be {@literal null}.
-	 */
-	public ValidatingCrateEventListener(Validator validator) {
-		Assert.notNull(validator);
-		this.validator = validator;
-	}
+    /**
+     * Creates a new {@link ValidatingCrateEventListener} using the given {@link Validator}.
+     *
+     * @param validator must not be {@literal null}.
+     */
+    public ValidatingCrateEventListener(Validator validator) {
+        Assert.notNull(validator);
+        this.validator = validator;
+    }
 
-	/*
-	 * (non-Javadoc)
-	 * @see org.springframework.data.crate.core.mapping.event.AbstractMongoEventListener#onBeforeSave(java.lang.Object, com.mongodb.CrateDocument)
-	 */
-	@Override
-	@SuppressWarnings({ "rawtypes", "unchecked" })
-	public void onBeforeSave(Object source, CrateDocument dbo) {
+    /*
+     * (non-Javadoc)
+     * @see org.springframework.data.crate.core.mapping.event.AbstractMongoEventListener#onBeforeSave(java.lang.Object, com.mongodb.CrateDocument)
+     */
+    @Override
+    @SuppressWarnings({"rawtypes", "unchecked"})
+    public void onBeforeSave(Object source, CrateDocument dbo) {
 
-		LOG.debug("Validating object: {}", source);
-		Set violations = validator.validate(source);
+        LOG.debug("Validating object: {}", source);
+        Set violations = validator.validate(source);
 
-		if (!violations.isEmpty()) {
+        if (!violations.isEmpty()) {
 
-			LOG.info("During object: {} validation violations found: {}", source, violations);
-			throw new ConstraintViolationException(violations);
-		}
-	}
+            LOG.info("During object: {} validation violations found: {}", source, violations);
+            throw new ConstraintViolationException(violations);
+        }
+    }
 }

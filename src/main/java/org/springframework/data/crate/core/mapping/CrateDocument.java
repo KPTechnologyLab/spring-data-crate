@@ -19,19 +19,19 @@ import java.util.TreeMap;
 
 /**
  * {@link CrateDocument} represents document to be stored in Crate DB.
- * 
+ *
  * @author Hasnain Javed
  * @since 1.0.0
  */
 public class CrateDocument extends TreeMap<String, Object> implements CrateDBObject {
-	
-	private static final long serialVersionUID = 3037469346219206410L;
 
-	public CrateDocument() {
-		super();
-	}
-	
-	public CrateDocument(String fieldName, Object value){
-		put(fieldName, value);
+    private static final long serialVersionUID = 3037469346219206410L;
+
+    public CrateDocument() {
+        super();
+    }
+
+    public CrateDocument(String fieldName, Object value) {
+        put(fieldName, value);
     }
 }

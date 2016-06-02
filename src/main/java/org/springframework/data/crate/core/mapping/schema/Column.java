@@ -16,140 +16,138 @@
 
 package org.springframework.data.crate.core.mapping.schema;
 
-import static java.util.Collections.emptyList;
-import static org.springframework.data.crate.core.mapping.CrateDataType.ARRAY;
-import static org.springframework.data.crate.core.mapping.CrateDataType.OBJECT;
-import static org.springframework.data.crate.core.mapping.CrateDataType.getCrateTypeFor;
-import static org.springframework.util.Assert.hasText;
-import static org.springframework.util.Assert.notNull;
-
 import java.util.List;
 import java.util.Map;
 
+import static java.util.Collections.emptyList;
+import static org.springframework.data.crate.core.mapping.CrateDataType.*;
+import static org.springframework.util.Assert.hasText;
+import static org.springframework.util.Assert.notNull;
+
 /**
  * {@link Column} holds definition for column. Generates crate specific ddl for column.
- * 
+ *
  * @author Hasnain Javed
  * @since 1.0.0
  */
 public class Column {
-	
-	private String name;
-	private String crateType;
-	private String crateElementType;
-	
-	private Class<?> rawType;
-	private Class<?> elementRawType;
-	
-	private boolean primaryKey;
-	
-	private List<Column> subColumns;
-	
-	public Column(String name, Class<?> rawType) {
-		this(name, rawType, null);
-	}
-	
-	public Column(String name, Class<?> rawType, Class<?> elementRawType) {
-		
-		hasText(name);
-		notNull(rawType);
-		
-		this.name = name;
-		this.rawType = rawType;
-		setCrateType(getCrateTypeFor(rawType));
-		
-		if(elementRawType != null) {
-			this.elementRawType = elementRawType;
-			setElementCrateType(getCrateTypeFor(elementRawType));
-		}
-	}
-	
-	public String getName() {
-		return name;
-	}
 
-	public String getCrateType() {
-		return crateType;
-	}
+    private String name;
+    private String crateType;
+    private String crateElementType;
 
-	private void setCrateType(String type) {
-		hasText(type);
-		this.crateType = type;
-	}
-	
-	public String getElementCrateType() {
-		return crateElementType;
-	}
+    private Class<?> rawType;
+    private Class<?> elementRawType;
 
-	private void setElementCrateType(String elementType) {
-		hasText(elementType);
-		this.crateElementType = elementType;
-	}
+    private boolean primaryKey;
 
-	public Class<?> getElementRawType() {
-		return elementRawType;
-	}
+    private List<Column> subColumns;
 
-	public Class<?> getRawType() {
-		return rawType;
-	}
+    public Column(String name, Class<?> rawType) {
+        this(name, rawType, null);
+    }
 
-	public boolean isPrimaryKey() {
-		return primaryKey;
-	}
+    public Column(String name, Class<?> rawType, Class<?> elementRawType) {
 
-	public void setPrimaryKey(boolean primaryKey) {
-		this.primaryKey = primaryKey;
-	}
+        hasText(name);
+        notNull(rawType);
 
-	public List<Column> getSubColumns() {
-		
-		if(subColumns == null) {
-			return emptyList();
-		}
-		
-		return subColumns;
-	}
+        this.name = name;
+        this.rawType = rawType;
+        setCrateType(getCrateTypeFor(rawType));
 
-	public void setSubColumns(List<Column> subColumns) {
-		this.subColumns = subColumns;
-	}
+        if (elementRawType != null) {
+            this.elementRawType = elementRawType;
+            setElementCrateType(getCrateTypeFor(elementRawType));
+        }
+    }
 
-	public boolean isArrayColumn() {
-		return ARRAY.equalsIgnoreCase(crateType);
-	}
-	
-	public boolean isPrimitiveArrayColumn() {
-		return (isArrayColumn() && isPrimitiveElementType(crateElementType));
-	}
-	
-	public boolean isObjectArrayColumn() {
-		return (isArrayColumn() && !isPrimitiveElementType(crateElementType));
-	}
-	
-	public boolean isObjectColumn() {
-		return (OBJECT.equalsIgnoreCase(crateType) && !isMapColumn());
-	}
-	
-	public boolean isMapColumn() {
-		return Map.class.isAssignableFrom(rawType);
-	}
-	
-	public boolean isPrimitiveElementType(String elementType) {
-		return !OBJECT.equalsIgnoreCase(elementType);
-	}
-	
-	@Override
-	public String toString() {
-		return "name=".concat(name)
-					  .concat(", ")
-					  .concat("crateType=")
-					  .concat(crateType)
-					  .concat(", ")
-					  .concat("crateElementType=")
-					  .concat(crateElementType == null ? "\"\"" : crateElementType)
-					  .concat(", ")
-					  .concat("subColumns=")
-					  .concat(getSubColumns().toString());
-	}
+    public String getName() {
+        return name;
+    }
+
+    public String getCrateType() {
+        return crateType;
+    }
+
+    private void setCrateType(String type) {
+        hasText(type);
+        this.crateType = type;
+    }
+
+    public String getElementCrateType() {
+        return crateElementType;
+    }
+
+    private void setElementCrateType(String elementType) {
+        hasText(elementType);
+        this.crateElementType = elementType;
+    }
+
+    public Class<?> getElementRawType() {
+        return elementRawType;
+    }
+
+    public Class<?> getRawType() {
+        return rawType;
+    }
+
+    public boolean isPrimaryKey() {
+        return primaryKey;
+    }
+
+    public void setPrimaryKey(boolean primaryKey) {
+        this.primaryKey = primaryKey;
+    }
+
+    public List<Column> getSubColumns() {
+
+        if (subColumns == null) {
+            return emptyList();
+        }
+
+        return subColumns;
+    }
+
+    public void setSubColumns(List<Column> subColumns) {
+        this.subColumns = subColumns;
+    }
+
+    public boolean isArrayColumn() {
+        return ARRAY.equalsIgnoreCase(crateType);
+    }
+
+    public boolean isPrimitiveArrayColumn() {
+        return (isArrayColumn() && isPrimitiveElementType(crateElementType));
+    }
+
+    public boolean isObjectArrayColumn() {
+        return (isArrayColumn() && !isPrimitiveElementType(crateElementType));
+    }
+
+    public boolean isObjectColumn() {
+        return (OBJECT.equalsIgnoreCase(crateType) && !isMapColumn());
+    }
+
+    public boolean isMapColumn() {
+        return Map.class.isAssignableFrom(rawType);
+    }
+
+    public boolean isPrimitiveElementType(String elementType) {
+        return !OBJECT.equalsIgnoreCase(elementType);
+    }
+
+    @Override
+    public String toString() {
+        return "name=".concat(name)
+                .concat(", ")
+                .concat("crateType=")
+                .concat(crateType)
+                .concat(", ")
+                .concat("crateElementType=")
+                .concat(crateElementType == null ? "\"\"" : crateElementType)
+                .concat(", ")
+                .concat("subColumns=")
+                .concat(getSubColumns().toString());
+    }
 }

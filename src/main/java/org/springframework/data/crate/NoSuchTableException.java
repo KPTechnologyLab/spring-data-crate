@@ -18,19 +18,18 @@ package org.springframework.data.crate;
 import org.springframework.dao.InvalidDataAccessResourceUsageException;
 
 /**
- * 
  * @author Hasnain Javed
  * @since 1.0.0
  */
 public class NoSuchTableException extends InvalidDataAccessResourceUsageException {
-	
-	private static final long serialVersionUID = 756197703690095538L;
-	
-	public NoSuchTableException(String msg) {
-		super(msg);
-	}
-	
-	public NoSuchTableException(String msg, Throwable cause) {
-		super(msg, cause);
-	}
+
+    private static final long serialVersionUID = 756197703690095538L;
+
+    public NoSuchTableException(String msg) {
+        super(msg);
+    }
+
+    public NoSuchTableException(String msg, Throwable cause) {
+        super(msg, cause);
+    }
 }

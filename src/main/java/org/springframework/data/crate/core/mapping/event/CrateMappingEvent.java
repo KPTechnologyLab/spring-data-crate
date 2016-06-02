@@ -21,26 +21,26 @@ import org.springframework.data.crate.core.mapping.CrateDocument;
 /**
  * @author Jon Brisbin <jbrisbin@vmware.com>
  * @author Hasnain Javed
- * @since 1.0.0 
+ * @since 1.0.0
  */
 public class CrateMappingEvent<T> extends ApplicationEvent {
-	
-	private static final long serialVersionUID = -8253586660680352433L;
-	
-	private final CrateDocument document;
-	
-	public CrateMappingEvent(T source, CrateDocument document) {
-		super(source);
-		this.document = document;
-	}
 
-	public CrateDocument getDocument() {
-		return document;
-	}
+    private static final long serialVersionUID = -8253586660680352433L;
 
-	@SuppressWarnings({ "unchecked" })
-	@Override
-	public T getSource() {
-		return (T) super.getSource();
-	}
+    private final CrateDocument document;
+
+    public CrateMappingEvent(T source, CrateDocument document) {
+        super(source);
+        this.document = document;
+    }
+
+    public CrateDocument getDocument() {
+        return document;
+    }
+
+    @SuppressWarnings({"unchecked"})
+    @Override
+    public T getSource() {
+        return (T) super.getSource();
+    }
 }

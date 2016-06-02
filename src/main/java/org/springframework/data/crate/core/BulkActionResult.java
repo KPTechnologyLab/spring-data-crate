@@ -15,100 +15,99 @@
  */
 package org.springframework.data.crate.core;
 
-import static org.springframework.util.Assert.notNull;
-import static org.springframework.util.StringUtils.isEmpty;
 import io.crate.action.sql.SQLBulkResponse.Result;
 
 import java.util.LinkedList;
 import java.util.List;
 
+import static org.springframework.util.Assert.notNull;
+import static org.springframework.util.StringUtils.isEmpty;
+
 /**
- * 
+ * @param <T>
  * @author Hasnain Javed
  * @since 1.0.0
- * @param <T>
  */
 public class BulkActionResult<T> implements BulkOperartionResult<T> {
-	
-	private List<ActionResult<T>> results;
-	
-	public BulkActionResult() {
-		results = new LinkedList<>();
-	}
-	
-	public ActionResult<T> addResult(Result result, T source) {
-		ActionResult<T> actionResult = new ActionResult<>(result, source);
-		results.add(actionResult);
-		return actionResult;
-	}
-	
-	@Override
-	public List<ActionResult<T>> getResults() {
-		return results;
-	}
-	
-	@Override
-	public List<ActionResult<T>> getFailures() {
-		
-		List<ActionResult<T>> failures = new LinkedList<>();
-		
-		for(ActionResult<T> result : results) {
-			if(result.isFailure()) {
-				failures.add(result);
-			}
-		}
-		
-		return failures;
-	}
-	
-	@Override
-	public List<ActionResult<T>> getSuccesses() {
-		
-		List<ActionResult<T>> successes = new LinkedList<>();
-		
-		for(ActionResult<T> result : results) {
-			if(result.isSuccess()) {
-				successes.add(result);
-			}
-		}
-		
-		return successes;
-	}
 
-	/**
-	 * 
-	 * @author Hasnain Javed
-	 * @since 1.0.0
-	 * @param <T>
-	 */
-	public static class ActionResult<T> {
-		
-		private Result result;
-		private T source;
-		
-		public ActionResult(Result result, T source) {
-			
-			notNull(result);
-			notNull(source);
-			
-			this.result = result;
-			this.source = source;
-		}
+    private List<ActionResult<T>> results;
 
-		public Result getResult() {
-			return result;
-		}
+    public BulkActionResult() {
+        results = new LinkedList<>();
+    }
 
-		public T getSource() {
-			return source;
-		}
-		
-		public boolean isFailure() {
-			return !isSuccess();
-		}
-		
-		public boolean isSuccess() {
-			return (result.rowCount() == 1 && isEmpty(result.errorMessage()));
-		}
-	}
+    public ActionResult<T> addResult(Result result, T source) {
+        ActionResult<T> actionResult = new ActionResult<>(result, source);
+        results.add(actionResult);
+        return actionResult;
+    }
+
+    @Override
+    public List<ActionResult<T>> getResults() {
+        return results;
+    }
+
+    @Override
+    public List<ActionResult<T>> getFailures() {
+
+        List<ActionResult<T>> failures = new LinkedList<>();
+
+        for (ActionResult<T> result : results) {
+            if (result.isFailure()) {
+                failures.add(result);
+            }
+        }
+
+        return failures;
+    }
+
+    @Override
+    public List<ActionResult<T>> getSuccesses() {
+
+        List<ActionResult<T>> successes = new LinkedList<>();
+
+        for (ActionResult<T> result : results) {
+            if (result.isSuccess()) {
+                successes.add(result);
+            }
+        }
+
+        return successes;
+    }
+
+    /**
+     * @param <T>
+     * @author Hasnain Javed
+     * @since 1.0.0
+     */
+    public static class ActionResult<T> {
+
+        private Result result;
+        private T source;
+
+        public ActionResult(Result result, T source) {
+
+            notNull(result);
+            notNull(source);
+
+            this.result = result;
+            this.source = source;
+        }
+
+        public Result getResult() {
+            return result;
+        }
+
+        public T getSource() {
+            return source;
+        }
+
+        public boolean isFailure() {
+            return !isSuccess();
+        }
+
+        public boolean isSuccess() {
+            return (result.rowCount() == 1 && isEmpty(result.errorMessage()));
+        }
+    }
 }

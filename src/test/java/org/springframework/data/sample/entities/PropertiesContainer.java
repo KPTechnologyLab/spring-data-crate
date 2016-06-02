@@ -16,19 +16,19 @@
 
 package org.springframework.data.sample.entities;
 
+import org.springframework.data.crate.core.mapping.annotations.Table;
+
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
-import org.springframework.data.crate.core.mapping.annotations.Table;
-
 @Table
 public class PropertiesContainer {
-	
-	public String simpleField;
-	public Book compositeField;
-	public List<String> listField;
-	public Set<Integer> setField;
-	public Book[] arrayField;
-	public Map<String, String> mapField;
+
+    public String simpleField;
+    public Book compositeField;
+    public List<String> listField;
+    public Set<Integer> setField;
+    public Book[] arrayField;
+    public Map<String, String> mapField;
 }

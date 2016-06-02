@@ -15,42 +15,39 @@
  */
 package org.springframework.data.crate.config;
 
-import static org.hamcrest.Matchers.hasItem;
-import static org.hamcrest.Matchers.hasSize;
-import static org.hamcrest.Matchers.is;
-import static org.junit.Assert.assertThat;
-import static org.springframework.data.crate.core.mapping.schema.SchemaExportOption.CREATE_DROP;
-
 import org.junit.Test;
 import org.springframework.context.annotation.Bean;
 import org.springframework.data.crate.core.mapping.annotations.Table;
 import org.springframework.data.crate.core.mapping.schema.CratePersistentEntitySchemaManager;
 
+import static org.hamcrest.Matchers.*;
+import static org.junit.Assert.assertThat;
+import static org.springframework.data.crate.core.mapping.schema.SchemaExportOption.CREATE_DROP;
+
 /**
- * 
  * @author Hasnain Javed
  * @since 1.0.0
  */
 public class AbstractCrateConfigurationTest {
 
-	@Test
-	public void usesConfigClassPackageAsBaseMappingPackage() throws ClassNotFoundException {
+    @Test
+    public void usesConfigClassPackageAsBaseMappingPackage() throws ClassNotFoundException {
 
-		AbstractCrateConfiguration configuration = new SampleCrateConfiguration();
-		assertThat(configuration.getMappingBasePackage(), is(SampleCrateConfiguration.class.getPackage().getName()));
-		assertThat(configuration.getInitialEntitySet(), hasSize(1));
-		assertThat(configuration.getInitialEntitySet(), hasItem(Entity.class));
-	}
-	
-	class SampleCrateConfiguration extends AbstractCrateConfiguration {
-		@Bean
-		public CratePersistentEntitySchemaManager cratePersistentEntitySchemaManager() throws Exception {
-			return new CratePersistentEntitySchemaManager(crateTemplate(), CREATE_DROP);
-		}
-	}
-	
-	@Table(name="entity")
-	static class Entity {
-		String name;
-	}
+        AbstractCrateConfiguration configuration = new SampleCrateConfiguration();
+        assertThat(configuration.getMappingBasePackage(), is(SampleCrateConfiguration.class.getPackage().getName()));
+        assertThat(configuration.getInitialEntitySet(), hasSize(1));
+        assertThat(configuration.getInitialEntitySet(), hasItem(Entity.class));
+    }
+
+    class SampleCrateConfiguration extends AbstractCrateConfiguration {
+        @Bean
+        public CratePersistentEntitySchemaManager cratePersistentEntitySchemaManager() throws Exception {
+            return new CratePersistentEntitySchemaManager(crateTemplate(), CREATE_DROP);
+        }
+    }
+
+    @Table(name = "entity")
+    static class Entity {
+        String name;
+    }
 }

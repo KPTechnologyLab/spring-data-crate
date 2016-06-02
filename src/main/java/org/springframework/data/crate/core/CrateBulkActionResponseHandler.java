@@ -18,11 +18,10 @@ package org.springframework.data.crate.core;
 import io.crate.action.sql.SQLBulkResponse;
 
 /**
- * 
  * @author Hasnain Javed
  * @since 1.0.0
  */
 public interface CrateBulkActionResponseHandler<T> {
-	
-	public BulkOperartionResult<T> handle(SQLBulkResponse response);
+
+    public BulkOperartionResult<T> handle(SQLBulkResponse response);
 }

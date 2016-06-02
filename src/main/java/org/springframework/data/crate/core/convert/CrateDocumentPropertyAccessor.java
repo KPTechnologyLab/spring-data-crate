@@ -15,51 +15,51 @@
  */
 package org.springframework.data.crate.core.convert;
 
-import java.util.Map;
-
 import org.springframework.context.expression.MapAccessor;
 import org.springframework.data.crate.core.mapping.CrateDocument;
 import org.springframework.expression.EvaluationContext;
 import org.springframework.expression.PropertyAccessor;
 import org.springframework.expression.TypedValue;
 
+import java.util.Map;
+
 /**
  * {@link PropertyAccessor} to allow entity based field access to {@link CrateDocument}s.
- * 
+ *
  * @author Hasnain Javed
  * @since 1.0.0
  */
 class CrateDocumentPropertyAccessor extends MapAccessor {
 
-	static final MapAccessor INSTANCE = new CrateDocumentPropertyAccessor();
+    static final MapAccessor INSTANCE = new CrateDocumentPropertyAccessor();
 
-	/*
-	 * (non-Javadoc)
-	 * @see org.springframework.context.expression.MapAccessor#getSpecificTargetClasses()
-	 */
-	@Override
-	public Class<?>[] getSpecificTargetClasses() {
-		return new Class[] { CrateDocument.class };
-	}
+    /*
+     * (non-Javadoc)
+     * @see org.springframework.context.expression.MapAccessor#getSpecificTargetClasses()
+     */
+    @Override
+    public Class<?>[] getSpecificTargetClasses() {
+        return new Class[]{CrateDocument.class};
+    }
 
-	/*
-	 * (non-Javadoc)
-	 * @see org.springframework.context.expression.MapAccessor#canRead(org.springframework.expression.EvaluationContext, java.lang.Object, java.lang.String)
-	 */
-	@Override
-	public boolean canRead(EvaluationContext context, Object target, String name) {
-		return true;
-	}
+    /*
+     * (non-Javadoc)
+     * @see org.springframework.context.expression.MapAccessor#canRead(org.springframework.expression.EvaluationContext, java.lang.Object, java.lang.String)
+     */
+    @Override
+    public boolean canRead(EvaluationContext context, Object target, String name) {
+        return true;
+    }
 
-	/*
-	 * (non-Javadoc)
-	 * @see org.springframework.context.expression.MapAccessor#read(org.springframework.expression.EvaluationContext, java.lang.Object, java.lang.String)
-	 */
-	@Override
-	@SuppressWarnings("unchecked")
-	public TypedValue read(EvaluationContext context, Object target, String name) {
-		Map<String, Object> source = (Map<String, Object>) target;
-		Object value = source.get(name);
-		return value == null ? TypedValue.NULL : new TypedValue(value);
-	}
+    /*
+     * (non-Javadoc)
+     * @see org.springframework.context.expression.MapAccessor#read(org.springframework.expression.EvaluationContext, java.lang.Object, java.lang.String)
+     */
+    @Override
+    @SuppressWarnings("unchecked")
+    public TypedValue read(EvaluationContext context, Object target, String name) {
+        Map<String, Object> source = (Map<String, Object>) target;
+        Object value = source.get(name);
+        return value == null ? TypedValue.NULL : new TypedValue(value);
+    }
 }

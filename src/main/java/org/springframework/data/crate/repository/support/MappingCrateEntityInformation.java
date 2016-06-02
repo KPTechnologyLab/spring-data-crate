@@ -15,13 +15,13 @@
  */
 package org.springframework.data.crate.repository.support;
 
-import static java.lang.String.format;
-import static org.springframework.util.Assert.notNull;
+import org.springframework.data.crate.core.mapping.CratePersistentEntity;
+import org.springframework.data.repository.core.support.AbstractEntityInformation;
 
 import java.io.Serializable;
 
-import org.springframework.data.crate.core.mapping.CratePersistentEntity;
-import org.springframework.data.repository.core.support.AbstractEntityInformation;
+import static java.lang.String.format;
+import static org.springframework.util.Assert.notNull;
 
 /**
  * Crate specific implementation of
@@ -32,60 +32,60 @@ import org.springframework.data.repository.core.support.AbstractEntityInformatio
  * @author Rizwan Idrees
  * @author Hasnain Javed
  */
-public class MappingCrateEntityInformation<T, ID extends Serializable> extends AbstractEntityInformation<T, ID> 
-												 implements CrateEntityInformation<T, ID> {
+public class MappingCrateEntityInformation<T, ID extends Serializable> extends AbstractEntityInformation<T, ID>
+        implements CrateEntityInformation<T, ID> {
 
-	private static final String ID_MSG = "Unable to identify 'id' property in class '%s'."
-										 .concat("Make sure the 'id' property is annotated with @Id or named as 'id'");
-	
-	private final CratePersistentEntity<T> entityMetadata;
-	private Class<?> idClass;
-	
-	public MappingCrateEntityInformation(CratePersistentEntity<T> entity) {
-		
-		super(entity.getType());
-		this.entityMetadata = entity;
-		this.idClass = entity.getIdProperty().getType();
-	}
+    private static final String ID_MSG = "Unable to identify 'id' property in class '%s'."
+            .concat("Make sure the 'id' property is annotated with @Id or named as 'id'");
 
-	@SuppressWarnings("unchecked")
-	@Override
-	public ID getId(T entity) {
-		
-		if(entityMetadata.hasIdProperty()) {
-			return (ID) entityMetadata.getPropertyAccessor(entity)
-					  				  .getProperty(entityMetadata.getIdProperty());
-		}
-		
-		return null;
-	}
+    private final CratePersistentEntity<T> entityMetadata;
+    private Class<?> idClass;
 
-	@SuppressWarnings("unchecked")
-	@Override
-	public Class<ID> getIdType() {
-		return (Class<ID>) idClass;
-	}
-	
-	@Override
-	public String getTableName() {
-		return entityMetadata.getTableName();
-	}
+    public MappingCrateEntityInformation(CratePersistentEntity<T> entity) {
 
-	@Override
-	public String getIdAttribute() {
-		
-		notNull(entityMetadata.getIdProperty(), format(ID_MSG, entityMetadata.getType().getSimpleName()));
-		return entityMetadata.getIdProperty().getFieldName();
-	}
+        super(entity.getType());
+        this.entityMetadata = entity;
+        this.idClass = entity.getIdProperty().getType();
+    }
 
-	@Override
-	public Long getVersion(T entity) {
-		
-		if(entityMetadata.hasVersionProperty()) {
-			return (Long) entityMetadata.getPropertyAccessor(entity)
-										.getProperty(entityMetadata.getVersionProperty());
-		}
-		
-		return null;
-	}
+    @SuppressWarnings("unchecked")
+    @Override
+    public ID getId(T entity) {
+
+        if (entityMetadata.hasIdProperty()) {
+            return (ID) entityMetadata.getPropertyAccessor(entity)
+                    .getProperty(entityMetadata.getIdProperty());
+        }
+
+        return null;
+    }
+
+    @SuppressWarnings("unchecked")
+    @Override
+    public Class<ID> getIdType() {
+        return (Class<ID>) idClass;
+    }
+
+    @Override
+    public String getTableName() {
+        return entityMetadata.getTableName();
+    }
+
+    @Override
+    public String getIdAttribute() {
+
+        notNull(entityMetadata.getIdProperty(), format(ID_MSG, entityMetadata.getType().getSimpleName()));
+        return entityMetadata.getIdProperty().getFieldName();
+    }
+
+    @Override
+    public Long getVersion(T entity) {
+
+        if (entityMetadata.hasVersionProperty()) {
+            return (Long) entityMetadata.getPropertyAccessor(entity)
+                    .getProperty(entityMetadata.getVersionProperty());
+        }
+
+        return null;
+    }
 }

@@ -15,13 +15,13 @@
  */
 package org.springframework.data.crate.repository.support;
 
-import java.io.Serializable;
-
 import org.springframework.data.crate.core.CrateOperations;
 import org.springframework.data.repository.Repository;
 import org.springframework.data.repository.core.support.RepositoryFactoryBeanSupport;
 import org.springframework.data.repository.core.support.RepositoryFactorySupport;
 import org.springframework.util.Assert;
+
+import java.io.Serializable;
 
 /**
  * Spring {@link org.springframework.beans.factory.FactoryBean} implementation to ease container based configuration for
@@ -30,32 +30,32 @@ import org.springframework.util.Assert;
  * @author Rizwan Idrees
  */
 public class CrateRepositoryFactoryBean<T extends Repository<S, ID>, S, ID extends Serializable> extends
-		RepositoryFactoryBeanSupport<T, S, ID> {
+        RepositoryFactoryBeanSupport<T, S, ID> {
 
-	private CrateOperations operations;
+    private CrateOperations operations;
 
-	/**
-	 * Configures the {@link CrateOperations} to be used to create Crate repositories.
-	 *
-	 * @param operations the operations to set
-	 */
-	public void setCrateOperations(CrateOperations operations) {
-		Assert.notNull(operations);
-		this.operations = operations;
-	}
+    /**
+     * Configures the {@link CrateOperations} to be used to create Crate repositories.
+     *
+     * @param operations the operations to set
+     */
+    public void setCrateOperations(CrateOperations operations) {
+        Assert.notNull(operations);
+        this.operations = operations;
+    }
 
-	/*
-	 * (non-Javadoc)
-	 * @see org.springframework.data.repository.core.support.RepositoryFactoryBeanSupport#afterPropertiesSet()
-	 */
-	@Override
-	public void afterPropertiesSet() {
-		super.afterPropertiesSet();
-		Assert.notNull(operations, "CrateOperations must be configured!");
-	}
+    /*
+     * (non-Javadoc)
+     * @see org.springframework.data.repository.core.support.RepositoryFactoryBeanSupport#afterPropertiesSet()
+     */
+    @Override
+    public void afterPropertiesSet() {
+        super.afterPropertiesSet();
+        Assert.notNull(operations, "CrateOperations must be configured!");
+    }
 
-	@Override
-	protected RepositoryFactorySupport createRepositoryFactory() {
-		return new CrateRepositoryFactory(operations);
-	}
+    @Override
+    protected RepositoryFactorySupport createRepositoryFactory() {
+        return new CrateRepositoryFactory(operations);
+    }
 }

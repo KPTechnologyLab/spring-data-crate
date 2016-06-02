@@ -25,7 +25,6 @@ import java.lang.annotation.RetentionPolicy;
  *
  * @author Hasnain Javed
  * @since 1.0.0
- *
  */
 @Documented
 @Retention(RetentionPolicy.RUNTIME)

@@ -1,122 +1,124 @@
 <?xml version="1.0" encoding="UTF-8" ?>
 <xsd:schema xmlns="http://www.springframework.org/schema/data/crate"
-	xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:beans="http://www.springframework.org/schema/beans"
-	xmlns:tool="http://www.springframework.org/schema/tool"
-	xmlns:repository="http://www.springframework.org/schema/data/repository"
-	targetNamespace="http://www.springframework.org/schema/data/crate"
-	elementFormDefault="qualified" attributeFormDefault="unqualified">
+            xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:beans="http://www.springframework.org/schema/beans"
+            xmlns:tool="http://www.springframework.org/schema/tool"
+            xmlns:repository="http://www.springframework.org/schema/data/repository"
+            targetNamespace="http://www.springframework.org/schema/data/crate"
+            elementFormDefault="qualified" attributeFormDefault="unqualified">
 
-	<xsd:import namespace="http://www.springframework.org/schema/beans" />
-	<xsd:import namespace="http://www.springframework.org/schema/tool" />
-	<xsd:import namespace="http://www.springframework.org/schema/data/repository"
-		schemaLocation="http://www.springframework.org/schema/data/repository/spring-repository.xsd" />
+    <xsd:import namespace="http://www.springframework.org/schema/beans"/>
+    <xsd:import namespace="http://www.springframework.org/schema/tool"/>
+    <xsd:import namespace="http://www.springframework.org/schema/data/repository"
+                schemaLocation="http://www.springframework.org/schema/data/repository/spring-repository.xsd"/>
 
-	<xsd:element name="repositories">
-		<xsd:complexType>
-			<xsd:complexContent>
-				<xsd:extension base="repository:repositories">
-					<xsd:attributeGroup ref="repository:repository-attributes" />
-					<xsd:attribute name="crate-template-ref" type="crateTemplateRef"
-						default="crateTemplate" />
-				</xsd:extension>
-			</xsd:complexContent>
-		</xsd:complexType>
-	</xsd:element>
+    <xsd:element name="repositories">
+        <xsd:complexType>
+            <xsd:complexContent>
+                <xsd:extension base="repository:repositories">
+                    <xsd:attributeGroup ref="repository:repository-attributes"/>
+                    <xsd:attribute name="crate-template-ref" type="crateTemplateRef"
+                                   default="crateTemplate"/>
+                </xsd:extension>
+            </xsd:complexContent>
+        </xsd:complexType>
+    </xsd:element>
 
-	<xsd:simpleType name="crateTemplateRef">
-		<xsd:annotation>
-			<xsd:appinfo>
-				<tool:annotation kind="ref">
-					<tool:assignable-to
-						type="org.springframework.data.crate.core.CrateTemplate" />
-				</tool:annotation>
-			</xsd:appinfo>
-		</xsd:annotation>
-		<xsd:union memberTypes="xsd:string" />
-	</xsd:simpleType>
+    <xsd:simpleType name="crateTemplateRef">
+        <xsd:annotation>
+            <xsd:appinfo>
+                <tool:annotation kind="ref">
+                    <tool:assignable-to
+                            type="org.springframework.data.crate.core.CrateTemplate"/>
+                </tool:annotation>
+            </xsd:appinfo>
+        </xsd:annotation>
+        <xsd:union memberTypes="xsd:string"/>
+    </xsd:simpleType>
 
-	<xsd:element name="client">
-		<xsd:annotation>
-			<xsd:documentation
-				source="java: org.springframework.data.crate.client.CrateClientFactoryBean" />
-			<xsd:appinfo>
-				<tool:assignable-to type="io.crate.client.CrateClient" />
-			</xsd:appinfo>
-		</xsd:annotation>
-		<xsd:complexType>
-			<xsd:complexContent>
-				<xsd:extension base="beans:identifiedType">
-					<xsd:attribute name="servers" type="xsd:string"
-						default="127.0.0.1:4300">
-						<xsd:annotation>
-							<xsd:documentation>
+    <xsd:element name="client">
+        <xsd:annotation>
+            <xsd:documentation
+                    source="java: org.springframework.data.crate.client.CrateClientFactoryBean"/>
+            <xsd:appinfo>
+                <tool:assignable-to type="io.crate.client.CrateClient"/>
+            </xsd:appinfo>
+        </xsd:annotation>
+        <xsd:complexType>
+            <xsd:complexContent>
+                <xsd:extension base="beans:identifiedType">
+                    <xsd:attribute name="servers" type="xsd:string"
+                                   default="127.0.0.1:4300">
+                        <xsd:annotation>
+                            <xsd:documentation>
                                 <![CDATA[The comma delimited list of host:port entries for crate nodes.]]></xsd:documentation>
-						</xsd:annotation>
-					</xsd:attribute>
-				</xsd:extension>
-			</xsd:complexContent>
-		</xsd:complexType>
-	</xsd:element>
+                        </xsd:annotation>
+                    </xsd:attribute>
+                </xsd:extension>
+            </xsd:complexContent>
+        </xsd:complexType>
+    </xsd:element>
 
-	<xsd:element name="schema-export">
-		<xsd:annotation>
-			<xsd:documentation source="java:org.springframework.data.crate.core.mapping.schema.CratePersistentEntitySchemaManager">
-				<![CDATA[Create/Alter tables in crate database using annotation metadata from persistent entities.]]>
-			</xsd:documentation>
-			<xsd:appinfo>
-				<tool:assignable-to type="org.springframework.data.crate.core.mapping.schema.CratePersistentEntitySchemaManager" />
-			</xsd:appinfo>
-		</xsd:annotation>
-		<xsd:complexType>
-			<xsd:attribute name="id" type="xsd:string" use="optional" default="cratePersistentEntitySchemaManager">
-				<xsd:annotation>
-					<xsd:documentation>
-						<![CDATA[The name of the schema export manager definition (by default "schemaExportManager").]]>
-					</xsd:documentation>
-				</xsd:annotation>
-			</xsd:attribute>
-			<xsd:attribute name="crate-template-ref" type="crateTemplateRef" default="crateTemplate">
-				<xsd:annotation>
-					<xsd:documentation>
-						<![CDATA[The reference to a CrateTemplate. Defaults to "crateTemplate".]]>
-					</xsd:documentation>
-				</xsd:annotation>
-			</xsd:attribute>
-			<xsd:attribute name="export-option">
-				<xsd:annotation>
-					<xsd:documentation>
-						<![CDATA[Export option for tables. 
+    <xsd:element name="schema-export">
+        <xsd:annotation>
+            <xsd:documentation
+                    source="java:org.springframework.data.crate.core.mapping.schema.CratePersistentEntitySchemaManager">
+                <![CDATA[Create/Alter tables in crate database using annotation metadata from persistent entities.]]>
+            </xsd:documentation>
+            <xsd:appinfo>
+                <tool:assignable-to
+                        type="org.springframework.data.crate.core.mapping.schema.CratePersistentEntitySchemaManager"/>
+            </xsd:appinfo>
+        </xsd:annotation>
+        <xsd:complexType>
+            <xsd:attribute name="id" type="xsd:string" use="optional" default="cratePersistentEntitySchemaManager">
+                <xsd:annotation>
+                    <xsd:documentation>
+                        <![CDATA[The name of the schema export manager definition (by default "schemaExportManager").]]>
+                    </xsd:documentation>
+                </xsd:annotation>
+            </xsd:attribute>
+            <xsd:attribute name="crate-template-ref" type="crateTemplateRef" default="crateTemplate">
+                <xsd:annotation>
+                    <xsd:documentation>
+                        <![CDATA[The reference to a CrateTemplate. Defaults to "crateTemplate".]]>
+                    </xsd:documentation>
+                </xsd:annotation>
+            </xsd:attribute>
+            <xsd:attribute name="export-option">
+                <xsd:annotation>
+                    <xsd:documentation>
+                        <![CDATA[Export option for tables.
 								"CREATE" will drop the tables before creating them.
 								"CREATE_DROP" has the same behaviour as "CREATE" but will drop the tables on application shutdown.
 								"UPDATE" will create a table if it does not exist otherwise, it will add new column(s) to an existing table.]]>
-					</xsd:documentation>
-				</xsd:annotation>
-				<xsd:simpleType>
-					<xsd:union memberTypes="exportOptionEnumeration xsd:string"/>
-				</xsd:simpleType>
-			</xsd:attribute>
-			<xsd:attribute name="ignoreFailures" type="xsd:string" use="optional" default="false">
-				<xsd:annotation>
-					<xsd:documentation>
-						Should failed SQL statements be ignored during schema export ? Defaults to 'false'
-					</xsd:documentation>
-				</xsd:annotation>
-			</xsd:attribute>
-			<xsd:attribute name="enabled" type="xsd:string" use="optional" default="true">
-				<xsd:annotation>
-					<xsd:documentation>
-						Should schema export manager export the schema ? Defaults to 'true'
-					</xsd:documentation>
-				</xsd:annotation>
-			</xsd:attribute>
-		</xsd:complexType>
-	</xsd:element>
-	
-	<xsd:simpleType name="exportOptionEnumeration">
-		<xsd:restriction base="xsd:token">
-			<xsd:enumeration value="CREATE" />
-			<xsd:enumeration value="CREATE_DROP" />
-			<xsd:enumeration value="UPDATE" />
-		</xsd:restriction>
-	</xsd:simpleType>
+                    </xsd:documentation>
+                </xsd:annotation>
+                <xsd:simpleType>
+                    <xsd:union memberTypes="exportOptionEnumeration xsd:string"/>
+                </xsd:simpleType>
+            </xsd:attribute>
+            <xsd:attribute name="ignoreFailures" type="xsd:string" use="optional" default="false">
+                <xsd:annotation>
+                    <xsd:documentation>
+                        Should failed SQL statements be ignored during schema export ? Defaults to 'false'
+                    </xsd:documentation>
+                </xsd:annotation>
+            </xsd:attribute>
+            <xsd:attribute name="enabled" type="xsd:string" use="optional" default="true">
+                <xsd:annotation>
+                    <xsd:documentation>
+                        Should schema export manager export the schema ? Defaults to 'true'
+                    </xsd:documentation>
+                </xsd:annotation>
+            </xsd:attribute>
+        </xsd:complexType>
+    </xsd:element>
+
+    <xsd:simpleType name="exportOptionEnumeration">
+        <xsd:restriction base="xsd:token">
+            <xsd:enumeration value="CREATE"/>
+            <xsd:enumeration value="CREATE_DROP"/>
+            <xsd:enumeration value="UPDATE"/>
+        </xsd:restriction>
+    </xsd:simpleType>
 </xsd:schema>

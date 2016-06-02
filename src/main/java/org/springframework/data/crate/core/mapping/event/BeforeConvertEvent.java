@@ -17,17 +17,17 @@ package org.springframework.data.crate.core.mapping.event;
 
 /**
  * Event being thrown before a domain object is converted to be persisted.
- * 
+ *
  * @author Jon Brisbin
  * @author Oliver Gierke
  * @author Hasnain Javed
  * @since 1.0.0
  */
 public class BeforeConvertEvent<T> extends CrateMappingEvent<T> {
-	
-	private static final long serialVersionUID = 1658430047662705202L;
 
-	public BeforeConvertEvent(T source) {
-		super(source, null);
-	}
+    private static final long serialVersionUID = 1658430047662705202L;
+
+    public BeforeConvertEvent(T source) {
+        super(source, null);
+    }
 }

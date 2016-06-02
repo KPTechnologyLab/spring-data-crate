@@ -16,31 +16,30 @@
 package org.springframework.data.crate.core.sql;
 
 /**
- * 
  * @author Hasnain Javed
- * @since 1.0.0 
+ * @since 1.0.0
  */
 public interface CrateSQLStatement {
-	
-	String SPACE = " ";
-	String COMMA = ",";
-	String OPEN_BRACE = "(";
-	String CLOSE_BRACE = ")";
-	String AS = "AS";
-	String PRIMARY_KEY = "PRIMARY KEY";
-	String CREATE_TABLE = "CREATE TABLE";
-	String DROP_TABLE = "DROP TABLE";
-	String ALTER_TABLE = "ALTER TABLE";
-	String ADD_COLUMN = "ADD COLUMN";
-	String INSERT_INTO = "INSERT INTO";
-	String WHERE = "WHERE";
-	String VALUES = "VALUES";
-	String WITH = "WITH";
-	String SET = "SET";
-	String REFRESH_TABLE = "REFRESH TABLE";
-	String NO_OF_REPLICAS = "number_of_replicas";
-	String REFRESH_INTERVAL = "refresh_interval";
-	String COLUMN_POLICY = "column_policy";
-	
-	String createStatement();
+
+    String SPACE = " ";
+    String COMMA = ",";
+    String OPEN_BRACE = "(";
+    String CLOSE_BRACE = ")";
+    String AS = "AS";
+    String PRIMARY_KEY = "PRIMARY KEY";
+    String CREATE_TABLE = "CREATE TABLE";
+    String DROP_TABLE = "DROP TABLE";
+    String ALTER_TABLE = "ALTER TABLE";
+    String ADD_COLUMN = "ADD COLUMN";
+    String INSERT_INTO = "INSERT INTO";
+    String WHERE = "WHERE";
+    String VALUES = "VALUES";
+    String WITH = "WITH";
+    String SET = "SET";
+    String REFRESH_TABLE = "REFRESH TABLE";
+    String NO_OF_REPLICAS = "number_of_replicas";
+    String REFRESH_INTERVAL = "refresh_interval";
+    String COLUMN_POLICY = "column_policy";
+
+    String createStatement();
 }
