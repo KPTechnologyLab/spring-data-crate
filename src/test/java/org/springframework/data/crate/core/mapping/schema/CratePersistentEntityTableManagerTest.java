@@ -24,7 +24,7 @@ import static org.springframework.data.crate.core.mapping.CrateDataType.ARRAY;
 import static org.springframework.data.crate.core.mapping.CrateDataType.LONG;
 import static org.springframework.data.crate.core.mapping.CrateDataType.OBJECT;
 import static org.springframework.data.crate.core.mapping.CrateDataType.STRING;
-import static org.springframework.data.crate.core.mapping.schema.ColumnPloicy.DYNAMIC;
+import static org.springframework.data.crate.core.mapping.schema.ColumnPolicy.DYNAMIC;
 import static org.springframework.data.crate.core.sql.CrateSQLStatement.NO_OF_REPLICAS;
 
 import java.util.Date;

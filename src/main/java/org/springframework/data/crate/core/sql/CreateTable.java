@@ -25,7 +25,7 @@ import static org.springframework.util.StringUtils.hasText;
 import java.util.Iterator;
 
 import org.springframework.data.crate.core.mapping.schema.Column;
-import org.springframework.data.crate.core.mapping.schema.ColumnPloicy;
+import org.springframework.data.crate.core.mapping.schema.ColumnPolicy;
 import org.springframework.data.crate.core.mapping.schema.TableDefinition;
 import org.springframework.data.crate.core.mapping.schema.TableParameters;
 import org.springframework.util.StringUtils;
@@ -157,7 +157,7 @@ public class CreateTable extends AbstractStatement {
 			
 			String numOfReplicas = parameters.getNumberOfReplicas();
 			Integer refreshInterval = parameters.getRefreshInterval();
-			ColumnPloicy columnPloicy = parameters.getColumnPloicy();
+			ColumnPolicy columnPolicy = parameters.getColumnPolicy();
 
 			StringBuilder builder = new StringBuilder(WITH);
 			builder.append(SPACE)
@@ -177,12 +177,12 @@ public class CreateTable extends AbstractStatement {
 					   .append(CrateSQLUtil.singleQuote(valueOf(refreshInterval)));
 			}
 			
-			if(columnPloicy != null) {
+			if(columnPolicy != null) {
 				builder.append(COMMA)
 				   	   .append(SPACE)
 				   	   .append(COLUMN_POLICY)
 				   	   .append("=")
-					   .append(CrateSQLUtil.singleQuote(valueOf(columnPloicy)));
+					   .append(CrateSQLUtil.singleQuote(valueOf(columnPolicy)));
 			}
 			
 			builder.append(CLOSE_BRACE);

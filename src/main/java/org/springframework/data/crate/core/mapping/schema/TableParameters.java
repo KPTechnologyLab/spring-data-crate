@@ -29,16 +29,16 @@ public class TableParameters {
 	
 	private final String numberOfReplicas;
 	private final int refreshInterval;
-	private final ColumnPloicy columnPloicy;
+	private final ColumnPolicy columnPolicy;
 	
-	public TableParameters(String numberOfReplicas, int refreshInterval, ColumnPloicy columnPloicy) {
+	public TableParameters(String numberOfReplicas, int refreshInterval, ColumnPolicy columnPolicy) {
 		
 		hasText(numberOfReplicas);
-		notNull(columnPloicy);
+		notNull(columnPolicy);
 		
 		this.numberOfReplicas = numberOfReplicas;
 		this.refreshInterval = refreshInterval;
-		this.columnPloicy = columnPloicy;
+		this.columnPolicy = columnPolicy;
 	}
 	
 	public String getNumberOfReplicas() {
@@ -49,7 +49,7 @@ public class TableParameters {
 		return refreshInterval;
 	}
 
-	public ColumnPloicy getColumnPloicy() {
-		return columnPloicy;
+	public ColumnPolicy getColumnPolicy() {
+		return columnPolicy;
 	}
 }

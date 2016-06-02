@@ -20,14 +20,14 @@ package org.springframework.data.crate.core.mapping.schema;
  * @author Hasnain Javed
  * @since 1.0.0
  */
-public enum ColumnPloicy {
+public enum ColumnPolicy {
 	
 	DYNAMIC("dynamic"),
 	STRICT("strict");
 	
 	private String policy;
 	
-	private ColumnPloicy(String policy) {
+	ColumnPolicy(String policy) {
 		this.policy = policy;
 	}
 	

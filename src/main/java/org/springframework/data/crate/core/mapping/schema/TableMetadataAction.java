@@ -76,7 +76,7 @@ class TableMetadataAction implements CrateAction, CrateActionResponseHandler<Tab
 		String tableName = valueOf(rows[0][0]);
 		String numberOfReplicas = valueOf(rows[0][1]);
 		int refreshInterval = parameters.getRefreshInterval();
-		ColumnPloicy policy = parameters.getColumnPloicy();
+		ColumnPolicy policy = parameters.getColumnPolicy();
 		
 		return new TableMetadata(tableName, columns, new TableParameters(numberOfReplicas, refreshInterval, policy));
 	}

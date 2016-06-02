@@ -237,8 +237,8 @@ public class CratePersistentEntityTableManager {
 //				alteredParameters.add(new AlterTableParameterDefinition(REFRESH_INTERVAL, entityParams.getRefreshInterval()));
 //			}
 			
-//			if(dbParams.getColumnPloicy() != entityParams.getColumnPloicy()) {
-//				alteredParameters.add(new AlterTableParameterDefinition(COLUMN_POLICY, entityParams.getColumnPloicy().toString()));
+//			if(dbParams.getColumnPolicy() != entityParams.getColumnPolicy()) {
+//				alteredParameters.add(new AlterTableParameterDefinition(COLUMN_POLICY, entityParams.getColumnPolicy().toString()));
 //			}
 			
 			return alteredParameters;

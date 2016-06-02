@@ -29,8 +29,8 @@ import org.junit.Test;
 import org.springframework.data.annotation.Id;
 import org.springframework.data.annotation.Version;
 import org.springframework.data.crate.core.mapping.annotations.Table;
-import org.springframework.data.crate.core.mapping.schema.ColumnPloicy;
-import static org.springframework.data.crate.core.mapping.schema.ColumnPloicy.*;
+import org.springframework.data.crate.core.mapping.schema.ColumnPolicy;
+import static org.springframework.data.crate.core.mapping.schema.ColumnPolicy.*;
 import org.springframework.data.crate.core.mapping.schema.TableParameters;
 import org.springframework.data.mapping.model.MappingException;
 import org.springframework.data.sample.entities.Book;
@@ -201,12 +201,12 @@ public class SimpleCratePersistentEntityTest {
 		
 		String defaultReplicas = EntityWithDefaultTableParameters.class.getAnnotation(Table.class).numberOfReplicas();
 		int defaultRefreshInterval = EntityWithDefaultTableParameters.class.getAnnotation(Table.class).refreshInterval();
-		ColumnPloicy defaultPolicy = EntityWithDefaultTableParameters.class.getAnnotation(Table.class).columnPolicy();
+		ColumnPolicy defaultPolicy = EntityWithDefaultTableParameters.class.getAnnotation(Table.class).columnPolicy();
 		
 		assertThat(parameters, is(notNullValue()));
 		assertThat(parameters.getNumberOfReplicas(), is(defaultReplicas));
 		assertThat(parameters.getRefreshInterval(), is(defaultRefreshInterval));
-		assertThat(parameters.getColumnPloicy(), is(defaultPolicy));
+		assertThat(parameters.getColumnPolicy(), is(defaultPolicy));
 	}
 	
 	@Test
@@ -218,12 +218,12 @@ public class SimpleCratePersistentEntityTest {
 		
 		String replicas = "2";
 		int refreshInterval = 1500;
-		ColumnPloicy policy = STRICT;
+		ColumnPolicy policy = STRICT;
 		
 		assertThat(parameters, is(notNullValue()));
 		assertThat(parameters.getNumberOfReplicas(), is(replicas));
 		assertThat(parameters.getRefreshInterval(), is(refreshInterval));
-		assertThat(parameters.getColumnPloicy(), is(policy));
+		assertThat(parameters.getColumnPolicy(), is(policy));
 	}
 	
 	private static CrateMappingContext prepareMappingContext(Class<?> type) {

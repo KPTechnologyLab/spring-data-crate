@@ -5,6 +5,8 @@ CHANGES for Spring Crate Data
 Unreleased
 ==========
 
+ - fix a typo in the enum name: `ColumnPloicy` -> `ColumnPolicy`.
+
  - update dependencies:
 
    - crate-client: 0.54.9

@@ -127,7 +127,7 @@ This will find the repository interface and register a proxy object in the
 container. You can use it as shown below:
 
 ```java
-@Table(name="users", numberOfReplicas="2", refreshInterval="1500", columnPolicy="dynamic")
+@Table(name="users", numberOfReplicas="2", refreshInterval=1500, columnPolicy=ColumnPolicy.DYNAMIC)
 public class User {
 
 	@Id
@@ -182,13 +182,14 @@ public class UserService {
      user.setId("abc123");
      user.setEmail("user@acme.com");
 
-     repository.insert(user);
+     repository.save(user);
 
 	 repository.refreshTable();
 
      User dbUser = repository.findById(user.getId());
      List<User> users = repository.findAll();
  }
+
 }
 ```
 
