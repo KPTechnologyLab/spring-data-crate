@@ -31,6 +31,7 @@
         <spring-core.version>4.2.6.RELEASE</spring-core.version>
         <javax-validation.version>1.1.0.Final</javax-validation.version>
         <hibernate-validator.version>5.2.4.Final</hibernate-validator.version>
+        <guava.version>19.0</guava.version>
     </properties>
 
     <dependencies>
@@ -193,6 +194,11 @@
             <artifactId>cditest-owb</artifactId>
             <version>${webbeans}</version>
             <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>com.google.guava</groupId>
+            <artifactId>guava</artifactId>
+            <version>${guava.version}</version>
         </dependency>
     </dependencies>
 

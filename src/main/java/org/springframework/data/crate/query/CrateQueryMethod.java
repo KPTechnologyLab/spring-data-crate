@@ -21,6 +21,7 @@
 
 package org.springframework.data.crate.query;
 
+import com.google.common.base.Optional;
 import org.springframework.core.annotation.AnnotationUtils;
 import org.springframework.data.crate.annotations.Query;
 import org.springframework.data.projection.ProjectionFactory;
@@ -39,12 +40,9 @@ public class CrateQueryMethod extends QueryMethod {
         this.query = method.getAnnotation(Query.class);
     }
 
-    public String getAnnotatedQuery() {
+    public Optional<String> getAnnotatedQuery() {
         String value = String.valueOf(AnnotationUtils.getValue(query, "value"));
-        if (!StringUtils.hasText(value)) {
-            return null;
-        }
-        return value;
+        return StringUtils.hasText(value) ? Optional.of(value) : Optional.<String>absent();
     }
 
 }
