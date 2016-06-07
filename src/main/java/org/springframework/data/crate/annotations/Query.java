@@ -19,33 +19,21 @@
  * software solely pursuant to the terms of the relevant commercial agreement.
  */
 
-package org.springframework.data.crate.query;
-
-import org.springframework.data.crate.core.CrateOperations;
-import org.springframework.data.repository.query.QueryMethod;
-import org.springframework.data.repository.query.RepositoryQuery;
-
-public abstract class CrateRepositoryQuery implements RepositoryQuery {
-
-    private final CrateQueryMethod queryMethod;
-    private final CrateOperations crateOperations;
-    private final String query;
-
-    protected CrateRepositoryQuery(String query, CrateQueryMethod queryMethod, CrateOperations crateOperations) {
-        this.queryMethod = queryMethod;
-        this.crateOperations = crateOperations;
-        this.query = query;
-    }
+package org.springframework.data.crate.annotations;
 
 
-    @Override
-    public QueryMethod getQueryMethod() {
-        return queryMethod;
-    }
+import org.springframework.data.annotation.QueryAnnotation;
 
-    @Override
-    public Object execute(Object[] parameters) {
-        return null;
-    }
+import java.lang.annotation.ElementType;
+import java.lang.annotation.Retention;
+import java.lang.annotation.RetentionPolicy;
+import java.lang.annotation.Target;
+
+@Target(ElementType.METHOD)
+@Retention(RetentionPolicy.RUNTIME)
+@QueryAnnotation
+public @interface Query {
+
+    String value() default "";
 
 }

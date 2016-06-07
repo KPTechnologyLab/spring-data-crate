@@ -21,31 +21,30 @@
 
 package org.springframework.data.crate.query;
 
-import org.springframework.data.crate.core.CrateOperations;
+import org.springframework.core.annotation.AnnotationUtils;
+import org.springframework.data.crate.annotations.Query;
+import org.springframework.data.projection.ProjectionFactory;
+import org.springframework.data.repository.core.RepositoryMetadata;
 import org.springframework.data.repository.query.QueryMethod;
-import org.springframework.data.repository.query.RepositoryQuery;
+import org.springframework.util.StringUtils;
 
-public abstract class CrateRepositoryQuery implements RepositoryQuery {
+import java.lang.reflect.Method;
 
-    private final CrateQueryMethod queryMethod;
-    private final CrateOperations crateOperations;
-    private final String query;
+public class CrateQueryMethod extends QueryMethod {
 
-    protected CrateRepositoryQuery(String query, CrateQueryMethod queryMethod, CrateOperations crateOperations) {
-        this.queryMethod = queryMethod;
-        this.crateOperations = crateOperations;
-        this.query = query;
+    private final Query query;
+
+    public CrateQueryMethod(Method method, RepositoryMetadata metadata, ProjectionFactory factory) {
+        super(method, metadata, factory);
+        this.query = method.getAnnotation(Query.class);
     }
 
-
-    @Override
-    public QueryMethod getQueryMethod() {
-        return queryMethod;
-    }
-
-    @Override
-    public Object execute(Object[] parameters) {
-        return null;
+    public String getAnnotatedQuery() {
+        String value = String.valueOf(AnnotationUtils.getValue(query, "value"));
+        if (!StringUtils.hasText(value)) {
+            return null;
+        }
+        return value;
     }
 
 }
