@@ -21,6 +21,7 @@
 
 package org.springframework.data.crate.query;
 
+import com.google.common.base.Optional;
 import org.springframework.data.crate.core.CrateAction;
 import org.springframework.data.crate.core.CrateActionResponseHandler;
 import org.springframework.data.crate.core.CrateOperations;
@@ -61,9 +62,22 @@ public class CrateRepositoryQuery implements RepositoryQuery {
         }
     }
 
+    public String getSource() {
+        return query;
+    }
+
     private Object getSingleResult(List<?> results) {
         isTrue(results.size() <= 1, String.format(Locale.ENGLISH,
                 "Select statement should return only one entity %d for query: %s", results.size(), query));
         return results.size() == 1 ? results.get(0) : null;
     }
+
+
+    public static CrateRepositoryQuery buildFromAnnotation(CrateQueryMethod queryMethod, CrateOperations crateOperations) {
+        if(queryMethod.getAnnotatedQuery().isPresent()) {
+            return new CrateRepositoryQuery(queryMethod.getAnnotatedQuery().get(), queryMethod, crateOperations);
+        }
+        throw new IllegalArgumentException("cannot create annotated query if annotation doesn't contain a query");
+    }
+
 }
