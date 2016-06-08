@@ -21,22 +21,30 @@
 
 package org.springframework.data.crate.query;
 
+import org.springframework.data.crate.core.CrateAction;
+import org.springframework.data.crate.core.CrateActionResponseHandler;
 import org.springframework.data.crate.core.CrateOperations;
 import org.springframework.data.repository.query.QueryMethod;
 import org.springframework.data.repository.query.RepositoryQuery;
 
-public abstract class CrateRepositoryQuery implements RepositoryQuery {
+import java.util.List;
+import java.util.Locale;
 
+import static org.springframework.util.Assert.isTrue;
+
+public class CrateRepositoryQuery implements RepositoryQuery {
+
+    private final CrateActionResponseHandler handler;
     private final CrateQueryMethod queryMethod;
     private final CrateOperations crateOperations;
     private final String query;
 
-    protected CrateRepositoryQuery(String query, CrateQueryMethod queryMethod, CrateOperations crateOperations) {
+    private CrateRepositoryQuery(String query, CrateQueryMethod queryMethod, CrateOperations crateOperations) {
         this.queryMethod = queryMethod;
         this.crateOperations = crateOperations;
         this.query = query;
+        this.handler = new SimpleQueryCrateHandler<>(queryMethod.getReturnedObjectType());
     }
-
 
     @Override
     public QueryMethod getQueryMethod() {
@@ -45,7 +53,17 @@ public abstract class CrateRepositoryQuery implements RepositoryQuery {
 
     @Override
     public Object execute(Object[] parameters) {
-        return null;
+        CrateAction action = new SimpleQueryCrateAction(query);
+        if (queryMethod.isCollectionQuery()) {
+            return crateOperations.execute(action, handler);
+        } else {
+            return getSingleResult((List<?>) crateOperations.execute(action, handler));
+        }
     }
 
+    private Object getSingleResult(List<?> results) {
+        isTrue(results.size() <= 1, String.format(Locale.ENGLISH,
+                "Select statement should return only one entity %d for query: %s", results.size(), query));
+        return results.size() == 1 ? results.get(0) : null;
+    }
 }
