@@ -21,21 +21,15 @@
 
 package org.springframework.data.crate.query;
 
-import com.google.common.base.Optional;
-import org.springframework.data.crate.core.CrateAction;
-import org.springframework.data.crate.core.CrateActionResponseHandler;
 import org.springframework.data.crate.core.CrateOperations;
+import org.springframework.data.crate.query.execution.CollectionExecutor;
+import org.springframework.data.crate.query.execution.QueryExecution;
+import org.springframework.data.crate.query.execution.SingleEntityExecutor;
 import org.springframework.data.repository.query.QueryMethod;
 import org.springframework.data.repository.query.RepositoryQuery;
 
-import java.util.List;
-import java.util.Locale;
-
-import static org.springframework.util.Assert.isTrue;
-
 public class CrateRepositoryQuery implements RepositoryQuery {
 
-    private final CrateActionResponseHandler handler;
     private final CrateQueryMethod queryMethod;
     private final CrateOperations crateOperations;
     private final String query;
@@ -44,7 +38,6 @@ public class CrateRepositoryQuery implements RepositoryQuery {
         this.queryMethod = queryMethod;
         this.crateOperations = crateOperations;
         this.query = query;
-        this.handler = new SimpleQueryCrateHandler<>(queryMethod.getReturnedObjectType());
     }
 
     @Override
@@ -54,11 +47,14 @@ public class CrateRepositoryQuery implements RepositoryQuery {
 
     @Override
     public Object execute(Object[] parameters) {
-        CrateAction action = new SimpleQueryCrateAction(query);
+        return getExecution().execute(this, parameters);
+    }
+
+    private QueryExecution getExecution() {
         if (queryMethod.isCollectionQuery()) {
-            return crateOperations.execute(action, handler);
+            return new CollectionExecutor(crateOperations);
         } else {
-            return getSingleResult((List<?>) crateOperations.execute(action, handler));
+            return new SingleEntityExecutor(crateOperations);
         }
     }
 
@@ -66,15 +62,8 @@ public class CrateRepositoryQuery implements RepositoryQuery {
         return query;
     }
 
-    private Object getSingleResult(List<?> results) {
-        isTrue(results.size() <= 1, String.format(Locale.ENGLISH,
-                "Select statement should return only one entity %d for query: %s", results.size(), query));
-        return results.size() == 1 ? results.get(0) : null;
-    }
-
-
     public static CrateRepositoryQuery buildFromAnnotation(CrateQueryMethod queryMethod, CrateOperations crateOperations) {
-        if(queryMethod.getAnnotatedQuery().isPresent()) {
+        if (queryMethod.getAnnotatedQuery().isPresent()) {
             return new CrateRepositoryQuery(queryMethod.getAnnotatedQuery().get(), queryMethod, crateOperations);
         }
         throw new IllegalArgumentException("cannot create annotated query if annotation doesn't contain a query");
