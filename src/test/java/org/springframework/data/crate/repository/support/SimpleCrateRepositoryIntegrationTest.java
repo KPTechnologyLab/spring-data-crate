@@ -17,8 +17,6 @@
 package org.springframework.data.crate.repository.support;
 
 import io.crate.client.CrateClient;
-import org.apache.commons.lang3.builder.EqualsBuilder;
-import org.apache.commons.lang3.builder.HashCodeBuilder;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
@@ -26,13 +24,14 @@ import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
-import org.springframework.data.annotation.Id;
-import org.springframework.data.annotation.Version;
 import org.springframework.data.crate.CrateIntegrationTest;
 import org.springframework.data.crate.config.TestCrateConfiguration;
 import org.springframework.data.crate.core.CrateOperations;
-import org.springframework.data.crate.core.mapping.annotations.Table;
 import org.springframework.data.crate.repository.CrateRepository;
+import org.springframework.data.crate.repository.config.EnableCrateRepositories;
+import org.springframework.data.repository.query.QueryLookupStrategy;
+import org.springframework.data.sample.entities.person.Person;
+import org.springframework.data.sample.repositories.PersonRepository;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 
@@ -55,6 +54,9 @@ public class SimpleCrateRepositoryIntegrationTest extends CrateIntegrationTest {
 
     @Autowired
     private CrateOperations crateOperations;
+
+    @Autowired
+    PersonRepository personRepository;
 
     private CrateEntityInformation<Person, String> entityInformation = new PersonInformation();
 
@@ -120,83 +122,20 @@ public class SimpleCrateRepositoryIntegrationTest extends CrateIntegrationTest {
         assertThat(repository.findOne(hasnain.getEmail()), is(nullValue()));
     }
 
-    @Table(name = "person", numberOfReplicas = "0")
-    static class Person {
-
-        @Id
-        private String email;
-        private String name;
-        private int age;
-
-        @Version
-        private long version;
-
-        public Person(String email, String name, int age) {
-            super();
-            this.email = email;
-            this.name = name;
-            this.age = age;
-        }
-
-        public String getEmail() {
-            return email;
-        }
-
-        public void setEmail(String email) {
-            this.email = email;
-        }
-
-        public String getName() {
-            return name;
-        }
-
-        public void setName(String name) {
-            this.name = name;
-        }
-
-        public int getAge() {
-            return age;
-        }
-
-        public void setAge(int age) {
-            this.age = age;
-        }
-
-        public long getVersion() {
-            return version;
-        }
-
-        public void setVersion(long version) {
-            this.version = version;
-        }
-
-        @Override
-        public boolean equals(Object obj) {
-
-            if (!(obj instanceof Person)) {
-                return false;
-            }
-
-            if (this == obj) {
-                return true;
-            }
-
-            Person that = (Person) obj;
-
-            return new EqualsBuilder().append(this.email, that.email)
-                    .append(this.name, that.name)
-                    .append(this.age, that.age)
-                    .isEquals();
-        }
-
-        @Override
-        public int hashCode() {
-            return new HashCodeBuilder(11, 21).append(email)
-                    .append(name)
-                    .append(age)
-                    .toHashCode();
-        }
+    @Test
+    public void testSimpleAnnotation() {
+        List<Person> persons = personRepository.getAll();
+        assertThat(persons.size(), is(2));
+        assertThat(persons.get(0).getName(), is("Hasnain Javed"));
     }
+
+    @Test
+    public void testParameterizedAnnotation() {
+        List<Person> persons = personRepository.findByName("Hasnain Javed");
+        assertThat(persons.size(), is(1));
+        assertThat(persons.get(0).getName(), is("Hasnain Javed"));
+    }
+
 
     private static class PersonInformation implements CrateEntityInformation<Person, String> {
 
@@ -237,6 +176,8 @@ public class SimpleCrateRepositoryIntegrationTest extends CrateIntegrationTest {
     }
 
     @Configuration
+    @EnableCrateRepositories(basePackages = "org.springframework.data.sample.repositories",
+            queryLookupStrategy = QueryLookupStrategy.Key.USE_DECLARED_QUERY)
     static class TestConfig extends TestCrateConfiguration {
 
         @Bean
@@ -244,6 +185,10 @@ public class SimpleCrateRepositoryIntegrationTest extends CrateIntegrationTest {
             return new CrateClient(String.format(Locale.ENGLISH, "%s:%d", server.crateHost(), server.transportPort()));
         }
 
+        @Override
+        protected String getMappingBasePackage() {
+            return "org.springframework.data.sample.entities.person";
+        }
     }
 
 }

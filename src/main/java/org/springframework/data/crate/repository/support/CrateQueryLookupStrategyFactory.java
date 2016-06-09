@@ -22,6 +22,8 @@
 package org.springframework.data.crate.repository.support;
 
 import org.springframework.data.crate.core.CrateOperations;
+import org.springframework.data.crate.query.CrateQueryMethod;
+import org.springframework.data.crate.query.CrateRepositoryQuery;
 import org.springframework.data.projection.ProjectionFactory;
 import org.springframework.data.repository.core.NamedQueries;
 import org.springframework.data.repository.core.RepositoryMetadata;
@@ -60,6 +62,12 @@ public final class CrateQueryLookupStrategyFactory {
             super(operations, context);
         }
 
+        @Override
+        public RepositoryQuery resolveQuery(Method method, RepositoryMetadata repositoryMetadata,
+                                            ProjectionFactory projectionFactory, NamedQueries namedQueries) {
+            CrateQueryMethod queryMethod = new CrateQueryMethod(method, repositoryMetadata, projectionFactory);
+            return CrateRepositoryQuery.buildFromAnnotation(queryMethod, operations);
+        }
     }
 
     static class CreateQueryLookupStrategy extends CrateAbstractLookupStrategy {

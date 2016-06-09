@@ -43,7 +43,7 @@ public class SingleEntityExecutor extends QueryExecution {
         QueryMethod queryMethod = query.getQueryMethod();
 
         return getSingleResult(operations.execute(
-                new SimpleQueryCrateAction(query.getSource()),
+                new SimpleQueryCrateAction(query.getSource(), values),
                 new SimpleQueryCrateHandler<>(queryMethod.getReturnedObjectType()))
         );
     }

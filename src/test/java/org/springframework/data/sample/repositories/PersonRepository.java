@@ -19,27 +19,19 @@
  * software solely pursuant to the terms of the relevant commercial agreement.
  */
 
-package org.springframework.data.crate.query.execution;
+package org.springframework.data.sample.repositories;
 
-import org.springframework.data.crate.core.CrateOperations;
-import org.springframework.data.crate.query.CrateRepositoryQuery;
-import org.springframework.data.crate.query.SimpleQueryCrateAction;
-import org.springframework.data.crate.query.SimpleQueryCrateHandler;
-import org.springframework.data.repository.query.QueryMethod;
+import org.springframework.data.crate.annotations.Query;
+import org.springframework.data.crate.repository.CrateRepository;
+import org.springframework.data.sample.entities.person.Person;
 
-public class CollectionExecutor extends QueryExecution {
+import java.util.List;
 
-    public CollectionExecutor(CrateOperations operations) {
-        super(operations);
-    }
+public interface PersonRepository extends CrateRepository<Person, Integer> {
 
-    @Override
-    protected Object doExecute(CrateRepositoryQuery query, Object[] values) {
-        QueryMethod queryMethod = query.getQueryMethod();
+    @Query("select * from person order by name")
+    List<Person> getAll();
 
-        return operations.execute(
-                new SimpleQueryCrateAction(query.getSource(), values),
-                new SimpleQueryCrateHandler<>(queryMethod.getReturnedObjectType())
-        );
-    }
+    @Query("select * from person where name = $1")
+    List<Person> findByName(String name);
 }

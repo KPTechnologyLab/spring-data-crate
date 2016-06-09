@@ -71,8 +71,7 @@ public class CrateDocumentConverter {
                 logger.debug("pushed '{}' as CrateArray to root CrateDocument", row.getColumn());
             } else {
                 root.put(row.getColumn(), row.getPayload());
-                logger.debug("pushed '{}' as simple type '{}' to root CrateDocument",
-                        new Object[]{row.getColumn(), row.getPayload().getClass().getName()});
+                logger.debug("pushed '{}' as simple type to root CrateDocument", row.getColumn());
             }
         }
 

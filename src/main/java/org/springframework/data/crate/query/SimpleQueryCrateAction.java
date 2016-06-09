@@ -31,15 +31,20 @@ public class SimpleQueryCrateAction implements CrateAction {
 
     private final String query;
 
-    public SimpleQueryCrateAction(String query) {
+    private final Object[] parameters;
+
+    public SimpleQueryCrateAction(String query, Object[] parameters) {
         notNull(query);
         hasText(query);
         this.query = query;
+        this.parameters = parameters;
     }
 
     @Override
     public SQLRequest getSQLRequest() {
-        return new SQLRequest(getSQLStatement());
+        SQLRequest request =  new SQLRequest(getSQLStatement(), parameters);
+        request.includeTypesOnResponse(true);
+        return request;
     }
 
     @Override
