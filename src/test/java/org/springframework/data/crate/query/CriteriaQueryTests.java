@@ -30,37 +30,37 @@ public class CriteriaQueryTests {
 
     @Test
     public void testSQLRenderGreaterThanEqualCriteria() {
-        WhereMethodQueryClause criteria = new WhereMethodQueryClause(new Criteria("age").greaterThan(18));
+        CriteriaQuery criteria = new CriteriaQuery(new Criteria("age").greaterThan(18));
         assertThat(criteria.buildSQLString().toString(), is("age > 18"));
-        criteria = new WhereMethodQueryClause(new Criteria("age").greaterThanEqual(19));
+        criteria = new CriteriaQuery(new Criteria("age").greaterThanEqual(19));
         assertThat(criteria.buildSQLString().toString(), is("age >= 19"));
     }
 
     @Test
     public void testSQLRenderLessThanEqualCriteria() {
-        WhereMethodQueryClause criteria = new WhereMethodQueryClause(new Criteria("age").lessThan(18));
+        CriteriaQuery criteria = new CriteriaQuery(new Criteria("age").lessThan(18));
         assertThat(criteria.buildSQLString().toString(), is("age < 18"));
-        criteria = new WhereMethodQueryClause(new Criteria("age").lessThanEqual(19));
+        criteria = new CriteriaQuery(new Criteria("age").lessThanEqual(19));
         assertThat(criteria.buildSQLString().toString(), is("age <= 19"));
     }
 
     @Test
     public void testSQLRenderSimpleOrCriteria() {
-        WhereMethodQueryClause criteria = new WhereMethodQueryClause(new Criteria("age").is(18)
+        CriteriaQuery criteria = new CriteriaQuery(new Criteria("age").is(18)
                 .or(new Criteria("name").is("foo")));
         assertThat(criteria.buildSQLString().toString(), is("age = 18 OR name = 'foo'"));
     }
 
     @Test
     public void testSQLRenderSimpleAndCriteria() {
-        WhereMethodQueryClause criteria = new WhereMethodQueryClause(new Criteria("age").lessThan(18)
+        CriteriaQuery criteria = new CriteriaQuery(new Criteria("age").lessThan(18)
                 .and(new Criteria("name").is("foo")));
         assertThat(criteria.buildSQLString().toString(), is("age < 18 AND name = 'foo'"));
     }
 
     @Test
     public void testSQLRenderChainedAndCriteria() {
-        WhereMethodQueryClause criteria = new WhereMethodQueryClause(new Criteria("age").lessThan(18)
+        CriteriaQuery criteria = new CriteriaQuery(new Criteria("age").lessThan(18)
                 .and(new Criteria("name").is("bar"))
                 .and(new Criteria("location").is("foo")));
         assertThat(criteria.buildSQLString().toString(), is("age < 18 AND name = 'bar' AND location = 'foo'"));
@@ -68,7 +68,7 @@ public class CriteriaQueryTests {
 
     @Test
     public void testSQLRenderChainedAndOrCriteria() {
-        WhereMethodQueryClause criteria = new WhereMethodQueryClause(new Criteria("age").lessThan(18)
+        CriteriaQuery criteria = new CriteriaQuery(new Criteria("age").lessThan(18)
                 .and(new Criteria("name").is("bar"))
                 .or(new Criteria("location").is("foo")));
         assertThat(criteria.buildSQLString().toString(), is("(age < 18 AND name = 'bar') OR location = 'foo'"));
@@ -76,7 +76,7 @@ public class CriteriaQueryTests {
 
     @Test
     public void testSQLRenderChainedMultipleAndWithOrCriteria() {
-        WhereMethodQueryClause criteria = new WhereMethodQueryClause(new Criteria("age").lessThan(18)
+        CriteriaQuery criteria = new CriteriaQuery(new Criteria("age").lessThan(18)
                 .and(new Criteria("name").is("bar"))
                 .and(new Criteria("lastname").is("bar"))
                 .or(new Criteria("location").is("foo")));
@@ -86,7 +86,7 @@ public class CriteriaQueryTests {
 
     @Test
     public void testSQLRenderChainedOrAndCriteria() {
-        WhereMethodQueryClause criteria = new WhereMethodQueryClause(new Criteria("location").is("foo")
+        CriteriaQuery criteria = new CriteriaQuery(new Criteria("location").is("foo")
                 .or(new Criteria("age").lessThan(18))
                 .and(new Criteria("name").is("bar")));
         assertThat(criteria.buildSQLString().toString(), is("(location = 'foo' OR age < 18) AND name = 'bar'"));
@@ -94,14 +94,14 @@ public class CriteriaQueryTests {
 
     @Test
     public void testSQLRenderChainedMultipleOrWithAndCriteria() {
-        WhereMethodQueryClause criteria = new WhereMethodQueryClause(new Criteria("location").is("foo")
+        CriteriaQuery criteria = new CriteriaQuery(new Criteria("location").is("foo")
                 .or(new Criteria("age").lessThan(18))
                 .or(new Criteria("height").lessThan(180))
                 .and(new Criteria("name").is("bar")));
         assertThat(criteria.buildSQLString().toString(),
                 is("(location = 'foo' OR age < 18 OR height < 180) AND name = 'bar'"));
 
-        criteria = new WhereMethodQueryClause(new Criteria("location").is("foo")
+        criteria = new CriteriaQuery(new Criteria("location").is("foo")
                 .or(new Criteria("age").lessThan(18))
                 .or(new Criteria("height").lessThan(180))
                 .and(new Criteria("name").is("bar"), new Criteria("weight").lessThan(80)));
@@ -111,7 +111,7 @@ public class CriteriaQueryTests {
 
     @Test
     public void testSQLRenderWithLikeAndStartWithAndEndWithCriteria() {
-        WhereMethodQueryClause criteria = new WhereMethodQueryClause(new Criteria("location").like("foolocation")
+        CriteriaQuery criteria = new CriteriaQuery(new Criteria("location").like("foolocation")
                 .and(new Criteria("name").startsWith("bar"))
                 .and(new Criteria("lastname").endsWith("foo")));
         assertThat(criteria.buildSQLString().toString(),
@@ -120,7 +120,7 @@ public class CriteriaQueryTests {
 
     @Test
     public void testSQLRenderWithNullCriteria() {
-        WhereMethodQueryClause criteria = new WhereMethodQueryClause(new Criteria("name").is(null));
+        CriteriaQuery criteria = new CriteriaQuery(new Criteria("name").is(null));
         assertThat(criteria.buildSQLString().toString(), is("name IS NULL"));
     }
 }

@@ -31,12 +31,29 @@ import java.util.Iterator;
 import static org.springframework.data.crate.query.Criteria.AND_OPERATOR;
 import static org.springframework.data.crate.query.Criteria.OR_OPERATOR;
 
-public class WhereMethodQueryClause extends PartialMethodQuery {
+class CriteriaQuery extends PartialQuery {
 
-    private final Criteria criteria;
+    private Criteria criteria;
 
-    public WhereMethodQueryClause(Criteria criteria) {
+    private CriteriaQuery() {
+    }
+
+    CriteriaQuery(Criteria criteria) {
         this.criteria = criteria;
+    }
+
+    <T extends CriteriaQuery> T addCriteria(Criteria criteria) {
+        Preconditions.checkNotNull(criteria, "Cannot add null criteria.");
+        if (this.criteria == null) {
+            this.criteria = criteria;
+        } else {
+            this.criteria.and(criteria);
+        }
+        return (T) this;
+    }
+
+    Criteria getCriteria() {
+        return this.criteria;
     }
 
     public StringBuilder buildSQLString() {

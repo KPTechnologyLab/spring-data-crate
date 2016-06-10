@@ -21,16 +21,6 @@
 
 package org.springframework.data.crate.query;
 
-public class SelectMethodQuery implements MethodQuery {
+abstract class PartialQuery implements MethodQuery {
 
-    private final PartialMethodQuery where;
-
-    public SelectMethodQuery(PartialMethodQuery where) {
-        this.where = where;
-    }
-
-    @Override
-    public StringBuilder buildSQLString() {
-        return null;
-    }
 }
