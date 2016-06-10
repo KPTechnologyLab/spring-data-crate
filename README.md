@@ -75,6 +75,38 @@ public interface UserRepository extends CrateRepository<User, String> {
 Currently documents can be queried by Id. Support will be added to derive
 queries from method names.
 
+#### Query Methods
+
+##### Query Lookup Strategies
+
+###### Declared Queries
+
+It's also possible to use the @Query annotation to define queries:
+
+```java
+public interface UserRepository extends CrateRepository<User, String> {
+
+    @Query("select * from users")
+    List<User> getAllUsers();
+}
+```
+
+The query annotation can also be used with
+[parameter substitution](https://crate.io/docs/reference/sql/rest.html#parameter-substitution),
+where the arguments passed to the method has to match the positional
+placeholders in the query:
+
+
+```java
+public interface UserRepository extends CrateRepository<User, String> {
+
+    @Query("select * from users where name=$1 and age=$2")
+    List<User> findUsersByNameAndAge(String name, int age);
+}
+```
+
+#### Application config
+
 You can have Spring automatically create a proxy for the interface by using
 the following JavaConfig:
 
