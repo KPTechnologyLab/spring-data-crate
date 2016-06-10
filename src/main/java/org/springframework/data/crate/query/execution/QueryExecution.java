@@ -21,11 +21,15 @@
 
 package org.springframework.data.crate.query.execution;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.data.crate.core.CrateOperations;
 import org.springframework.data.crate.query.CrateRepositoryQuery;
 import org.springframework.util.Assert;
 
 public abstract class QueryExecution {
+
+    private final Logger LOGGER = LoggerFactory.getLogger(getClass());
 
     protected final CrateOperations operations;
 
@@ -36,21 +40,14 @@ public abstract class QueryExecution {
     public Object execute(CrateRepositoryQuery query, Object[] values) {
         Assert.notNull(query);
         Assert.notNull(values);
-
-        Object result;
-
+        Object result = null;
         try {
             result = doExecute(query, values);
         } catch (Exception e) {
-            return null;
-        }
-
-        if (result == null) {
-            return null;
+            LOGGER.warn("Failed to execute query: ", e);
         }
         return result;
     }
 
     protected abstract Object doExecute(CrateRepositoryQuery query, Object[] values);
-
 }

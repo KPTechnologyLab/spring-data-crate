@@ -81,7 +81,7 @@ queries from method names.
 
 ###### Declared Queries
 
-It's also possible to use the @Query annotation to define queries:
+It's also possible to use the `@Query` annotation to define queries:
 
 ```java
 public interface UserRepository extends CrateRepository<User, String> {

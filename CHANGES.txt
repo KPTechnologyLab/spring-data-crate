@@ -5,6 +5,8 @@ CHANGES for Spring Crate Data
 Unreleased
 ==========
 
+ - added support for native queries
+
  - fix a typo in the enum name: `ColumnPloicy` -> `ColumnPolicy`.
 
  - update dependencies:

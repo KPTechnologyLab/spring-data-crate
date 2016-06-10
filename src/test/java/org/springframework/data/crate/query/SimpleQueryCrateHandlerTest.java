@@ -42,7 +42,7 @@ public class SimpleQueryCrateHandlerTest {
     private static CrateActionResponseHandler handler;
 
     @BeforeClass
-    public static void beforeClass() throws NoSuchMethodException {
+    public static void beforeClass() {
         handler = new SimpleQueryCrateHandler<>(User.class);
     }
 

@@ -22,22 +22,20 @@ import static org.mockito.Mockito.when;
 public class CrateRepositoryQueryTest {
 
     @Test
-    public void testReplacePlaceholders() throws Exception {
-        CrateQueryMethod repositoryMethod = prepareQueryMethod("b", User.class);
+    public void testGetAnnotatedQuery() throws Exception {
+        CrateQueryMethod repositoryMethod = prepareQueryMethod("selectFromNodes", SampleEntity.class);
         RepositoryQuery repositoryQuery = CrateRepositoryQuery.buildFromAnnotation(repositoryMethod, mock(CrateOperations.class));
         assertThat(repositoryQuery, is(instanceOf(CrateRepositoryQuery.class)));
-        assertThat(((CrateRepositoryQuery)repositoryQuery).getSource(), is("select * from sys.nodes"));
+        assertThat(((CrateRepositoryQuery) repositoryQuery).getSource(), is("select * from sys.nodes"));
     }
 
-    public interface AnnotatedQueryRepository {
+    interface AnnotatedQueryRepository {
 
         @Query("select * from sys.nodes")
-        List<SampleEntity> b();
-
+        List<SampleEntity> selectFromNodes();
     }
 
     private CrateQueryMethod prepareQueryMethod(String methodName, Class<?> entityClass) throws Exception {
-
         RepositoryMetadata repositoryMetadata = Mockito.mock(RepositoryMetadata.class);
         when(repositoryMetadata.getDomainType()).thenReturn((Class) entityClass);
 
