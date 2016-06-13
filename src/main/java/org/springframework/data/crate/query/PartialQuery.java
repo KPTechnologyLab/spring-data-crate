@@ -22,5 +22,4 @@
 package org.springframework.data.crate.query;
 
 abstract class PartialQuery implements MethodQuery {
-
 }

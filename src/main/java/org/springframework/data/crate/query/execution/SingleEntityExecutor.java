@@ -23,8 +23,6 @@ package org.springframework.data.crate.query.execution;
 
 import org.springframework.data.crate.core.CrateOperations;
 import org.springframework.data.crate.query.CrateRepositoryQuery;
-import org.springframework.data.crate.query.SimpleQueryCrateAction;
-import org.springframework.data.crate.query.SimpleQueryCrateHandler;
 import org.springframework.data.repository.query.QueryMethod;
 
 import java.util.List;

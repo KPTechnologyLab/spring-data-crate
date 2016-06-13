@@ -19,36 +19,24 @@
  * software solely pursuant to the terms of the relevant commercial agreement.
  */
 
-package org.springframework.data.crate.query;
+package org.springframework.data.sample.repositories.custom;
 
-import io.crate.action.sql.SQLRequest;
-import org.springframework.data.crate.core.CrateAction;
+import org.springframework.data.crate.repository.CrateRepository;
+import org.springframework.data.sample.entities.person.Person;
 
-import static org.springframework.util.Assert.hasText;
-import static org.springframework.util.Assert.notNull;
+import java.util.List;
 
-public class SimpleQueryCrateAction implements CrateAction {
+public interface CustomPersonCrateRepository extends CrateRepository<Person, Integer> {
 
-    private final String query;
+    Person getByEmail(String email);
 
-    private final Object[] parameters;
+    List<Person> findByName(String name);
 
-    public SimpleQueryCrateAction(String query, Object[] parameters) {
-        notNull(query);
-        hasText(query);
-        this.query = query;
-        this.parameters = parameters;
-    }
+    Person getByNameAndEmail(String name, String email);
 
-    @Override
-    public SQLRequest getSQLRequest() {
-        SQLRequest request =  new SQLRequest(getSQLStatement(), parameters);
-        request.includeTypesOnResponse(true);
-        return request;
-    }
+    List<Person> findByNameStartingWith(String pattern);
 
-    @Override
-    public String getSQLStatement() {
-        return query;
-    }
+    List<Person> findByNameOrAge(String name, Integer age);
+
+    List<Person> findByAgeGreaterThanEqual(Integer age);
 }

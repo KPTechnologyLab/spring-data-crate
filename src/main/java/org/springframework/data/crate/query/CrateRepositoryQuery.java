@@ -28,25 +28,20 @@ import org.springframework.data.crate.query.execution.SingleEntityExecutor;
 import org.springframework.data.repository.query.QueryMethod;
 import org.springframework.data.repository.query.RepositoryQuery;
 
-public class CrateRepositoryQuery implements RepositoryQuery {
+public abstract class CrateRepositoryQuery implements RepositoryQuery {
 
-    private final CrateQueryMethod queryMethod;
-    private final CrateOperations crateOperations;
-    private final String query;
+    protected final CrateQueryMethod queryMethod;
+    protected final CrateOperations crateOperations;
+    private String query;
 
-    private CrateRepositoryQuery(String query, CrateQueryMethod queryMethod, CrateOperations crateOperations) {
+    protected CrateRepositoryQuery(CrateQueryMethod queryMethod, CrateOperations crateOperations) {
         this.queryMethod = queryMethod;
         this.crateOperations = crateOperations;
-        this.query = query;
-    }
-
-    @Override
-    public QueryMethod getQueryMethod() {
-        return queryMethod;
     }
 
     @Override
     public Object execute(Object[] parameters) {
+        query = createQuery(parameters);
         return getExecution().execute(this, parameters);
     }
 
@@ -58,15 +53,14 @@ public class CrateRepositoryQuery implements RepositoryQuery {
         }
     }
 
+    @Override
+    public QueryMethod getQueryMethod() {
+        return queryMethod;
+    }
+
     public String getSource() {
         return query;
     }
 
-    public static CrateRepositoryQuery buildFromAnnotation(CrateQueryMethod queryMethod, CrateOperations crateOperations) {
-        if (queryMethod.getAnnotatedQuery().isPresent()) {
-            return new CrateRepositoryQuery(queryMethod.getAnnotatedQuery().get(), queryMethod, crateOperations);
-        }
-        throw new IllegalArgumentException("cannot create annotated query if annotation doesn't contain a query");
-    }
-
+    protected abstract String createQuery(Object[] parameters);
 }

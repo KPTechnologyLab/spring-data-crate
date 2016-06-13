@@ -29,9 +29,7 @@ import org.springframework.data.crate.config.TestCrateConfiguration;
 import org.springframework.data.crate.core.CrateOperations;
 import org.springframework.data.crate.repository.CrateRepository;
 import org.springframework.data.crate.repository.config.EnableCrateRepositories;
-import org.springframework.data.repository.query.QueryLookupStrategy;
 import org.springframework.data.sample.entities.person.Person;
-import org.springframework.data.sample.repositories.PersonRepository;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 
@@ -55,9 +53,6 @@ public class SimpleCrateRepositoryIntegrationTest extends CrateIntegrationTest {
     @Autowired
     private CrateOperations crateOperations;
 
-    @Autowired
-    PersonRepository personRepository;
-
     private CrateEntityInformation<Person, String> entityInformation = new PersonInformation();
 
     private CrateRepository<Person, String> repository;
@@ -70,7 +65,7 @@ public class SimpleCrateRepositoryIntegrationTest extends CrateIntegrationTest {
     @Before
     public void setup() throws InterruptedException {
 
-        repository = new SimpleCrateRepository<Person, String>(entityInformation, crateOperations);
+        repository = new SimpleCrateRepository<>(entityInformation, crateOperations);
 
         hasnain = new Person("hasnain@test.com", "Hasnain Javed", 34);
         rizwan = new Person("rizwan@test.com", "Rizwan Idress", 33);
@@ -122,21 +117,6 @@ public class SimpleCrateRepositoryIntegrationTest extends CrateIntegrationTest {
         assertThat(repository.findOne(hasnain.getEmail()), is(nullValue()));
     }
 
-    @Test
-    public void testSimpleAnnotation() {
-        List<Person> persons = personRepository.getAll();
-        assertThat(persons.size(), is(2));
-        assertThat(persons.get(0).getName(), is("Hasnain Javed"));
-    }
-
-    @Test
-    public void testParameterizedAnnotation() {
-        List<Person> persons = personRepository.findByName("Hasnain Javed");
-        assertThat(persons.size(), is(1));
-        assertThat(persons.get(0).getName(), is("Hasnain Javed"));
-    }
-
-
     private static class PersonInformation implements CrateEntityInformation<Person, String> {
 
         @Override
@@ -176,8 +156,7 @@ public class SimpleCrateRepositoryIntegrationTest extends CrateIntegrationTest {
     }
 
     @Configuration
-    @EnableCrateRepositories(basePackages = "org.springframework.data.sample.repositories",
-            queryLookupStrategy = QueryLookupStrategy.Key.USE_DECLARED_QUERY)
+    @EnableCrateRepositories(basePackages = "org.springframework.data.sample.repositories.simple")
     static class TestConfig extends TestCrateConfiguration {
 
         @Bean
@@ -190,5 +169,4 @@ public class SimpleCrateRepositoryIntegrationTest extends CrateIntegrationTest {
             return "org.springframework.data.sample.entities.person";
         }
     }
-
 }

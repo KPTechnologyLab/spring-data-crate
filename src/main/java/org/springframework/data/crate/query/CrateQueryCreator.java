@@ -17,7 +17,6 @@ import java.util.Set;
 
 public class CrateQueryCreator extends AbstractQueryCreator<MethodQuery, CriteriaQuery> {
 
-    private PartTree tree;
     private final Set<String> roots;
     private final MappingContext<?, CratePersistentProperty> context;
 
@@ -26,7 +25,6 @@ public class CrateQueryCreator extends AbstractQueryCreator<MethodQuery, Criteri
                              ParameterAccessor parameters,
                              MappingContext<?, CratePersistentProperty> context) {
         super(tree, parameters);
-        this.tree = tree;
         this.roots = roots;
         this.context = context;
     }

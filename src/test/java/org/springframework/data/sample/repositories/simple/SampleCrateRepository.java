@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package org.springframework.data.sample.repositories;
+package org.springframework.data.sample.repositories.simple;
 
 import org.springframework.data.crate.repository.CrateRepository;
 import org.springframework.data.sample.entities.SampleEntity;

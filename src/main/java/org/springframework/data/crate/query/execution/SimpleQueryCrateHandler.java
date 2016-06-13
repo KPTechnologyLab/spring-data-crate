@@ -18,7 +18,7 @@
  * with Crate these terms will supersede the license and you may use the
  * software solely pursuant to the terms of the relevant commercial agreement.
  */
-package org.springframework.data.crate.query;
+package org.springframework.data.crate.query.execution;
 
 import io.crate.action.sql.SQLResponse;
 import io.crate.types.DataType;

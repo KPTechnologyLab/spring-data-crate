@@ -22,8 +22,9 @@
 package org.springframework.data.crate.repository.support;
 
 import org.springframework.data.crate.core.CrateOperations;
+import org.springframework.data.crate.query.AnnotatedCrateRepositoryQuery;
 import org.springframework.data.crate.query.CrateQueryMethod;
-import org.springframework.data.crate.query.CrateRepositoryQuery;
+import org.springframework.data.crate.query.PartTreeCrateRepositoryQuery;
 import org.springframework.data.projection.ProjectionFactory;
 import org.springframework.data.repository.core.NamedQueries;
 import org.springframework.data.repository.core.RepositoryMetadata;
@@ -66,7 +67,7 @@ public final class CrateQueryLookupStrategyFactory {
         public RepositoryQuery resolveQuery(Method method, RepositoryMetadata repositoryMetadata,
                                             ProjectionFactory projectionFactory, NamedQueries namedQueries) {
             CrateQueryMethod queryMethod = new CrateQueryMethod(method, repositoryMetadata, projectionFactory);
-            return CrateRepositoryQuery.buildFromAnnotation(queryMethod, operations);
+            return new AnnotatedCrateRepositoryQuery(queryMethod, operations);
         }
     }
 
@@ -76,6 +77,12 @@ public final class CrateQueryLookupStrategyFactory {
             super(operations, context);
         }
 
+        @Override
+        public RepositoryQuery resolveQuery(Method method, RepositoryMetadata repositoryMetadata,
+                                            ProjectionFactory projectionFactory, NamedQueries namedQueries) {
+            CrateQueryMethod queryMethod = new CrateQueryMethod(method, repositoryMetadata, projectionFactory);
+            return new PartTreeCrateRepositoryQuery(queryMethod, operations);
+        }
     }
 
     static class CreateIfNotFoundQueryLookupStrategy extends CrateAbstractLookupStrategy {
@@ -97,7 +104,6 @@ public final class CrateQueryLookupStrategyFactory {
                         .resolveQuery(method, repositoryMetadata, projectionFactory, namedQueries);
             }
         }
-
     }
 
     public static QueryLookupStrategy create(CrateOperations operations,
@@ -119,5 +125,4 @@ public final class CrateQueryLookupStrategyFactory {
                         "Spring Data Crate does not support %s query lookup strategy.", key));
         }
     }
-
 }

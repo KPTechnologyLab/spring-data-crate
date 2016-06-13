@@ -23,7 +23,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.ApplicationContext;
 import org.springframework.data.crate.client.CrateClientFactoryBean;
 import org.springframework.data.crate.core.mapping.schema.CratePersistentEntitySchemaManager;
-import org.springframework.data.sample.repositories.SampleCrateRepository;
+import org.springframework.data.sample.repositories.simple.SampleCrateRepository;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 

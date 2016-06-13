@@ -21,27 +21,19 @@
 
 package org.springframework.data.crate.query;
 
-import com.google.common.base.Optional;
-import org.springframework.core.annotation.AnnotationUtils;
-import org.springframework.data.crate.annotations.Query;
-import org.springframework.data.projection.ProjectionFactory;
-import org.springframework.data.repository.core.RepositoryMetadata;
-import org.springframework.data.repository.query.QueryMethod;
-import org.springframework.util.StringUtils;
+import org.springframework.data.crate.core.CrateOperations;
 
-import java.lang.reflect.Method;
+public class AnnotatedCrateRepositoryQuery extends CrateRepositoryQuery {
 
-public class CrateQueryMethod extends QueryMethod {
-
-    private final Query query;
-
-    public CrateQueryMethod(Method method, RepositoryMetadata metadata, ProjectionFactory factory) {
-        super(method, metadata, factory);
-        this.query = method.getAnnotation(Query.class);
+    public AnnotatedCrateRepositoryQuery(CrateQueryMethod queryMethod, CrateOperations crateOperations) {
+        super(queryMethod, crateOperations);
     }
 
-    public Optional<String> getAnnotatedQuery() {
-        String value = String.valueOf(AnnotationUtils.getValue(query, "value"));
-        return StringUtils.hasText(value) ? Optional.of(value) : Optional.<String>absent();
+    @Override
+    protected String createQuery(Object[] parameters) {
+        if (queryMethod.getAnnotatedQuery().isPresent()) {
+            return queryMethod.getAnnotatedQuery().get();
+        }
+        throw new IllegalArgumentException("cannot create annotated query if an annotation doesn't contain a query");
     }
 }

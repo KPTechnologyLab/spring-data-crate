@@ -19,29 +19,36 @@
  * software solely pursuant to the terms of the relevant commercial agreement.
  */
 
-package org.springframework.data.crate.query;
+package org.springframework.data.crate.query.execution;
 
-import com.google.common.base.Optional;
-import org.springframework.core.annotation.AnnotationUtils;
-import org.springframework.data.crate.annotations.Query;
-import org.springframework.data.projection.ProjectionFactory;
-import org.springframework.data.repository.core.RepositoryMetadata;
-import org.springframework.data.repository.query.QueryMethod;
-import org.springframework.util.StringUtils;
+import io.crate.action.sql.SQLRequest;
+import org.springframework.data.crate.core.CrateAction;
 
-import java.lang.reflect.Method;
+import static org.springframework.util.Assert.hasText;
+import static org.springframework.util.Assert.notNull;
 
-public class CrateQueryMethod extends QueryMethod {
+public class SimpleQueryCrateAction implements CrateAction {
 
-    private final Query query;
+    private final String query;
 
-    public CrateQueryMethod(Method method, RepositoryMetadata metadata, ProjectionFactory factory) {
-        super(method, metadata, factory);
-        this.query = method.getAnnotation(Query.class);
+    private final Object[] parameters;
+
+    public SimpleQueryCrateAction(String query, Object[] parameters) {
+        notNull(query);
+        hasText(query);
+        this.query = query;
+        this.parameters = parameters;
     }
 
-    public Optional<String> getAnnotatedQuery() {
-        String value = String.valueOf(AnnotationUtils.getValue(query, "value"));
-        return StringUtils.hasText(value) ? Optional.of(value) : Optional.<String>absent();
+    @Override
+    public SQLRequest getSQLRequest() {
+        SQLRequest request =  new SQLRequest(getSQLStatement(), parameters);
+        request.includeTypesOnResponse(true);
+        return request;
+    }
+
+    @Override
+    public String getSQLStatement() {
+        return query;
     }
 }

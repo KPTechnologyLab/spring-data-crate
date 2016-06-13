@@ -24,12 +24,13 @@ public class CrateRepositoryQueryTest {
     @Test
     public void testGetAnnotatedQuery() throws Exception {
         CrateQueryMethod repositoryMethod = prepareQueryMethod("selectFromNodes", SampleEntity.class);
-        RepositoryQuery repositoryQuery = CrateRepositoryQuery.buildFromAnnotation(repositoryMethod, mock(CrateOperations.class));
+        AnnotatedCrateRepositoryQuery repositoryQuery = new AnnotatedCrateRepositoryQuery(repositoryMethod, mock(CrateOperations.class));
         assertThat(repositoryQuery, is(instanceOf(CrateRepositoryQuery.class)));
-        assertThat(((CrateRepositoryQuery) repositoryQuery).getSource(), is("select * from sys.nodes"));
+        repositoryQuery.execute(new Object[]{});
+        assertThat(repositoryQuery.getSource(), is("select * from sys.nodes"));
     }
 
-    interface AnnotatedQueryRepository {
+    interface AnnotatedCrateRepository {
 
         @Query("select * from sys.nodes")
         List<SampleEntity> selectFromNodes();
@@ -39,7 +40,7 @@ public class CrateRepositoryQueryTest {
         RepositoryMetadata repositoryMetadata = Mockito.mock(RepositoryMetadata.class);
         when(repositoryMetadata.getDomainType()).thenReturn((Class) entityClass);
 
-        Method testMethod = AnnotatedQueryRepository.class.getMethod(methodName);
+        Method testMethod = AnnotatedCrateRepository.class.getMethod(methodName);
         when(repositoryMetadata.getReturnedDomainClass(testMethod)).thenReturn((Class) entityClass);
 
         return new CrateQueryMethod(testMethod, repositoryMetadata, mock(ProjectionFactory.class));
