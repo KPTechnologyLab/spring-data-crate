@@ -21,12 +21,16 @@
 
 package org.springframework.data.crate.query;
 
+import com.google.common.base.Preconditions;
+import org.springframework.data.crate.annotations.Query;
 import org.springframework.data.crate.core.CrateOperations;
 
 public class AnnotatedCrateRepositoryQuery extends CrateRepositoryQuery {
 
     public AnnotatedCrateRepositoryQuery(CrateQueryMethod queryMethod, CrateOperations crateOperations) {
         super(queryMethod, crateOperations);
+        Preconditions.checkArgument(queryMethod.isAnnotated(),
+                "Cannot create annotated query if an annotation doesn't contain a query.");
     }
 
     @Override
@@ -34,6 +38,6 @@ public class AnnotatedCrateRepositoryQuery extends CrateRepositoryQuery {
         if (queryMethod.getAnnotatedQuery().isPresent()) {
             return queryMethod.getAnnotatedQuery().get();
         }
-        throw new IllegalArgumentException("cannot create annotated query if an annotation doesn't contain a query");
+        throw new IllegalArgumentException("Cannot create annotated query if an annotation doesn't contain a query.");
     }
 }

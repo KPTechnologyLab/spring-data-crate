@@ -19,4 +19,5 @@ Import-Template:
  org.springframework.*;version="${spring:[=.=.=.=,+1.0.0)}",
  org.springframework.data.*;version="${spring-data-commons.version:[=.=.=.=,+1.0.0)}",
  org.w3c.*;version="0.0.0",
- com.google.common.*;version="${guava.version:[=.=.=,+18.0)}"
+ com.google.common.*;version="${guava.version:[=.=.=,+18.0)}",
+ org.apache.http.*;version="${apache.httpcomponents.version:[=.=.=.=,+1.0.0)}"

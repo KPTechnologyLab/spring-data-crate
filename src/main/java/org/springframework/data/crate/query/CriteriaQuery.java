@@ -35,7 +35,7 @@ class CriteriaQuery extends PartialQuery {
 
     private Criteria criteria;
 
-    private CriteriaQuery() {
+    CriteriaQuery() {
     }
 
     CriteriaQuery(Criteria criteria) {
@@ -100,8 +100,9 @@ class CriteriaQuery extends PartialQuery {
 
     private String createCriteriaFragment(Criteria criteriaChain) {
         StringBuilder builder = new StringBuilder();
-        if (criteriaChain.getQueryCriteriaEntries().isEmpty())
+        if (criteriaChain.getQueryCriteriaEntries().isEmpty()) {
             return null;
+        }
 
         Iterator<Criteria.CriteriaEntry> it = criteriaChain.getQueryCriteriaEntries().iterator();
         boolean singeEntryCriteria = (criteriaChain.getQueryCriteriaEntries().size() == 1);

@@ -44,4 +44,8 @@ public class CrateQueryMethod extends QueryMethod {
         String value = String.valueOf(AnnotationUtils.getValue(query, "value"));
         return StringUtils.hasText(value) ? Optional.of(value) : Optional.<String>absent();
     }
+
+    public boolean isAnnotated() {
+        return AnnotationUtils.getValue(query, "value") != null;
+    }
 }

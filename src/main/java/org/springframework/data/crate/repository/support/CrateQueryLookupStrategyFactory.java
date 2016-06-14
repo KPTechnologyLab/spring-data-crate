@@ -32,6 +32,7 @@ import org.springframework.data.repository.query.EvaluationContextProvider;
 import org.springframework.data.repository.query.QueryLookupStrategy;
 import org.springframework.data.repository.query.RepositoryQuery;
 
+import javax.naming.OperationNotSupportedException;
 import java.lang.reflect.Method;
 import java.util.Locale;
 
@@ -97,10 +98,10 @@ public final class CrateQueryLookupStrategyFactory {
                                             ProjectionFactory projectionFactory,
                                             NamedQueries namedQueries) {
             try {
-                return (new CreateQueryLookupStrategy(operations, context))
-                        .resolveQuery(method, repositoryMetadata, projectionFactory, namedQueries);
-            } catch (Exception e) {
                 return (new DeclaredQueryLookupStrategy(operations, context))
+                        .resolveQuery(method, repositoryMetadata, projectionFactory, namedQueries);
+            } catch (IllegalArgumentException e) {
+                return (new CreateQueryLookupStrategy(operations, context))
                         .resolveQuery(method, repositoryMetadata, projectionFactory, namedQueries);
             }
         }
@@ -110,7 +111,7 @@ public final class CrateQueryLookupStrategyFactory {
                                              QueryLookupStrategy.Key key,
                                              EvaluationContextProvider context) {
         if (key == null) {
-            return new CreateQueryLookupStrategy(operations, context);
+            return new CreateIfNotFoundQueryLookupStrategy(operations, context);
         }
 
         switch (key) {

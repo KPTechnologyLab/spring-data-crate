@@ -1,22 +1,17 @@
 /*
- * Licensed to CRATE Technology GmbH ("Crate") under one or more contributor
- * license agreements.  See the NOTICE file distributed with this work for
- * additional information regarding copyright ownership.  Crate licenses
- * this file to you under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.  You may
- * obtain a copy of the License at
+ * Copyright 2014 the original author or authors.
  *
- *     http://www.apache.org/licenses/LICENSE-2.0
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *      http://www.apache.org/licenses/LICENSE-2.0
  *
  * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS, WITHOUT
- * WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.  See the
- * License for the specific language governing permissions and limitations
- * under the License.
- *
- * However, if you have executed another commercial license agreement
- * with Crate these terms will supersede the license and you may use the
- * software solely pursuant to the terms of the relevant commercial agreement.
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
  */
 
 package org.springframework.data.crate.repository.support;
@@ -35,7 +30,7 @@ import org.springframework.data.crate.core.mapping.schema.CratePersistentEntityS
 import org.springframework.data.crate.repository.config.EnableCrateRepositories;
 import org.springframework.data.repository.query.QueryLookupStrategy;
 import org.springframework.data.sample.entities.person.Person;
-import org.springframework.data.sample.repositories.annotated.PersonRepository;
+import org.springframework.data.sample.repositories.custom.CustomPersonCrateRepository;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 
@@ -43,22 +38,24 @@ import java.util.List;
 import java.util.Locale;
 
 import static java.util.Arrays.asList;
-import static org.hamcrest.Matchers.is;
+import static org.hamcrest.core.Is.is;
 import static org.junit.Assert.assertThat;
 import static org.springframework.data.crate.core.mapping.schema.SchemaExportOption.CREATE_DROP;
 
 @RunWith(SpringJUnit4ClassRunner.class)
-@ContextConfiguration(classes = {UseDeclaredQueryLookupStrategyIntegrationTest.TestConfig.class})
-public class UseDeclaredQueryLookupStrategyIntegrationTest extends CrateIntegrationTest {
+@ContextConfiguration(classes = {CreateIfNotFoundLookupStrategyIntegrationTest.TestConfig.class})
+public class CreateIfNotFoundLookupStrategyIntegrationTest extends CrateIntegrationTest {
 
     @Autowired
-    PersonRepository repository;
+    private CustomPersonCrateRepository repository;
 
     @Before
     public void setup() throws InterruptedException {
         ensureGreen();
-        List<Person> persons = asList(new Person("person1@test.com", "person1", 34),
-                new Person("person2@test.com", "person2", 33));
+        List<Person> persons = asList(
+                new Person("person11@test.com", "person1", 25),
+                new Person("person12@test.com", "person2", 27)
+        );
         repository.save(persons);
         repository.refreshTable();
     }
@@ -69,22 +66,16 @@ public class UseDeclaredQueryLookupStrategyIntegrationTest extends CrateIntegrat
     }
 
     @Test
-    public void testSimpleAnnotation() {
-        List<Person> persons = repository.getAll();
-        assertThat(persons.size(), is(2));
-        assertThat(persons.get(0).getName(), is("person1"));
-    }
-
-    @Test
-    public void testParametrizedAnnotation() {
-        List<Person> persons = repository.findByName("person2");
+    public void testFailOnUsingDeclaredQueryAndUseCreateLookupStrategy() {
+        List<Person> persons = repository.findByName("person1");
         assertThat(persons.size(), is(1));
-        assertThat(persons.get(0).getEmail(), is("person2@test.com"));
+        assertThat(persons.get(0).getEmail(), is("person11@test.com"));
     }
 
     @Configuration
-    @EnableCrateRepositories(basePackages = "org.springframework.data.sample.repositories.annotated",
-            queryLookupStrategy = QueryLookupStrategy.Key.USE_DECLARED_QUERY)
+    @EnableCrateRepositories(
+            basePackages = "org.springframework.data.sample.repositories.custom",
+            queryLookupStrategy = QueryLookupStrategy.Key.CREATE_IF_NOT_FOUND)
     static class TestConfig extends TestCrateConfiguration {
 
         @Bean

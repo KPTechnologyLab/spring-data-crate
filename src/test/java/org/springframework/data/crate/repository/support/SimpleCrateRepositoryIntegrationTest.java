@@ -27,6 +27,7 @@ import org.springframework.context.annotation.Configuration;
 import org.springframework.data.crate.CrateIntegrationTest;
 import org.springframework.data.crate.config.TestCrateConfiguration;
 import org.springframework.data.crate.core.CrateOperations;
+import org.springframework.data.crate.core.mapping.schema.CratePersistentEntitySchemaManager;
 import org.springframework.data.crate.repository.CrateRepository;
 import org.springframework.data.crate.repository.config.EnableCrateRepositories;
 import org.springframework.data.sample.entities.person.Person;
@@ -40,6 +41,7 @@ import static java.util.Arrays.asList;
 import static org.hamcrest.Matchers.*;
 import static org.junit.Assert.assertThat;
 import static org.junit.Assert.assertTrue;
+import static org.springframework.data.crate.core.mapping.schema.SchemaExportOption.CREATE_DROP;
 
 /**
  * @author Rizwan Idress
@@ -162,6 +164,11 @@ public class SimpleCrateRepositoryIntegrationTest extends CrateIntegrationTest {
         @Bean
         public CrateClient crateClient() {
             return new CrateClient(String.format(Locale.ENGLISH, "%s:%d", server.crateHost(), server.transportPort()));
+        }
+
+        @Bean
+        public CratePersistentEntitySchemaManager cratePersistentEntitySchemaManager() throws Exception {
+            return new CratePersistentEntitySchemaManager(crateTemplate(), CREATE_DROP);
         }
 
         @Override

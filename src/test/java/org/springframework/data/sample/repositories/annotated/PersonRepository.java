@@ -19,7 +19,7 @@
  * software solely pursuant to the terms of the relevant commercial agreement.
  */
 
-package org.springframework.data.sample.repositories;
+package org.springframework.data.sample.repositories.annotated;
 
 import org.springframework.data.crate.annotations.Query;
 import org.springframework.data.crate.repository.CrateRepository;

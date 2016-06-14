@@ -79,8 +79,8 @@ queries from method names.
 
 ##### Query Lookup Strategies
 
-The Spring Data Crate can resolve a query using following
-query lookup strategies:
+The Spring Data Crate can resolve queries using following query lookup
+strategies:
 
 * `CREATE` constructs a query from the query method name of a
   repository.

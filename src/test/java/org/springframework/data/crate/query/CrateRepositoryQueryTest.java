@@ -1,6 +1,8 @@
 package org.springframework.data.crate.query;
 
+import org.junit.Rule;
 import org.junit.Test;
+import org.junit.rules.ExpectedException;
 import org.mockito.Mockito;
 import org.springframework.data.crate.annotations.Query;
 import org.springframework.data.crate.core.CrateOperations;
@@ -21,8 +23,11 @@ import static org.mockito.Mockito.when;
 
 public class CrateRepositoryQueryTest {
 
+    @Rule
+    public ExpectedException exception = ExpectedException.none();
+
     @Test
-    public void testGetAnnotatedQuery() throws Exception {
+    public void testGetAnnotatedQuery() throws NoSuchMethodException {
         CrateQueryMethod repositoryMethod = prepareQueryMethod("selectFromNodes", SampleEntity.class);
         AnnotatedCrateRepositoryQuery repositoryQuery = new AnnotatedCrateRepositoryQuery(repositoryMethod, mock(CrateOperations.class));
         assertThat(repositoryQuery, is(instanceOf(CrateRepositoryQuery.class)));
@@ -30,13 +35,23 @@ public class CrateRepositoryQueryTest {
         assertThat(repositoryQuery.getSource(), is("select * from sys.nodes"));
     }
 
+    @Test
+    public void testNoQueryAnnotation() throws Exception {
+        exception.expect(IllegalArgumentException.class);
+        exception.expectMessage("Cannot create annotated query if an annotation doesn't contain a query.");
+        CrateQueryMethod repositoryMethod = prepareQueryMethod("findAll", SampleEntity.class);
+        new AnnotatedCrateRepositoryQuery(repositoryMethod, mock(CrateOperations.class));
+    }
+
     interface AnnotatedCrateRepository {
 
         @Query("select * from sys.nodes")
         List<SampleEntity> selectFromNodes();
+
+        List<SampleEntity> findAll();
     }
 
-    private CrateQueryMethod prepareQueryMethod(String methodName, Class<?> entityClass) throws Exception {
+    private CrateQueryMethod prepareQueryMethod(String methodName, Class<?> entityClass) throws NoSuchMethodException {
         RepositoryMetadata repositoryMetadata = Mockito.mock(RepositoryMetadata.class);
         when(repositoryMetadata.getDomainType()).thenReturn((Class) entityClass);
 
