@@ -79,6 +79,50 @@ queries from method names.
 
 ##### Query Lookup Strategies
 
+The Spring Data Crate can resolve a query using following
+query lookup strategies:
+
+* `CREATE` constructs a query from the query method name of a
+  repository.
+* `USE_DECLARED_QUERY` looks up for a declared query and will throw an
+  exception in case it is not found.
+* `CREATE_IF_NOT_FOUND` checks first for declared query, if it is not
+  found, it uses the `CREATE` strategy to create a query from a method
+  name.
+
+The strategy can be configured at namespace via XML by setting the
+query lookup strategy attribute or through the `queryLookupStrategy`
+attribute of the `@EnableCrateRepositories` annotation when using Java
+configurations.
+
+###### Query creation
+
+When using the `CREATE` query lookup strategy the Spring Data Crate
+repository infrastructure constructs a query from a method name. It
+strips `find..By`, `read..By`, `query..By`, and `get..` prefixes from
+the method name. Then, the query is build by parsing the rest of the
+method name and the entity metadata.
+
+Expressions in a method name can be combined with `AND` and `OR`.
+
+The query creation mechanism also supports following operators:
+`[is]greaterThan`, `[is]greaterThanEqual`, `[is]lessThan`,
+`[is]lessThanEqual`, `[is]Equals`, `Like`, `[is]Start[s|ing]With`,
+`End[s|ing]With`, `[is]Null`, `[is]True`, and `[is]False`.
+
+```java
+public interface UserRepository extends CrateRepository<User, String> {
+
+    List<User> findByNameAndAge(String name, Integer age);
+    
+    List<User> findByNameOrAge(String name, Integer age);
+    
+    User getByEmail(String email);
+    
+    List<User> findByAgeGreaterThanEqual(Integer age);
+}
+```
+
 ###### Declared Queries
 
 It's also possible to use the `@Query` annotation to define queries:
