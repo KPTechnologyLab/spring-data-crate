@@ -23,4 +23,6 @@ package org.springframework.data.crate.config;
 public abstract class BeanNames {
 	
 	public static final String SCHEMA_EXPORT_MANAGER = "cratePersistentEntitySchemaManager";
+
+	private BeanNames() {}
 }

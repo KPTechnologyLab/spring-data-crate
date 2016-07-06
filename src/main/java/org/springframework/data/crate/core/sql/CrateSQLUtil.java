@@ -20,6 +20,8 @@ public class CrateSQLUtil {
 	private static final Pattern PATTERN = compile("\\['([^\\]]*)'\\]");
     private static final Pattern CRATE_SQL_PATTERN = compile("(.+?)(?:\\['([^\\]])*'\\])+");
 
+	private CrateSQLUtil() {}
+
 	public static String doubleQuote(String toQuote) {
 		
 		if(hasText(toQuote)) {
